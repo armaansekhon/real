@@ -1,15 +1,15 @@
-import { Drawer } from 'expo-router/drawer';
-import React from 'react'
+import { Drawer } from "expo-router/drawer";
+import React from "react";
 
-const _layout = () => {
+const DrawerLayout = () => {
   return (
-   <Drawer>
-     <Drawer.Screen
+    <Drawer>
+      <Drawer.Screen
         name="(tabs)"
-        options={{ drawerLabel: 'Main Tabs', title: 'App' }}
+        options={{ drawerLabel: "Main Tabs", title: "App" }}
       />
-   </Drawer>
-  )
-}
+    </Drawer>
+  );
+};
 
-export default _layout
+export default DrawerLayout;

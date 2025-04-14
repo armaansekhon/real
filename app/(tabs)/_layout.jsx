@@ -3,7 +3,7 @@ import React from 'react'
 import { Tabs } from 'expo-router'
 import CustomTabBar from '../../components/CustomTabBar'
 
-const _layout = () => {
+const TabLayout = () => {
   return (
     <View >
         <Tabs
@@ -21,7 +21,7 @@ const _layout = () => {
   )
 }
 
-export default _layout
+export default TabLayout
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "white" },
