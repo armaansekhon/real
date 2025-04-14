@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "hooks/useThemeColor.js", "hooks/useColorScheme.web.js", "hooks/useColorScheme.js", "constants/Colors.js", "app/_layout.jsx", "app/(tabs)/_layout.jsx"  ]
 }
