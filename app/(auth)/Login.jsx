@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     
    flexGrow:1,
-   paddingBottom:"0"
+   paddingBottom:"80"
  
    
   },
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderColor: '#e0e0e0',
-     marginTop:"180",
+     marginTop:"160",
   },
   title: {
     fontFamily: 'PlusSB',
