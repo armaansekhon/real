@@ -120,17 +120,6 @@ const styles = StyleSheet.create({
    alignItems:"center",
    justifyContent:"center",
    borderRadius:"20%",
-  //  borderWidth: 1, 
-    // borderColor: "#d3d3d3", 
-   
-  //  shadowColor: "#000",
-  //   shadowOffset: { width: 0, height: 2 },
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 3.84,
-  
-  //   elevation: 2,
-
-   
 
 
 
@@ -163,8 +152,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   userIconContainer: {
-    position: 'absolute',
-    top: -45,
+    // position: 'absolute',
+    top: -10,
     backgroundColor: 'transparent',
     borderRadius: 30,
     padding: 0,
@@ -172,7 +161,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
-    elevation: 5,
+    // elevation: 5,
   },
   inputField: {
     width: '100%',
@@ -180,7 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     borderRadius: 8,
     borderColor:"#d3d3d3",
-    borderWidth:"0.5",
+    borderWidth:0.5,
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 15,
@@ -194,7 +183,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderColor:"#d3d3d3",
-    borderWidth:"0.5",
+    borderWidth:0.5,
     paddingHorizontal: 15,
     marginBottom: 10,
   },

@@ -11,6 +11,7 @@ import { Link, Stack } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
+import { Platform } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
@@ -47,6 +48,14 @@ const Onboard = () => {
             Let's <Text style={styles.greenText}>Work</Text>
           </Text>
 
+
+  
+      <View styles={styles.bottomView}>
+      <Text style={styles.bottomText3}>
+Click here to proceed for Login
+          </Text>
+
+     
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
@@ -60,6 +69,8 @@ const Onboard = () => {
               color="black"
             />
           </TouchableOpacity>
+
+          </View>
         </View>
       </ImageBackground>
     </>
@@ -96,7 +107,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#fff",
     letterSpacing: 2.4,
-    marginTop: "-120",
+    marginTop: -120,
     fontFamily: "PlusB",
   },
   description: {
@@ -110,10 +121,13 @@ const styles = StyleSheet.create({
     marginLeft: 9,
   },
   bottomContainer: {
+    position: "relative",
     backgroundColor: "#fff",
     height: height * 0.3,
     justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 30,
+    marginBottom: 10,
+    alignItems: "flex-start", // this aligns all to left only
     width: "100%",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
@@ -122,24 +136,37 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: Colors.black,
     fontFamily: "PlusSB",
-    top: -40,
-    left: -72,
+    marginBottom: 6,
+
   },
   bottomText2: {
-    fontSize: 23,
+    fontSize: 22,
     color: "Colors.black",
     fontFamily: "PlusR",
-    top: -50,
-    left: -90,
+    marginBottom: 4,
+    
+  },
+  bottomText3: {
+    fontSize: 13,
+    color: "Colors.black",
+    fontFamily: "PlusR",
+    bottom: -30,
+    // marginTop: 16,
+
   },
   greenText: {
     color: "green",
   },
   button: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: -40,
-    right: -120,
-    top: -12,
+    //  position: "static",
+    alignSelf: "flex-end",
+    
   },
+bottomView: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingHorizontal: 20,
+  marginTop: 20,
+},
 });
