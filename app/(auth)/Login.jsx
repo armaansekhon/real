@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import {
   StyleSheet, Text, View, TextInput, TouchableOpacity,
   ScrollView, KeyboardAvoidingView, Platform, Keyboard,
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     
    flexGrow:1,
-   paddingBottom:"280"
+   paddingBottom: Platform.OS === 'ios' ? 280 : 180, // Platform-specific padding
  
    
   },
