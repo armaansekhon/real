@@ -33,9 +33,9 @@ import { Dimensions } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from 'expo-router'
 const { height } = Dimensions.get("window");
-type Props = {};
 
-const Onboard = (props) => {
+
+const Onboard = () => {
 
   const Router=useRouter();
   return (
