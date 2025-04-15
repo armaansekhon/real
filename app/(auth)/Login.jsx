@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     
    flexGrow:1,
-   paddingBottom: Platform.OS === 'ios' ? 280 : 180, // Platform-specific padding
+   paddingBottom: Platform.OS === 'ios' ? 280 : 80, // Platform-specific padding
  
    
   },
