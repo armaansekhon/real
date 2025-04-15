@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   
   rowContainer: {
     flexDirection: 'row',
-    gap: 30,
+    gap: Platform.OS === 'ios' ? 50 : 30,
     justifyContent: 'space-between',
     alignItems: 'center',
     left: -16
