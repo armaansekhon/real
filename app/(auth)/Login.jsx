@@ -15,85 +15,96 @@ const Login = () => {
   const Router = useRouter();
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     
-     
+    <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+    
+    >
+      
+      
       <SafeAreaView style={styles.container}>
-        <View style={styles.innerContainer}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContainer}
-            keyboardShouldPersistTaps="handled"
-            bo
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.Iconcontainer}>
-              <Ionicons
-                onPress={() => Router.back()}
-                style={styles.backIcon}
-                name="chevron-back-sharp"
-                size={22}
-                color="black"
-              />
-            </View>
-  
-            <Text style={styles.title}>Welcome Back!</Text>
-            <Text style={styles.subtitle}>
-              Glad to see you, <Text style={styles.textGreen}>again!</Text>
-            </Text>
-  
-            <View style={styles.userIconContainer}>
-              <Userlogo height={80} width={80} />
-            </View>
-  
-            <View style={styles.centeredContainer}>
-              <TextInput
-                style={styles.inputField}
-                placeholder="Enter the Email"
-                placeholderTextColor="#444444"
-                keyboardType="email-address"
-              />
-  
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={styles.passwordField}
-                  placeholder="Enter the Password"
-                  placeholderTextColor="#444444"
-                  secureTextEntry={!passwordVisible}
-                />
-                <TouchableOpacity
-                  onPress={() => setPasswordVisible(!passwordVisible)}
-                  style={styles.eyeIcon}
-                >
-                  <Ionicons
-                    name={passwordVisible ? 'eye-off-outline' : 'eye-outline'}
-                    size={20}
-                    color="#a9a9a9"
-                  />
-                </TouchableOpacity>
-              </View>
-  
-              <TouchableOpacity>
-                <Text style={styles.forgetPassword}>Forgot Password?</Text>
-              </TouchableOpacity>
-  
-              <TouchableOpacity style={styles.loginButton}>
-                <Text style={styles.loginButtonText}>Login</Text>
-              </TouchableOpacity>
-
-              <View style={styles.fixedBottom}>
-            <Text style={styles.bottomText}>
-              Don't have an account?{' '}
-              <Text style={styles.contactAdmin}>Contact Admin</Text>
-            </Text>
-          </View>
-            </View>
-           
-          </ScrollView>
-  
-          {/* This stays fixed at the bottom */}
-         
+    <View style={styles.innerContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+        bo
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.Iconcontainer}>
+          <Ionicons
+            onPress={() => Router.back()}
+            style={styles.backIcon}
+            name="chevron-back-sharp"
+            size={22}
+            color="black"
+          />
         </View>
-      </SafeAreaView>
-   
+
+        <Text style={styles.title}>Welcome Back!</Text>
+        <Text style={styles.subtitle}>
+          Glad to see you, <Text style={styles.textGreen}>again!</Text>
+        </Text>
+
+        <View style={styles.userIconContainer}>
+          <Userlogo height={80} width={80} />
+        </View>
+
+        <View style={styles.centeredContainer}>
+          <TextInput
+            style={styles.inputField}
+            placeholder="Enter the Email"
+            placeholderTextColor="#444444"
+            keyboardType="email-address"
+          />
+
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordField}
+              placeholder="Enter the Password"
+              placeholderTextColor="#444444"
+              secureTextEntry={!passwordVisible}
+            />
+            <TouchableOpacity
+              onPress={() => setPasswordVisible(!passwordVisible)}
+              style={styles.eyeIcon}
+            >
+              <Ionicons
+                name={passwordVisible ? 'eye-off-outline' : 'eye-outline'}
+                size={20}
+                color="#a9a9a9"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity>
+            <Text style={styles.forgetPassword}>Forgot Password?</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.loginButton}>
+            <Text style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
+
+          <View style={styles.fixedBottom}>
+        <Text style={styles.bottomText}>
+          Don't have an account?{' '}
+          <Text style={styles.contactAdmin}>Contact Admin</Text>
+        </Text>
+      </View>
+        </View>
+       
+      </ScrollView>
+
+      {/* This stays fixed at the bottom */}
+     
+    </View>
+  </SafeAreaView>
+</KeyboardAvoidingView>
+</TouchableWithoutFeedback>
+     
+      
   );
   
 };
@@ -110,7 +121,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     
    flexGrow:1,
-   paddingBottom: Platform.OS === 'ios' ? 280 : 80, // Platform-specific padding
+   paddingBottom: Platform.OS === 'ios' ? 280 : 10, // Platform-specific padding
  
    
   },
