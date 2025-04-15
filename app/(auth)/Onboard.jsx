@@ -50,27 +50,27 @@ const Onboard = () => {
 
 
   
-      <View styles={styles.bottomView}>
-      <Text style={styles.bottomText3}>
-Click here to proceed for Login
-          </Text>
+          <View style={styles.bottomView}>
+  <View style={styles.rowContainer}>
+    <Text style={styles.bottomText3}>
+      Click here to proceed for Login
+    </Text>
 
-     
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              console.log("Navigating to Login");
-              Router.push("/(auth)/Login");
-            }}
-          >
-            <Ionicons
-              name="chevron-forward-circle-sharp"
-              size={60}
-              color="black"
-            />
-          </TouchableOpacity>
-
-          </View>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={() => {
+        console.log("Navigating to Login");
+        Router.push("/(auth)/Login");
+      }}
+    >
+      <Ionicons
+        name="chevron-forward-circle-sharp"
+        size={60}
+        color="black"
+      />
+    </TouchableOpacity>
+  </View>
+</View>
         </View>
       </ImageBackground>
     </>
@@ -158,15 +158,37 @@ const styles = StyleSheet.create({
     color: "green",
   },
   button: {
+    right: 1,
     //  position: "static",
-    alignSelf: "flex-end",
+    // alignSelf: "flex-end",
     
   },
-bottomView: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  paddingHorizontal: 20,
-  marginTop: 20,
-},
+
+
+
+
+
+  bottomView: {
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  
+  rowContainer: {
+    flexDirection: 'row',
+    gap: 30,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    left: -16
+  },
+  
+  bottomText3: {
+    fontSize: 14,
+    color: 'black',
+    fontFamily: 'PlusR',
+  
+  },
+  
+  button: {
+    // Optional: add margin or padding if needed
+  },
 });
