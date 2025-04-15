@@ -1,22 +1,3 @@
-// import { SafeAreaView, Text, Touchable, TouchableOpacity } from 'react-native'
-// import React from 'react'
-// import { useRouter } from 'expo-router'
-
-// const Onboard = () => {
-//   const Router=useRouter();
-//   return (
-//     <SafeAreaView>
-//       <Text>Onboard</Text>
-//       <TouchableOpacity onPress={()=>{Router.push({
-//         pathname:"/Login"
-//       })}}><Text>click</Text></TouchableOpacity>
-
-//     </SafeAreaView>
-//   )
-// }
-
-// export default Onboard
-
 import {
   ImageBackground,
   StyleSheet,
@@ -31,13 +12,13 @@ import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from 'expo-router'
+import { useRouter } from "expo-router";
+
 const { height } = Dimensions.get("window");
-type Props = {};
 
-const Onboard = (props) => {
+const Onboard = () => {
+  const Router = useRouter();
 
-  const Router=useRouter();
   return (
     <>
       <ImageBackground
@@ -56,8 +37,6 @@ const Onboard = (props) => {
           <View style={styles.wrapper}>
             <Text style={styles.title}>Get Started</Text>
             <Text style={styles.description}>Discover Your Dream</Text>
-
-        
           </View>
         </SafeAreaView>
 
@@ -65,15 +44,22 @@ const Onboard = (props) => {
         <View style={styles.bottomContainer}>
           <Text style={styles.bottomText}>Welcome!</Text>
           <Text style={styles.bottomText2}>
-  Let's  <Text style={styles.greenText}>Work</Text>
-</Text>
+            Let's <Text style={styles.greenText}>Work</Text>
+          </Text>
 
-<TouchableOpacity
-  style={styles.button}
-  onPress={() => Router.push("/Login")}
->
-  <Ionicons name="chevron-forward-circle-sharp" size={60} color="black" />
-</TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              console.log("Navigating to Login");
+              Router.push("/(auth)/Login");
+            }}
+          >
+            <Ionicons
+              name="chevron-forward-circle-sharp"
+              size={60}
+              color="black"
+            />
+          </TouchableOpacity>
         </View>
       </ImageBackground>
     </>
@@ -123,41 +109,37 @@ const styles = StyleSheet.create({
     marginTop: -16,
     marginLeft: 9,
   },
-
-
   bottomContainer: {
     backgroundColor: "#fff",
-    height: height * 0.30, 
+    height: height * 0.3,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
-  
   },
   bottomText: {
     fontSize: 32,
     color: Colors.black,
     fontFamily: "PlusSB",
     top: -40,
-    left: -72
+    left: -72,
   },
   bottomText2: {
     fontSize: 23,
     color: "Colors.black",
     fontFamily: "PlusR",
     top: -50,
-    left: -90
+    left: -90,
   },
   greenText: {
     color: "green",
   },
-
   button: {
-    alignItems: "center", 
+    alignItems: "center",
     justifyContent: "center",
-    marginBottom: -40, 
+    marginBottom: -40,
     right: -120,
-    top: -12
+    top: -12,
   },
 });

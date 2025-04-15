@@ -6,6 +6,7 @@ import {useFonts} from "expo-font"
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 
+
 const index = () => {
     const [fontsLoaded]=useFonts({
         "PlusEL":require("../assets/fonts/PlusJakartaSans-ExtraLight.ttf"),
