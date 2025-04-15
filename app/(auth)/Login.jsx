@@ -77,13 +77,15 @@ const Login = () => {
               <TouchableOpacity style={styles.loginButton}>
                 <Text style={styles.loginButtonText}>Login</Text>
               </TouchableOpacity>
-            </View>
-            <View style={styles.fixedBottom}>
+
+              <View style={styles.fixedBottom}>
             <Text style={styles.bottomText}>
               Don't have an account?{' '}
               <Text style={styles.contactAdmin}>Contact Admin</Text>
             </Text>
           </View>
+            </View>
+           
           </ScrollView>
   
           {/* This stays fixed at the bottom */}
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     
    flexGrow:1,
-   paddingBottom:"80"
+   paddingBottom:"280"
  
    
   },
@@ -115,10 +117,13 @@ const styles = StyleSheet.create({
   fixedBottom: {
     alignItems: 'center',
     paddingVertical: 15,
-    backgroundColor: '#ffffff',
-    borderTopWidth: 1,
+    backgroundColor: 'transparent',
+    
+    marginTop:"5",
+    
+  
     borderColor: '#e0e0e0',
-     marginTop:"160",
+    
   },
   title: {
     fontFamily: 'PlusSB',
@@ -132,7 +137,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: 'black',
      // Center the text
-     marginBottom: 40,
+     marginBottom: 50,
   },
   textGreen: {
     fontFamily: 'PlusSB',
