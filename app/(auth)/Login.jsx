@@ -15,7 +15,7 @@ const Styles=StyleSheet.create({
   text:{
     fontFamily:"PlusEL",
     margin:"auto",
-    fontSize:"50",
+//  
 
   },
 

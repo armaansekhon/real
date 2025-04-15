@@ -18,10 +18,8 @@ const index = () => {
       return <AppLoading />; }
 
   return (
-    <Redirect href="/Login" />
-  //   <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //   <Text style={{ fontFamily: 'PlusEL', fontSize: 20 }}>Font Loaded Successfully!</Text>
-  // </SafeAreaView>
+    <Redirect href="/Onboard" />
+
    
   )
 }
