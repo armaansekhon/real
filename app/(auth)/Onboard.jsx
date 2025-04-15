@@ -127,10 +127,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 30,
     marginBottom: 10,
-    alignItems: "flex-start", // this aligns all to left only
+    alignItems: "flex-start", 
     width: "100%",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
+    minHeight: 150,
+    
   },
   bottomText: {
     fontSize: 32,
@@ -146,14 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     
   },
-  bottomText3: {
-    fontSize: 13,
-    color: "Colors.black",
-    fontFamily: "PlusR",
-    bottom: -30,
-    // marginTop: 16,
 
-  },
   greenText: {
     color: "green",
   },
