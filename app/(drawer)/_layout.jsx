@@ -1,18 +1,26 @@
-import { Drawer } from "expo-router/drawer";
 import React from "react";
-import { Slot } from "expo-router";
+import { Drawer } from "expo-router/drawer";
+import CustomDrawer from "../../components/CustomDrawer";
+import { modules } from "../../constants/modules";
 
 const DrawerLayout = () => {
   return (
-    <Drawer>
-    
-    <Drawer.Screen name="Geolocation" options={{ title: "Geolocation" }} />
-     
-    <Drawer.Screen name="MarkAttendence" options={{ title: "MarkAttendence" }} />
-      <Drawer.Screen
-        name="(tabs)"
-        options={{ drawerLabel: "Main Tabs", title: "App",  }}
-      />
+    <Drawer
+      drawerContent={(props) => <CustomDrawer {...props} />}
+      screenOptions={{
+        headerShown: false,
+        headerStyle: { backgroundColor: "#5aaf57" },
+        // headerTintColor: "#fff",
+        headerTitleStyle: { fontWeight: "bold" },
+      }}
+    >
+      {modules.map((module) => (
+        <Drawer.Screen
+          key={module.name}
+          name={module.name}
+          options={{ title: module.title }}
+        />
+      ))}
     </Drawer>
   );
 };
