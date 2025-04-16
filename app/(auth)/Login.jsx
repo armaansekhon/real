@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 
 const Login = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const Router = useRouter();
+  const router = useRouter();
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -35,7 +35,7 @@ const Login = () => {
       >
         <View style={styles.Iconcontainer}>
           <Ionicons
-            onPress={() => Router.back()}
+            onPress={() => router.back()}
             style={styles.backIcon}
             name="chevron-back-sharp"
             size={22}
@@ -83,9 +83,11 @@ const Login = () => {
             <Text style={styles.forgetPassword}>Forgot Password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>Login</Text>
-          </TouchableOpacity>
+          <TouchableOpacity  onPress={() => router.push("/(drawer)/(tabs)/Home" )}  style={styles.loginButton}>
+            <Text // Navigate to the drawer layout
+     style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity
+          >
 
           <View style={styles.fixedBottom}>
         <Text style={styles.bottomText}>
