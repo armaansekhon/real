@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { View, ActivityIndicator } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
+import { UserProvider } from '../context/UserContext';
 
 export  function AppEntry() {
   const [checkingAuth, setCheckingAuth] = useState(true);

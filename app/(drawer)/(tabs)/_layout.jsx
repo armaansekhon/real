@@ -4,8 +4,10 @@ import { Tabs } from 'expo-router'
 import CustomTabBar from "../../../components/CustomTabBar"
 
 
+
 const TabLayout = () => {
   return (
+
     <Tabs
       screenOptions={{
         gestureEnabled: true,
@@ -16,6 +18,7 @@ const TabLayout = () => {
       <Tabs.Screen name="Notification" options={{ title: "Notifications", headerShown: false }} />
       <Tabs.Screen name="Profile" options={{ title: "Profile", headerShown: false }} />
     </Tabs>
+
   );
 };
 

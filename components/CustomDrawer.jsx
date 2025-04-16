@@ -8,12 +8,14 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  SafeAreaView
+  SafeAreaView,
+ 
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { modules } from "../constants/modules";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { DrawerContentScrollView } from "@react-navigation/drawer";
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -84,15 +86,19 @@ const bot  =useSafeAreaInsets();
   };
 
   return (
-    <SafeAreaView style={styles.drawerContainer}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+     
+         <SafeAreaView style={styles.drawerContainer}>
+        {/* <DrawerContentScrollView> */}
+      <ScrollView contentContainerStyle={styles.scrollContainer}
+           showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Ionicons name="person-circle-outline" size={60} color="black" />
           <Text style={styles.username}>Welcome, Admin</Text>
         </View>
         {renderDrawerItems(modules)}
-       
-      </ScrollView>
+  
+      </ScrollView >
+      {/* </DrawerContentScrollView> */}
       <View>
              <TouchableOpacity    style={styles.loginButton}>
                         <Text 
@@ -100,7 +106,10 @@ const bot  =useSafeAreaInsets();
                       </TouchableOpacity>
                       
         </View>
+
     </SafeAreaView>
+    
+   
   );
 };
 
@@ -156,7 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf:"center",
-    bottom:60,
+    bottom: Platform.OS === "ios" ? 50 : 10,
   },
   loginButtonText: {
     color: '#fff',
