@@ -48,7 +48,7 @@ const CustomTabBar = ({ state, navigation }) => {
 const styles = {
   tabBar: {
     position: "absolute",
-    bottom: Platform.OS === "ios" ? 30 : 50, // Adjust for iOS and Android
+    bottom: Platform.OS === "ios" ? 30 : 15, // Adjust for iOS and Android
     flexDirection: "row",
     justifyContent: "center",
     height: 60,
