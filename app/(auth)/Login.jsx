@@ -3,16 +3,45 @@ import React, { useState } from 'react';
 import {
   StyleSheet, Text, View, TextInput, TouchableOpacity,
   ScrollView, KeyboardAvoidingView, Platform, Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback, Alert
 } from 'react-native';
+
+import * as SecureStore from 'expo-secure-store';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Userlogo from "../../assets/svg/loguser.svg";
 import { useRouter } from 'expo-router';
+import useLogin from '../../hooks/useLogin';
 
 const Login = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const { login, loading } = useLogin();
+
   const router = useRouter();
+
+  const handleLogin = async () => {
+    const result = await login(identifier, password);
+    if (result) {
+      router.push("/(drawer)/(tabs)/Home");
+    }
+  };
+
+
+  //   if (usercode === 'admin@example.com' && password === 'admin123') {
+  //     try {
+  //       await SecureStore.setItemAsync('userEmail', email);
+  //       await SecureStore.setItemAsync('userToken', 'dummy-token-123');
+
+  //       router.push("/(drawer)/(tabs)/Home");
+  //     } catch (e) {
+  //       Alert.alert("Secure store error", e.message);
+  //     }
+  //   } else {
+  //     Alert.alert("Invalid email or password.");
+  //   }
+  // };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -55,9 +84,12 @@ const Login = () => {
         <View style={styles.centeredContainer}>
           <TextInput
             style={styles.inputField}
-            placeholder="Enter the Email"
+            placeholder="Enter the Email or Usercode"
             placeholderTextColor="#444444"
             keyboardType="email-address"
+            autoCapitalize="none"
+            value={identifier}
+            onChangeText={setIdentifier}
           />
 
           <View style={styles.passwordContainer}>
@@ -66,6 +98,8 @@ const Login = () => {
               placeholder="Enter the Password"
               placeholderTextColor="#444444"
               secureTextEntry={!passwordVisible}
+              value={password}
+              onChangeText={setPassword}
             />
             <TouchableOpacity
               onPress={() => setPasswordVisible(!passwordVisible)}
@@ -83,11 +117,22 @@ const Login = () => {
             <Text style={styles.forgetPassword}>Forgot Password?</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity  onPress={() => router.push("/(drawer)/(tabs)/Home" )}  style={styles.loginButton}>
-            <Text // Navigate to the drawer layout
-     style={styles.loginButtonText}>Login</Text>
-          </TouchableOpacity
-          >
+          <TouchableOpacity
+  onPress={async () => {
+    const result = await login(identifier, password);
+    if (result.success) {
+      router.push("/(drawer)/(tabs)/Home");
+    }
+  }}
+  style={styles.loginButton}
+  disabled={loading}
+>
+  <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+</TouchableOpacity>
+
+          {/* <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
+                  <Text style={styles.loginButtonText}>Login</Text>
+                </TouchableOpacity> */}
 
           <View style={styles.fixedBottom}>
         <Text style={styles.bottomText}>
