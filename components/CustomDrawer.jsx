@@ -9,6 +9,7 @@ import {
   Platform,
   UIManager,
   SafeAreaView,
+ 
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { modules } from "../constants/modules";
@@ -18,6 +19,7 @@ import { ImageBackground } from "react-native";
 
 // Import Folder SVG
 import FolderIcon from "../assets/svg/Folder.svg";
+import { DrawerContentScrollView } from "@react-navigation/drawer";
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -124,10 +126,8 @@ const CustomDrawer = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={[styles.drawerContainer, { paddingTop: insets.top }]}>
+    <SafeAreaView style={styles.drawerContainer}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* ID Card Layout in Header */}
-        
         <View style={styles.header}>
           <Ionicons name="person-circle-outline" size={60} color="black" style={styles.headerIcon} />
           <View style={styles.headerTextContainer}>
@@ -140,13 +140,18 @@ const CustomDrawer = ({ navigation }) => {
         </View>
 
         {renderDrawerItems(modules)}
+       
       </ScrollView>
-      <View style={{borderTopWidth:1,paddingTop:10, borderColor:"#d3d3d3"}}>
-        <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>Log-Out</Text>
-        </TouchableOpacity>
-      </View>
+      <View>
+             <TouchableOpacity    style={styles.loginButton}>
+                        <Text 
+                 style={styles.loginButtonText}>Log-Out</Text>
+                      </TouchableOpacity>
+                      
+        </View>
     </SafeAreaView>
+    
+   
   );
 };
 
@@ -230,12 +235,10 @@ paddingLeft:20
     height: 35,
     // backgroundColor: "black",
     borderRadius: 8,
-    // borderWidth:1,
-    // borderColor:"#5aaf57",
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
-    marginBottom: Platform.OS === "ios" ? 50 : 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf:"center",
+    bottom:60,
   },
   loginButtonText: {
     color: "#000",
