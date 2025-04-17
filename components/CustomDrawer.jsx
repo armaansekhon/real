@@ -211,6 +211,12 @@ paddingLeft:20
     borderRadius: 8,
     marginBottom: 10,
     backgroundColor: "transparent",
+    shadowColor: '#5aaf57',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3.84,
+    elevation: 5,
+  
   },
   clickedDrawerItem: {
     backgroundColor: "rgba(90, 175, 87, 0.2)", // Transparent green background for clicked item
