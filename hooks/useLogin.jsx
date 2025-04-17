@@ -3,9 +3,11 @@ import { useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { API_BASE_URL } from '../services/api'; // adjust path as needed
 import { Alert } from 'react-native';
+import { useUser } from '../context/UserContext';
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
+  const { setUser, setUserType } = useUser(); 
 
   const login = async (usercode, password) => {
     setLoading(true);
@@ -23,9 +25,13 @@ const useLogin = () => {
   
       if (response.ok && data.secretKey) {
         await SecureStore.setItemAsync('auth_token', data.secretKey);
+        setUser(data.user);
+        setUserType(data.user.userCategoryCode);
+        
         await SecureStore.setItemAsync('userType', data.user.userCategoryCode);
 
         console.log('Token stored:', data.secretKey, "type:",data.user.userCategoryCode);
+
         return { success: true };
       } else {
         throw new Error(data.error || "Token not found in response");

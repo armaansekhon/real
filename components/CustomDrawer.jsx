@@ -9,6 +9,7 @@ import {
   Platform,
   UIManager,
   SafeAreaView,
+ 
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { modules } from "../constants/modules";
@@ -20,6 +21,7 @@ import Logout from "../assets/svg/logout.svg"
 
 // Import Folder SVG
 import FolderIcon from "../assets/svg/Folder.svg";
+import { DrawerContentScrollView } from "@react-navigation/drawer";
 
 // Enable LayoutAnimation on Android
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -126,10 +128,8 @@ const CustomDrawer = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={[styles.drawerContainer, { paddingTop: insets.top }]}>
+    <SafeAreaView style={styles.drawerContainer}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* ID Card Layout in Header */}
-        
         <View style={styles.header}>
         <LottieView
   source={require('../assets/svg/reales2.json')}
@@ -148,6 +148,7 @@ const CustomDrawer = ({ navigation }) => {
         </View>
 
         {renderDrawerItems(modules)}
+       
       </ScrollView>
       <View style={{borderTopWidth:0,paddingTop:10, borderColor:"#d3d3d3" ,backgroundColor:"#f0fff0"}}>
         <TouchableOpacity style={styles.loginButton}>
@@ -156,6 +157,8 @@ const CustomDrawer = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    
+   
   );
 };
 
@@ -247,12 +250,12 @@ marginBottom:30,
     height: 35,
     // backgroundColor: "#fff",
     borderRadius: 8,
-    borderWidth:0.5,
-    borderColor:"#777",
+    // borderWidth:1,
+    // borderColor:"#5aaf57",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    marginBottom: Platform.OS === "ios" ? 40 : 10,
+    marginBottom: Platform.OS === "ios" ? 50 : 10,
   },
   loginButtonText: {
     color: "#444",

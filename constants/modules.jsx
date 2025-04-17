@@ -55,4 +55,5 @@ export const modules = [
         // icon: "person-outline",
         icon: CRM,
       },
+    
   ];
