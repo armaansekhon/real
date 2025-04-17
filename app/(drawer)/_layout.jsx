@@ -1,15 +1,26 @@
 import React from "react";
 import { Drawer } from "expo-router/drawer";
+
 import CustomDrawer from "../../components/CustomDrawer";
 import { modules } from "../../constants/modules";
+import { DrawerActions } from "@react-navigation/native";
+import { DrawerContent } from "@react-navigation/drawer";
 
 const DrawerLayout = () => {
   return (
     <Drawer
+    
       drawerContent={(props) => <CustomDrawer {...props} />}
       screenOptions={{
         headerShown: false,
-        headerStyle: { backgroundColor: "#5aaf57" },
+        headerStyle: { backgroundColor: "white" },
+        drawerHideStatusBarOnOpen:"true",
+        drawerActiveBackgroundColor: "rgba(90, 175, 87, 0.2)", // Transparent green background for active item
+        drawerActiveTintColor: "#5aaf57", // Darker green for active text and icon
+        drawerInactiveTintColor: "#000", // Default color for inactive text and icon
+       
+     
+        
         // headerTintColor: "#fff",
         headerTitleStyle: { fontWeight: "bold" },
       }}
