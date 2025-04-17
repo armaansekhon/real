@@ -15,6 +15,8 @@ import { modules } from "../constants/modules";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ImageBackground } from "react-native";
+import LottieView from 'lottie-react-native';
+import Logout from "../assets/svg/logout.svg"
 
 // Import Folder SVG
 import FolderIcon from "../assets/svg/Folder.svg";
@@ -129,7 +131,13 @@ const CustomDrawer = ({ navigation }) => {
         {/* ID Card Layout in Header */}
         
         <View style={styles.header}>
-          <Ionicons name="person-circle-outline" size={60} color="black" style={styles.headerIcon} />
+        <LottieView
+  source={require('../assets/svg/reales2.json')}
+  autoPlay={true}
+  loop={true}
+  speed={0.5}
+  style={styles.ani}
+/>
           <View style={styles.headerTextContainer}>
           <Text style={styles.welcomeText}>
               Welcome <Text style={styles.adminText}>Admin</Text>
@@ -141,8 +149,9 @@ const CustomDrawer = ({ navigation }) => {
 
         {renderDrawerItems(modules)}
       </ScrollView>
-      <View style={{borderTopWidth:1,paddingTop:10, borderColor:"#d3d3d3"}}>
+      <View style={{borderTopWidth:0,paddingTop:10, borderColor:"#d3d3d3" ,backgroundColor:"#f0fff0"}}>
         <TouchableOpacity style={styles.loginButton}>
+          <Logout height={30}   width={30}  ></Logout>
           <Text style={styles.loginButtonText}>Log-Out</Text>
         </TouchableOpacity>
       </View>
@@ -153,7 +162,7 @@ const CustomDrawer = ({ navigation }) => {
 const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor:"#f0fff0",
     paddingVertical: 20,
     paddingHorizontal: 15,
   },
@@ -171,10 +180,17 @@ const styles = StyleSheet.create({
     borderColor: "green",
     marginBottom: 10,
   },
-  headerIcon: {
+  ani: {
     // marginRight: 10,
-paddingLeft:20
+    height:50,
+    width:90
+,paddingLeft:20,
+transform:[{scale:2.5}],
+marginBottom:30,
+
   },
+
+  
   headerTextContainer: {
     flex: 1,
     alignItems: "center",
@@ -226,20 +242,22 @@ paddingLeft:20
     overflow: "hidden",
   },
   loginButton: {
-    width: "40%",
+    flexDirection:"row",
+    width: "45%",
     height: 35,
-    // backgroundColor: "black",
+    // backgroundColor: "#fff",
     borderRadius: 8,
-    // borderWidth:1,
-    // borderColor:"#5aaf57",
+    borderWidth:0.5,
+    borderColor:"#777",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    marginBottom: Platform.OS === "ios" ? 50 : 10,
+    marginBottom: Platform.OS === "ios" ? 40 : 10,
   },
   loginButtonText: {
-    color: "#000",
+    color: "#444",
     fontSize: 16,
+    paddingLeft:10,
     fontFamily:"PlusSB"
   },
 });
