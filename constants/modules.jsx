@@ -55,16 +55,5 @@ export const modules = [
         // icon: "person-outline",
         icon: CRM,
       },
-      {
-        name: "Geolocatio",
-        path: "/(drawer)/Geolocation",
-        title: "Geolocation",
-        icon: "person-outline",
-      },
-      {
-        name: "MarkAttendanc",
-        path: "/(drawer)/MarkAttendance",
-        title: "Mark Attendance",
-        icon: "person-outline",
-      },
+    
   ];

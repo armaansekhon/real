@@ -8,7 +8,7 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  SafeAreaView,,
+  SafeAreaView,
  
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
