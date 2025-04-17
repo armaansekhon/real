@@ -8,13 +8,17 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
-  SafeAreaView,
+  SafeAreaView,,
  
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { modules } from "../constants/modules";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { modules } from "../constants/modules";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { ImageBackground } from "react-native";
+
+// Import Folder SVG
+import FolderIcon from "../assets/svg/Folder.svg";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 
 // Enable LayoutAnimation on Android
@@ -22,10 +26,12 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const CustomDrawer = ({ state }) => {
-  const router = useRouter();
+const CustomDrawer = ({ navigation }) => {
+  const [clickedItem, setClickedItem] = useState(null); // Track the last clicked item
   const [expandedItems, setExpandedItems] = useState({}); // Track expanded/collapsed state
-const bot  =useSafeAreaInsets();
+  const insets = useSafeAreaInsets();
+  const Router = useRouter();
+
   const toggleExpand = (moduleName) => {
     // Trigger animation
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -36,20 +42,42 @@ const bot  =useSafeAreaInsets();
     }));
   };
 
+  const handleItemClick = (module) => {
+    setClickedItem(module.name); // Set the clicked item
+    Router.push(module.path); // Navigate to the screen
+  };
+
   const renderDrawerItems = (modules) => {
-    return modules.map((module, index) => {
+    return modules.map((module) => {
+      const isClicked = clickedItem === module.name; // Check if the item is clicked
+
       if (module.children) {
         const isExpanded = expandedItems[module.name]; // Check if the module is expanded
 
         return (
-          <SafeAreaView key={module.name}>
+          <View key={module.name}>
             {/* Parent Item */}
             <TouchableOpacity
-              style={styles.drawerItem}
+              style={[
+                styles.drawerItem,
+                isClicked && styles.clickedDrawerItem, // Apply clicked background
+              ]}
               onPress={() => toggleExpand(module.name)} // Toggle expand/collapse
             >
-              <Ionicons name={module.icon || "folder-outline"} size={24} color="#000" />
-              <Text style={styles.drawerItemText}>{module.title}</Text>
+              {/* Render Folder SVG if no icon is provided */}
+              {module.icon ? (
+                <module.icon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+              ) : (
+                <FolderIcon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+              )}
+              <Text
+                style={[
+                  styles.drawerItemText,
+                  isClicked && styles.clickedDrawerItemText, // Apply clicked text color
+                ]}
+              >
+                {module.title}
+              </Text>
               <Ionicons
                 name={isExpanded ? "chevron-up-outline" : "chevron-down-outline"}
                 size={20}
@@ -64,7 +92,7 @@ const bot  =useSafeAreaInsets();
                 {renderDrawerItems(module.children)}
               </View>
             )}
-          </SafeAreaView>
+          </View>
         );
       }
 
@@ -74,31 +102,46 @@ const bot  =useSafeAreaInsets();
           key={module.name}
           style={[
             styles.drawerItem,
-            state?.index === index && styles.activeDrawerItem,
+            isClicked && styles.clickedDrawerItem, // Apply clicked background
           ]}
-          onPress={() => router.push(module.path)}
+          onPress={() => handleItemClick(module)} // Handle item click
         >
-          <Ionicons name={module.icon || "folder-outline"} size={24} color="#000" />
-          <Text style={styles.drawerItemText}>{module.title}</Text>
+          {/* Render Folder SVG if no icon is provided */}
+          {module.icon ? (
+            <module.icon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+          ) : (
+            <FolderIcon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+          )}
+          <Text
+            style={[
+              styles.drawerItemText,
+              isClicked && styles.clickedDrawerItemText, // Apply clicked text color
+            ]}
+          >
+            {module.title}
+          </Text>
         </TouchableOpacity>
       );
     });
   };
 
   return (
-     
-         <SafeAreaView style={styles.drawerContainer}>
-        {/* <DrawerContentScrollView> */}
-      <ScrollView contentContainerStyle={styles.scrollContainer}
-           showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.drawerContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
-          <Ionicons name="person-circle-outline" size={60} color="black" />
-          <Text style={styles.username}>Welcome, Admin</Text>
+          <Ionicons name="person-circle-outline" size={60} color="black" style={styles.headerIcon} />
+          <View style={styles.headerTextContainer}>
+          <Text style={styles.welcomeText}>
+              Welcome <Text style={styles.adminText}>Admin</Text>
+            </Text>
+            <Text style={styles.designation}>Executive</Text>
+          </View>
+          
         </View>
+
         {renderDrawerItems(modules)}
-  
-      </ScrollView >
-      {/* </DrawerContentScrollView> */}
+       
+      </ScrollView>
       <View>
              <TouchableOpacity    style={styles.loginButton}>
                         <Text 
@@ -106,7 +149,6 @@ const bot  =useSafeAreaInsets();
                       </TouchableOpacity>
                       
         </View>
-
     </SafeAreaView>
     
    
@@ -116,7 +158,7 @@ const bot  =useSafeAreaInsets();
 const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#f5f5f5",
     paddingVertical: 20,
     paddingHorizontal: 15,
   },
@@ -124,56 +166,83 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
+    flexDirection: "row",
     alignItems: "center",
-    top:60,
-    marginBottom: 80,
+    justifyContent: "space-between",
+    paddingTop: Platform.OS === "ios" ? 75 : 30,
+    paddingBottom:20,
+    backgroundColor: "#f8f9fa",
+    // borderBottomWidth: 1,
+    borderColor: "green",
+    marginBottom: 10,
   },
-  username: {
-    fontSize: 18,
-    fontFamily:"PlusR",
+  headerIcon: {
+    // marginRight: 10,
+paddingLeft:20
+  },
+  headerTextContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  welcomeText: {
+    fontSize: 23,
     color: "#000",
-    marginTop: 10,
+    fontFamily:"PlusR"
+  },
+  adminText: {
+    color: "#5aaf57", // Green color for "Admin"
+    fontFamily:"PlusR ",
+  },
+  designation: {
+    fontSize: 14,
+    color: "#555",
+    marginTop: 4,
+  },
+  headerSettingsIcon: {
+    marginLeft: 10,
   },
   drawerItem: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 20,
+    borderBottomWidth:0.5,
+    borderColor:"#d3d3d3",
     borderRadius: 8,
     marginBottom: 10,
     backgroundColor: "transparent",
   },
-  activeDrawerItem: {
-    // backgroundColor: "#fff",
+  clickedDrawerItem: {
+    backgroundColor: "rgba(90, 175, 87, 0.2)", // Transparent green background for clicked item
   },
   drawerItemText: {
     marginLeft: 10,
     fontSize: 16,
     color: "#000",
-    fontFamily:"Plusr",
+  },
+  clickedDrawerItemText: {
+    color: "#5aaf57", // Darker green for clicked text
   },
   nestedItems: {
     marginLeft: 20,
     marginTop: 5,
-    overflow: "hidden", 
+    overflow: "hidden",
   },
   loginButton: {
-    width: '80%',
-    height: 50,
-    backgroundColor: '#000',
+    width: "40%",
+    height: 35,
+    // backgroundColor: "black",
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf:"center",
-    bottom: Platform.OS === "ios" ? 50 : 10,
+    bottom:60,
   },
   loginButtonText: {
-    color: '#fff',
+    color: "#000",
     fontSize: 16,
-    // fontWeight: 'bold',
-    fontFamily:"PlusR"
+    fontFamily:"PlusSB"
   },
-
 });
 
 export default CustomDrawer;
