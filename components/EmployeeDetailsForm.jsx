@@ -63,7 +63,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
         <Ionicons name="checkmark" size={24} color="green" />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View contentContainerStyle={styles.scrollContent}>
         {/* Profile Image */}
         <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
           <Image
@@ -105,7 +105,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
         >
           <Ionicons name="arrow-forward-circle" size={50} color="#4CAF50" />
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }

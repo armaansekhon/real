@@ -72,7 +72,7 @@ const Stepper = ({ currentStep, labels, onStepPress }) => {
                   style={[
                     styles.line,
                     {
-                      backgroundColor: '#3b82f6',
+                      backgroundColor: '#32cd32',
                       width: animatedWidths[index].interpolate({
                         inputRange: [0, 1],
                         outputRange: ['0%', '100%'],
@@ -109,8 +109,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circle: {
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
   circleText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 11,
   },
   label: {
     fontSize: 12,
