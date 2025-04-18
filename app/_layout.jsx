@@ -7,6 +7,7 @@ const RootLayout = () => {
   return (
  
     <UserProvider>
+      <ModuleProvider>
     <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
 
 
@@ -15,6 +16,7 @@ const RootLayout = () => {
       
   
     </Stack>
+    </ModuleProvider>
     </UserProvider>
  
   );
