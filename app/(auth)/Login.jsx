@@ -147,7 +147,7 @@ const Login = () => {
               <Ionicons
                 name={passwordVisible ? 'eye-off' : 'eye'}
                 size={20}
-                color="#a9a9a9"
+                color="#555"
               />
             </TouchableOpacity>
           </View>
