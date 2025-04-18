@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Alert, SafeAreaView, Text } from 'react-native';
 import EmployeeDetailsForm from '../../../../components/EmployeeDetailsForm';
 import GeneralDetailsForm from '../../../../components/GeneralDetailsForm';
 import AddressDetailsForm from '../../../../components/AddressDetailsForm';
 
 import Stepper from '../../../../components/Stepper';
+
+import { Colors } from "@/constants/Colors";
+import { Dimensions } from 'react-native';
+
+const { height } = Dimensions.get("window");
 
 export default function AddEmployee() {
   const [step, setStep] = useState(0);
@@ -42,12 +47,18 @@ export default function AddEmployee() {
 
   return (
    <SafeAreaView style={styles.container}>
-    <Stepper
+
+{/* <View style={styles.bottomContainer}>
+
+              </View> */}
+
+              <Stepper
     currentStep={step}
     labels={['Employee', 'General', 'Address']}
     onStepPress={(index) => setStep(index)} // allows backward navigation
     />
 
+  
       {step === 0 && (
         <EmployeeDetailsForm
           initialData={formData.employeeDetails}
@@ -96,4 +107,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', // light background
     justifyContent: 'center',
   },
+
+
+  bottomContainer: {
+    position: "relative",
+    backgroundColor: "#fff",
+    height: height * 0.1,
+    justifyContent: "center",
+    paddingHorizontal: 30,
+    marginBottom: 10,
+    elevation: 7,
+    shadowOffset: 0.6,
+    shadowColor: "#32cd32",
+    alignItems: "flex-start", 
+    width: "100%",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    minHeight: 90,
+    
+  },
+
 });

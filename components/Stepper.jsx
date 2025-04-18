@@ -9,9 +9,7 @@ import {
 } from 'react-native';
 
 const Stepper = ({ currentStep, labels, onStepPress }) => {
-  const animatedWidths = useRef(
-    labels.map(() => new Animated.Value(0))
-  ).current;
+  const animatedWidths = useRef(labels.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
     animatedWidths.forEach((animVal, index) => {
@@ -53,7 +51,11 @@ const Stepper = ({ currentStep, labels, onStepPress }) => {
                     },
                   ]}
                 >
-                  {/* <Text style={styles.circleText}>{index + 1}</Text> */}
+                  {isCompleted ? (
+                    <Text style={styles.checkmark}>✔</Text>
+                  ) : (
+                    <View style={styles.innerDot} />
+                  )}
                 </View>
                 <Text
                   style={[
@@ -66,13 +68,15 @@ const Stepper = ({ currentStep, labels, onStepPress }) => {
                 </Text>
               </Pressable>
 
-              {/* Line only if not last */}
               {!isLast && (
                 <Animated.View
                   style={[
                     styles.line,
                     {
-                      backgroundColor: '#32cd32',
+                      backgroundColor: animatedWidths[index].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['#ccc', '#32cd32'], // gray to green
+                      }),
                       width: animatedWidths[index].interpolate({
                         inputRange: [0, 1],
                         outputRange: ['0%', '100%'],
@@ -97,8 +101,9 @@ const styles = StyleSheet.create({
   stepperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 18,
-    marginLeft:  50
+    paddingHorizontal: 0,
+    width: '100%',
+    marginLeft: 30,
   },
   stepSection: {
     flex: 1,
@@ -110,22 +115,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circle: {
-    width: 15,
-    height: 15,
+    width: 20,
+    height: 20,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  circleText: {
+  innerDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
+  checkmark: {
+    fontSize: 12,
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 9,
   },
   label: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#666',
     textAlign: 'center',
     marginTop: 4,
+    fontFamily: 'PlusR',
   },
   completedLabel: {
     color: '#5aaf57',
@@ -137,11 +149,10 @@ const styles = StyleSheet.create({
   },
   line: {
     height: 2,
-    backgroundColor: '#5aaf57',
     marginHorizontal: 8,
     marginTop: -15,
     alignSelf: 'center',
-    left: -23
+    left: -23,
   },
 });
 

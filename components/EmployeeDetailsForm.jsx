@@ -14,21 +14,19 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 
+import { Dimensions } from "react-native";
+// import {getDynamicWidth}
+
+
+const { height } = Dimensions.get("window");
+
 export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [data, setData] = useState(initialData || {});
   const [imageUri, setImageUri] = useState(null);
+  const [showSave, setShowSave] = useState(false);
 
-  const fields = [
-    { key: "department", placeholder: "Department" },
-    { key: "designation", placeholder: "Designation" },
-    { key: "employeeType", placeholder: "Employee Type" },
-    { key: "employeeCategory", placeholder: "Employee Category" },
-    { key: "technology", placeholder: "Technology" },
-    { key: "name", placeholder: "Name" },
-    { key: "joiningDate", placeholder: "Joining Date" },
-    { key: "fatherName", placeholder: "Father Name" },
-    { key: "motherName", placeholder: "Mother Name" },
-  ];
+
+
 
   useEffect(() => {
     (async () => {
@@ -48,38 +46,63 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       aspect: [1, 1],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      const uri = result.assets[0].uri;
+      setData({ ...data, profileImage: uri }); // Save in data
+      setShowSave(true);
     }
   };
+  
+
+  const groupedFields = [
+    [
+    { key: "department", placeholder: "Department" },
+    { key: "designation", placeholder: "Designation" },
+    ],
+    [{ key: "employeeType", placeholder: "Employee Type" },
+    { key: "employeeCategory", placeholder: "Employee Category" },
+    ],
+    [
+    { key: "technology", placeholder: "Technology" },
+    { key: "name", placeholder: "Name" },
+    { key: "joiningDate", placeholder: "Joining Date" },
+    ],
+    [
+    { key: "fatherName", placeholder: "Father Name" },
+    { key: "motherName", placeholder: "Mother Name" },
+    ],
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.headerRow}>
-        <Ionicons name="chevron-back" size={24} color="black" />
-        <Text style={styles.headerTitle}>Add Employee</Text>
-        <Ionicons name="checkmark" size={24} color="green" />
+      {/* Header Row with Avatar */}
+<View style={styles.headerRow}>
+  <View style={styles.headerTextContainer}>
+    <Text style={styles.headerTitle}>Employee</Text>
+    <Text style={styles.headerSubTitle}>Details</Text>
+    <Text style={styles.headerDesc}>Fill out the Employee Details below</Text>
+  </View>
+
+  <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+    {data.profileImage ? (
+      <Image source={{ uri: data.profileImage }} style={styles.avatar} />
+    ) : (
+      <View style={[styles.avatar, styles.placeholder]}>
+        <Ionicons name="person-circle-outline" size={60} color="#ccc" />
       </View>
+    )}
+  </TouchableOpacity>
+</View>
 
-      <View contentContainerStyle={styles.scrollContent}>
-        {/* Profile Image */}
-        <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-          <Image
-            source={
-              imageUri
-                ? { uri: imageUri }
-                : require("../assets/images/favicon.png")
-            }
-            style={styles.avatar}
-          />
-          <View style={styles.editIcon}>
-            <Ionicons name="camera" size={11} color="#fff" />
-          </View>
-        </TouchableOpacity>
 
-        {/* FlatList with 2 columns */}
+  {showSave && (
+    <TouchableOpacity style={styles.saveIconButton} onPress={() => alert("Image saved locally!")}>
+      <Ionicons name="save-outline" size={24} color="#fff" />
+    </TouchableOpacity>
+  )}
+        {/* FlatList with 2 columns
         <FlatList
           data={fields}
           numColumns={2}
@@ -96,7 +119,30 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
               />
             </View>
           )}
-        />
+        /> */}
+
+
+<View style={styles.flexGrid}>
+  {groupedFields.map((row, rowIndex) => (
+    <View key={rowIndex} style={styles.rowContainer}>
+      {row.map((item) => (
+        <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
+          <Text style={styles.label}>{item.placeholder}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={item.placeholder}
+            value={data[item.key] || ""}
+            onChangeText={(text) =>
+              setData({ ...data, [item.key]: text })
+            }
+          />
+        </View>
+      ))}
+    </View>
+  ))}
+</View>
+
+
 
         {/* Next button replaced with icon */}
         <TouchableOpacity
@@ -105,7 +151,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
         >
           <Ionicons name="arrow-forward-circle" size={50} color="#4CAF50" />
         </TouchableOpacity>
-      </View>
+      {/* </View> */}
     </SafeAreaView>
   );
 }
@@ -115,64 +161,114 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingTop: 25,
-    paddingBottom: 10,
-    backgroundColor: "#fff",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 60,
-  },
-  avatarContainer: {
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-  },
-  editIcon: {
-    position: "absolute",
-    bottom: 0,
-    right: 10,
-    backgroundColor: "#4CAF50",
-    padding: 6,
-    borderRadius: 20,
-  },
-  inputWrapper: {
-    flex: 1,
-    marginBottom: 16,
-    marginHorizontal: 8,
-  },
-  input: {
-    height: 40,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    fontSize: 13,
-    borderColor: "#ddd",
-    borderWidth: 1,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: "600",
-    marginBottom: 6,
-    color: "#333",
-  },
+
   nextButton: {
     alignItems: "center",
     marginTop: 20,
   },
+
+
+
+
+  placeholder: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+  },
+  saveButton: {
+    marginTop: 8,
+    backgroundColor: "#4CAF50",
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  saveText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
+    headerRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 20,
+      marginBottom: 20,
+    },
+    
+    headerTextContainer: {
+      flex: 1,
+    },
+    
+    avatarContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginLeft: 10,
+    },
+    
+    avatar: {
+      width: 70,
+      height: 70,
+      borderRadius: 70,
+      resizeMode: "cover",
+    },
+    
+    placeholder: {
+      backgroundColor: "#eee",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    
+    headerTitle: {
+      fontSize: 30,
+      fontFamily: "PlusSB",
+    },
+    
+    headerSubTitle: {
+      fontSize: 25,
+      fontFamily: "PlusSB",
+      color: "#5aaf57",
+      marginTop: -5,
+    },
+    
+    headerDesc: {
+      fontSize: 10,
+      fontFamily: "PlusR",
+      marginTop: 3,
+    },
+
+
+    flexGrid: {
+      flexDirection: "column",
+      gap: 16,
+    },
+    
+    rowContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 4,
+    },
+    
+    inputWrapper: {
+      marginBottom: 3,
+    },
+    
+    input: {
+      height: 30,
+      backgroundColor: "#f9f9f9",
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      fontSize: 10,
+      borderColor: "#ddd",
+      borderWidth: 1,
+    },
+    
+    label: {
+      fontSize: 12,
+      fontWeight: "600",
+      marginBottom: 6,
+      color: "#333",
+    },
+    
+    
 });
+
