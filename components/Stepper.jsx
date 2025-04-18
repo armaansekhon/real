@@ -69,21 +69,21 @@ const Stepper = ({ currentStep, labels, onStepPress }) => {
               </Pressable>
 
               {!isLast && (
-                <Animated.View
-                  style={[
-                    styles.line,
-                    {
-                      backgroundColor: animatedWidths[index].interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ['#ccc', '#32cd32'], // gray to green
-                      }),
-                      width: animatedWidths[index].interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ['0%', '100%'],
-                      }),
-                    },
-                  ]}
-                />
+    <View style={styles.lineWrapper}>
+    <View style={styles.staticLine} />
+    <Animated.View
+      style={[
+        styles.animatedLine,
+        {
+          width: animatedWidths[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0%', '100%'],
+          }),
+        },
+      ]}
+    />
+  </View>
+  
               )}
             </View>
           );
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     width: '100%',
     marginLeft: 30,
+    marginTop: 90
   },
   stepSection: {
     flex: 1,
@@ -115,8 +116,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circle: {
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   label: {
-    fontSize: 9,
+    fontSize: 10,
     color: '#666',
     textAlign: 'center',
     marginTop: 4,
@@ -154,6 +155,32 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     left: -23,
   },
+
+
+
+
+
+
+  lineWrapper: {
+    position: 'relative',
+    flexGrow: 1,
+    height: 2,
+    marginHorizontal: -5,  // slightly more space
+    marginTop: -15,
+    justifyContent: 'center',
+  },
+  staticLine: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#ccc',
+    borderRadius: 1,
+    
+  },
+  animatedLine: {
+    height: 2,
+    backgroundColor: '#32cd32',
+    borderRadius: 1,
+  },
+  
 });
 
 export default Stepper;

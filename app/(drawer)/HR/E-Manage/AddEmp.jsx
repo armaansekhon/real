@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, SafeAreaView, Text } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
 import EmployeeDetailsForm from '../../../../components/EmployeeDetailsForm';
 import GeneralDetailsForm from '../../../../components/GeneralDetailsForm';
 import AddressDetailsForm from '../../../../components/AddressDetailsForm';
-
 import Stepper from '../../../../components/Stepper';
 
-import { Colors } from "@/constants/Colors";
-import { Dimensions } from 'react-native';
+const { height, width } = Dimensions.get('window');
 
-const { height } = Dimensions.get("window");
-
-export default function AddEmployee() {
+export default function AddEmployee({ navigation }) {
   const [step, setStep] = useState(0);
-
   const [formData, setFormData] = useState({
     employeeDetails: {},
     generalDetails: {},
@@ -33,32 +38,36 @@ export default function AddEmployee() {
   const handleSubmit = (finalData) => {
     console.log('Final Submitted Data: ', finalData);
     Alert.alert('Success!', 'All data submitted.');
-    
     setFormData({
       employeeDetails: {},
       generalDetails: {},
       addressDetails: {},
     });
     setStep(0);
-
   };
 
-
-
   return (
-   <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color="#333" />
+        </TouchableOpacity>
 
-{/* <View style={styles.bottomContainer}>
+        <View style={styles.stepperContainer}>
+          <Stepper
+            currentStep={step}
+            labels={['Employee', 'General', 'Address']}
+            onStepPress={(index) => setStep(index)}
+          />
+        </View>
 
-              </View> */}
+        {/* <TouchableOpacity onPress={() => Alert.alert('Notifications')}>
+          <Ionicons name="notifications-outline" size={26} color="#333" />
+        </TouchableOpacity> */}
+      </View>
 
-              <Stepper
-    currentStep={step}
-    labels={['Employee', 'General', 'Address']}
-    onStepPress={(index) => setStep(index)} // allows backward navigation
-    />
-
-  
+      {/* Step Forms */}
       {step === 0 && (
         <EmployeeDetailsForm
           initialData={formData.employeeDetails}
@@ -87,14 +96,11 @@ export default function AddEmployee() {
               ...formData,
               addressDetails: data,
             };
-            setFormData(finalData); // optional for future reuse
+            setFormData(finalData);
             handleSubmit(finalData);
           }}
         />
       )}
-
-
-
     </SafeAreaView>
   );
 }
@@ -102,29 +108,26 @@ export default function AddEmployee() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
-    // paddingVertical: 16,
-    backgroundColor: '#fff', // light background
-    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
 
-
-  bottomContainer: {
-    position: "relative",
-    backgroundColor: "#fff",
-    height: height * 0.1,
-    justifyContent: "center",
-    paddingHorizontal: 30,
-    marginBottom: 10,
-    elevation: 7,
-    shadowOffset: 0.6,
-    shadowColor: "#32cd32",
-    alignItems: "flex-start", 
-    width: "100%",
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    minHeight: 90,
-    
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    // elevation: 4,
+    zIndex: 10,
   },
 
+  stepperContainer: {
+    position: 'absolute',
+    left: 38,
+    right: 0,
+    alignItems: 'center',
+    zIndex: -1,
+
+  },
 });
