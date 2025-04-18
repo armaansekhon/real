@@ -199,7 +199,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           setData({ ...data, [item.key]: value });
           setShowSave(true);
         }}
-        placeholder={`Select ${item.placeholder}`}
+        placeholder={` ${item.placeholder}`}
         style={{ zIndex: 1000 , borderColor: '#ccc', backgroundColor: "#f9f9f9"}}
         containerStyle={{ zIndex: 1000 }}
         dropDownContainerStyle={{ zIndex: 999 }}
