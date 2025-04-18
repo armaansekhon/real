@@ -12,12 +12,14 @@ import {
  
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { modules } from "../constants/modules";
+// import { modules } from "../constants/modules";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ImageBackground } from "react-native";
 import LottieView from 'lottie-react-native';
-import Logout from "../assets/svg/logout.svg"
+import Logout from "../assets/svg/logout.svg";
+import { useModules } from "../context/ModuleContext";
+import { useUser } from "../context/UserContext";
 
 // Import Folder SVG
 import FolderIcon from "../assets/svg/Folder.svg";
@@ -33,6 +35,9 @@ const CustomDrawer = ({ navigation }) => {
   const [expandedItems, setExpandedItems] = useState({}); // Track expanded/collapsed state
   const insets = useSafeAreaInsets();
   const Router = useRouter();
+  const { modules } = useModules();
+  const { user}=useUser();
+ 
 
   const toggleExpand = (moduleName) => {
     // Trigger animation
@@ -50,6 +55,7 @@ const CustomDrawer = ({ navigation }) => {
   };
 
   const renderDrawerItems = (modules) => {
+  
     return modules.map((module) => {
       const isClicked = clickedItem === module.name; // Check if the item is clicked
 
@@ -140,7 +146,8 @@ const CustomDrawer = ({ navigation }) => {
 />
           <View style={styles.headerTextContainer}>
           <Text style={styles.welcomeText}>
-              Welcome <Text style={styles.adminText}>Admin</Text>
+              {/* {/* Welcome <Text style={styles.adminText}>{user.name}</Text> */}
+              Welcome <Text style={styles.adminText}>Admin</Text> 
             </Text>
             <Text style={styles.designation}>Executive</Text>
           </View>
@@ -205,7 +212,7 @@ marginBottom:30,
   },
   adminText: {
     color: "#5aaf57", // Green color for "Admin"
-    fontFamily:"PlusR ",
+    fontFamily:"PlusL ",
   },
   designation: {
     fontSize: 14,
@@ -220,8 +227,8 @@ marginBottom:30,
     alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 20,
-    borderBottomWidth:0.5,
-    borderColor:"#d3d3d3",
+    // borderBottomWidth:1,
+    borderColor:"#ffff",
     borderRadius: 8,
     marginBottom: 10,
     backgroundColor: "transparent",
@@ -229,15 +236,19 @@ marginBottom:30,
   
   },
   clickedDrawerItem: {
-    backgroundColor: "rgba(90, 175, 87, 0.2)", // Transparent green background for clicked item
+    backgroundColor: "white",
+    // backgroundColor: "rgba(90, 175, 87, 0.2)", // Transparent green background for clicked item
   },
   drawerItemText: {
     marginLeft: 10,
     fontSize: 16,
-    color: "#000",
+    color: "black",
+    fontFamily:"PlusR"
   },
   clickedDrawerItemText: {
-    color: "#5aaf57", // Darker green for clicked text
+    color: "#5aaf57",
+    fontFamily:"PlusSB"
+     // Darker green for clicked text
   },
   nestedItems: {
     marginLeft: 20,

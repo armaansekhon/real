@@ -21,24 +21,29 @@ const useLogin = () => {
       });
   
       const data = await response.json();
-      console.log(" Login Response:", data);
+      // console.log(" Login Response:", data);
   
       if (response.ok && data.secretKey) {
         await SecureStore.setItemAsync('auth_token', data.secretKey);
         setUser(data.user);
         setUserType(data.user.userCategoryCode);
-        
+   
         await SecureStore.setItemAsync('userType', data.user.userCategoryCode);
+        await SecureStore.setItemAsync('privileges', JSON.stringify(data.user.privileges || []))
+        console.log('Token stored:', data.secretKey, "type:",data.user.userCategoryCode,"acess:",data.user.privileges );
 
-        console.log('Token stored:', data.secretKey, "type:",data.user.userCategoryCode);
-
-        return { success: true };
+        return { success: true,
+          privileges: data.user.privileges || [],
+         };
       } else {
         throw new Error(data.error || "Token not found in response");
       }
     } catch (error) {
       console.error(" Login error:", error.message);
       return false;
+    }
+    finally {
+      setLoading(false); // ✅ always reset loading, success or error
     }
   };
   

@@ -1,4 +1,5 @@
 import { UserProvider } from "@/context/UserContext";
+import { ModuleProvider } from "@/context/ModuleContext";
 import { Stack } from "expo-router";
 import React from "react";
 
@@ -6,14 +7,17 @@ import React from "react";
 const RootLayout = () => {
   return (
     <UserProvider>
-    <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
+      <ModuleProvider>
+      <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
 
 
         
 
       
   
-    </Stack>
+</Stack>
+      </ModuleProvider>
+   
     </UserProvider>
   );
 };

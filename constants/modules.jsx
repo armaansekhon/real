@@ -5,13 +5,14 @@ import Brief from "../assets/svg/breif.svg"
 
 
 
-export const modules = [
+export const defaultModules   = [
     {
       name: "Home",
       path: "/(drawer)/(tabs)/Home",
       title: "Tabs",
     //   icon: "home-outline",
       icon: Property,
+      alwaysVisible: true
      
     },
     {
@@ -54,6 +55,7 @@ export const modules = [
         title: "Mark Attendance",
         // icon: "person-outline",
         icon: CRM,
+        alwaysVisible: true
       },
     
   ];
