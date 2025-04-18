@@ -145,7 +145,7 @@ const Login = () => {
               style={styles.eyeIcon}
             >
               <Ionicons
-                name={passwordVisible ? 'eye-off-outline' : 'eye-outline'}
+                name={passwordVisible ? 'eye-off' : 'eye'}
                 size={20}
                 color="#a9a9a9"
               />
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 10,
     fontFamily:"PlusSB",
-    left:"70",
+  marginLeft:"auto"
   },
   loginButton: {
     width: '100%',
