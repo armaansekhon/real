@@ -46,14 +46,14 @@ const Stepper = ({ currentStep, labels, onStepPress }) => {
                     styles.circle,
                     {
                       backgroundColor: isCompleted
-                        ? '#3b82f6'
+                        ? '#32cd32'
                         : isActive
                         ? '#5aaf57'
                         : '#ccc',
                     },
                   ]}
                 >
-                  <Text style={styles.circleText}>{index + 1}</Text>
+                  {/* <Text style={styles.circleText}>{index + 1}</Text> */}
                 </View>
                 <Text
                   style={[
@@ -97,7 +97,8 @@ const styles = StyleSheet.create({
   stepperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
+    marginLeft:  
   },
   stepSection: {
     flex: 1,
@@ -109,8 +110,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circle: {
-    width: 20,
-    height: 20,
+    width: 15,
+    height: 15,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
@@ -118,10 +119,10 @@ const styles = StyleSheet.create({
   circleText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 11,
+    fontSize: 9,
   },
   label: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#666',
     textAlign: 'center',
     marginTop: 4,
@@ -140,6 +141,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginTop: -15,
     alignSelf: 'center',
+    left: -23
   },
 });
 

@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
     // borderBottomWidth: 1,
     borderColor: "green",
     marginBottom: 10,
+    
   },
   ani: {
     // marginRight: 10,
@@ -266,7 +267,7 @@ marginBottom:30,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    marginBottom: Platform.OS === "ios" ? 50 : 10,
+    marginBottom: Platform.OS === "ios" ? 60 : 30,
   },
   loginButtonText: {
     color: "#444",
