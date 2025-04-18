@@ -12,10 +12,14 @@ import {
  
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { modules } from "../constants/modules";
+// import { modules } from "../constants/modules";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ImageBackground } from "react-native";
+import LottieView from 'lottie-react-native';
+import Logout from "../assets/svg/logout.svg";
+import { useModules } from "../context/ModuleContext";
+import { useUser } from "../context/UserContext";
 
 // Import Folder SVG
 import FolderIcon from "../assets/svg/Folder.svg";
@@ -31,6 +35,9 @@ const CustomDrawer = ({ navigation }) => {
   const [expandedItems, setExpandedItems] = useState({}); // Track expanded/collapsed state
   const insets = useSafeAreaInsets();
   const Router = useRouter();
+  const { modules } = useModules();
+  const { user}=useUser();
+ 
 
   const toggleExpand = (moduleName) => {
     // Trigger animation
@@ -48,6 +55,7 @@ const CustomDrawer = ({ navigation }) => {
   };
 
   const renderDrawerItems = (modules) => {
+  
     return modules.map((module) => {
       const isClicked = clickedItem === module.name; // Check if the item is clicked
 
@@ -129,10 +137,17 @@ const CustomDrawer = ({ navigation }) => {
     <SafeAreaView style={styles.drawerContainer}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
-          <Ionicons name="person-circle-outline" size={60} color="black" style={styles.headerIcon} />
+        <LottieView
+  source={require('../assets/svg/reales2.json')}
+  autoPlay={true}
+  loop={true}
+  speed={0.5}
+  style={styles.ani}
+/>
           <View style={styles.headerTextContainer}>
           <Text style={styles.welcomeText}>
-              Welcome <Text style={styles.adminText}>Admin</Text>
+              {/* {/* Welcome <Text style={styles.adminText}>{user.name}</Text> */}
+              Welcome <Text style={styles.adminText}>Admin</Text> 
             </Text>
             <Text style={styles.designation}>Executive</Text>
           </View>
@@ -142,13 +157,12 @@ const CustomDrawer = ({ navigation }) => {
         {renderDrawerItems(modules)}
        
       </ScrollView>
-      <View>
-             <TouchableOpacity    style={styles.loginButton}>
-                        <Text 
-                 style={styles.loginButtonText}>Log-Out</Text>
-                      </TouchableOpacity>
-                      
-        </View>
+      <View style={{borderTopWidth:0,paddingTop:10, borderColor:"#d3d3d3" ,backgroundColor:"#f0fff0"}}>
+        <TouchableOpacity style={styles.loginButton}>
+          <Logout height={30}   width={30}  ></Logout>
+          <Text style={styles.loginButtonText}>Log-Out</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
     
    
@@ -158,7 +172,7 @@ const CustomDrawer = ({ navigation }) => {
 const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor:"#f0fff0",
     paddingVertical: 20,
     paddingHorizontal: 15,
   },
@@ -176,10 +190,17 @@ const styles = StyleSheet.create({
     borderColor: "green",
     marginBottom: 10,
   },
-  headerIcon: {
+  ani: {
     // marginRight: 10,
-paddingLeft:20
+    height:50,
+    width:90
+,paddingLeft:20,
+transform:[{scale:2.5}],
+marginBottom:30,
+
   },
+
+  
   headerTextContainer: {
     flex: 1,
     alignItems: "center",
@@ -191,7 +212,7 @@ paddingLeft:20
   },
   adminText: {
     color: "#5aaf57", // Green color for "Admin"
-    fontFamily:"PlusR ",
+    fontFamily:"PlusL ",
   },
   designation: {
     fontSize: 14,
@@ -206,8 +227,8 @@ paddingLeft:20
     alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 20,
-    borderBottomWidth:0.5,
-    borderColor:"#d3d3d3",
+    // borderBottomWidth:1,
+    borderColor:"#ffff",
     borderRadius: 8,
     marginBottom: 10,
     backgroundColor: "transparent",
@@ -215,15 +236,19 @@ paddingLeft:20
   
   },
   clickedDrawerItem: {
-    backgroundColor: "rgba(90, 175, 87, 0.2)", // Transparent green background for clicked item
+    backgroundColor: "white",
+    // backgroundColor: "rgba(90, 175, 87, 0.2)", // Transparent green background for clicked item
   },
   drawerItemText: {
     marginLeft: 10,
     fontSize: 16,
-    color: "#000",
+    color: "black",
+    fontFamily:"PlusR"
   },
   clickedDrawerItemText: {
-    color: "#5aaf57", // Darker green for clicked text
+    color: "#5aaf57",
+    fontFamily:"PlusSB"
+     // Darker green for clicked text
   },
   nestedItems: {
     marginLeft: 20,
@@ -231,18 +256,22 @@ paddingLeft:20
     overflow: "hidden",
   },
   loginButton: {
-    width: "40%",
+    flexDirection:"row",
+    width: "45%",
     height: 35,
-    // backgroundColor: "black",
+    // backgroundColor: "#fff",
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf:"center",
-    bottom:60,
+    // borderWidth:1,
+    // borderColor:"#5aaf57",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    marginBottom: Platform.OS === "ios" ? 50 : 10,
   },
   loginButtonText: {
-    color: "#000",
+    color: "#444",
     fontSize: 16,
+    paddingLeft:10,
     fontFamily:"PlusSB"
   },
 });

@@ -21,7 +21,7 @@ const Home = () => {
   // console.log("hello",type);
   return (
  
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1  , backgroundColor:"white"}}>
     <View style={{ flex: 1, justifyContent: "center", backgroundColor:"white", alignItems: "center" }}>
       <Text>Welcome to the Home Screen!</Text>
       <Text>Welcome {user?.name || 'Guest'}!</Text>

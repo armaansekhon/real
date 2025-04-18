@@ -12,19 +12,41 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Userlogo from "../../assets/svg/loguser.svg";
 import { useRouter } from 'expo-router';
 import useLogin from '../../hooks/useLogin';
+import { useModules } from '../../context/ModuleContext';
 
 const Login = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading } = useLogin();
+  const { refreshModules } = useModules();
 
   const router = useRouter();
 
   const handleLogin = async () => {
+    if (!identifier || !password) {
+      Alert.alert("Validation Error", "Please fill in all fields.");
+      return;
+    }
+  
+    console.log("Logging in...");
     const result = await login(identifier, password);
+    console.log("Login result:", result); // Add this
+  
     if (result) {
-      router.push("/(drawer)/(tabs)/Home");
+      try {
+        console.log("Fetching modules...");
+        await refreshModules();
+        console.log("Modules fetched");
+        router.replace("/(drawer)/(tabs)/Home");
+      } catch (error) {
+        console.error("fetchModules error:", error); // Catch issues here
+      }
+    } else {
+      Alert.alert("Login Failed", "Invalid email/usercode or password.");
+      setIdentifier("");  // Clear input fields
+      setPassword("");
+      
     }
   };
 
@@ -42,6 +64,23 @@ const Login = () => {
   //     Alert.alert("Invalid email or password.");
   //   }
   // };
+
+
+
+
+
+//   "privileges": [
+//     "/(drawer)/(tabs)/Home",
+//     "/(drawer)/MarkAttendance",
+//     "/(drawer)/Reports",
+//     "/(drawer)/Employee/Performance"
+//   ]
+// }
+
+
+
+
+
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -118,12 +157,15 @@ const Login = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-  onPress={async () => {
-    const result = await login(identifier, password);
-    if (result.success) {
-      router.push("/(drawer)/(tabs)/Home");
-    }
-  }}
+  // onPress={async () => {
+  //   const result = await login(identifier, password);
+  //   if (result.success) {
+  //     await fetchModules();
+  //     router.push("/(drawer)/(tabs)/Home");
+    
+  //   }
+  // }}
+  onPress={handleLogin}
   style={styles.loginButton}
   disabled={loading}
 >
