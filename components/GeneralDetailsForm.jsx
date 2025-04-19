@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -127,7 +128,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   </View>
 
   {/* ScrollView only for form fields */}
-  <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+  <ScrollView contentContainerStyle={{ paddingBottom: 140 }}>
     <View style={styles.flexGrid}>
       {groupedFields.map((row, rowIndex) => (
         <View
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     marginBottom: 20,
-    marginTop: 50,
+    marginTop: Platform.OS === 'ios' ? 60 : 50,
   },
   headerTextContainer: {
     flex: 1,

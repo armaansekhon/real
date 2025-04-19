@@ -10,17 +10,27 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
+  SafeAreaView
 } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons'; // Icons!
 import LottieView from 'lottie-react-native';
 import AdminStatsSection from './AdminStatSection';
+import AdminAppointments from './AdminAppointments';
 
 const { height, width } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = height * 0.27;
 const HEADER_MIN_HEIGHT = height * 0.13;
 const CARD_HEIGHT = height * 0.12;
 
+
+
+
+
 const AdminDashboard = () => {
+  
+
+  
+  
   const scrollY = React.useRef(new Animated.Value(0)).current;
 
   const headerHeight = scrollY.interpolate({
@@ -30,14 +40,14 @@ const AdminDashboard = () => {
   });
 
   const cardOpacity = scrollY.interpolate({
-    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT - 10],
+    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT - 25],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
   const cardTranslate = scrollY.interpolate({
     inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
-    outputRange: [0, -50],
+    outputRange: [0, -30],
     extrapolate: 'clamp',
   });
   const welcomeFontSize = scrollY.interpolate({
@@ -54,7 +64,7 @@ const AdminDashboard = () => {
 
   const welcomeTranslateY = scrollY.interpolate({
     inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
-    outputRange: [0, -30], // reduced from -HEADER_MAX_HEIGHT / 2 + 50
+    outputRange: [0, -10], // reduced from -HEADER_MAX_HEIGHT / 2 + 50
     extrapolate: 'clamp',
   });
 
@@ -140,7 +150,7 @@ const AdminDashboard = () => {
         <View style={styles.cardContent}>
           <Text style={styles.name}>John Doe</Text>
           <Text style={styles.designation}>Senior Developer</Text>
-          <Text style={styles.details}>ID: EMP12345</Text>
+          {/* <Text style={styles.details}>ID: EMP12345</Text> */}
         </View>
       </Animated.View>
 
@@ -153,8 +163,12 @@ const AdminDashboard = () => {
         )}
         scrollEventThrottle={16}
       >
-        <View style={{ height: 1000, padding: 20 }}>
+        <View style={{ height: 800, padding: 20 }}>
          <AdminStatsSection></AdminStatsSection>
+         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+   <AdminAppointments></AdminAppointments>
+    </SafeAreaView>
+
         </View>
       </Animated.ScrollView>
     </View>
@@ -184,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   centerTextContainer: {
-    marginTop: HEADER_MIN_HEIGHT+10 ,
+    marginTop: HEADER_MIN_HEIGHT-10 ,
   alignItems: 'center',
   // position: 'absolute',
   width: '100%',
@@ -195,12 +209,12 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 36,
     // fontWeight: '700',
-    fontFamily:"PlusL"
+    fontFamily:"PlusR"
   },
  
   card: {
     position: 'absolute',
-    top: HEADER_MAX_HEIGHT - CARD_HEIGHT / 2,
+    top: HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.2,
     alignSelf: 'center',
     width: width * 0.75,
     height: CARD_HEIGHT,
@@ -210,7 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent:"center",
-    padding: 16,
+    padding: 11,
     zIndex: 20,
     ...Platform.select({
       ios: {
@@ -225,17 +239,17 @@ const styles = StyleSheet.create({
     }),
   },
   avatar: {
-    width: 80,
-    height: 80,
+    width: 65,
+    height: 65,
     borderRadius: 40,
     
-    borderColor: '#00AC88',
+    // borderColor: '#00AC88',
     // borderWidth: 2,
     resizeMode: 'cover',
   },
   cardContent: {
     
-    marginLeft:35,
+    marginLeft:30,
     flexShrink: 1,
   },
   ani: {
@@ -276,8 +290,8 @@ transform:[{scale:4.5}],
     color: '#196f3d',
   },
   scrollContent: {
-    paddingTop: HEADER_MAX_HEIGHT -120 ,
-    paddingBottom: 40,
+    paddingTop: HEADER_MAX_HEIGHT -160 ,
+    // paddingBottom: 40,
     // borderWidth:1,
     
   },

@@ -7,11 +7,11 @@ const AdminStatsSection = () => {
     <View style={styles.container}>
       <View style={styles.cardWrapper}>
         <StatCard
-          title="Views"
+          title="Properties"
           value="29"
           percentage="+11.02%"
-          iconName="trending-up"
-          gradientColors={['#66d17a', '#48c68a']}
+          iconName="home"
+          gradientColors={['#32D07D', '#0DAF69']}
         />
       </View>
 
@@ -20,18 +20,18 @@ const AdminStatsSection = () => {
           title="Customers"
           value="715"
           percentage="-0.03%"
-          iconName="trending-down"
-          gradientColors={['#111', '#333']}
+          iconName="people-outline"
+          gradientColors={['#0F0F0F', '#2B2B2B']}
         />
       </View>
 
       <View style={styles.cardWrapper}>
         <StatCard
-          title="Orders"
-          value="316"
+          title="Attendence"
+          value="32"
           percentage="+6.08%"
-          iconName="trending-up"
-          gradientColors={['#111', '#333']}
+          iconName="hand-left"
+          gradientColors={['#0F0F0F', '#2B2B2B']}
         />
       </View>
 
@@ -41,7 +41,7 @@ const AdminStatsSection = () => {
           value="$695"
           percentage="+15.03%"
           iconName="trending-up"
-          gradientColors={['#f6b042', '#f7931e']}
+          gradientColors={['#F4A500', '#FEC301']}
         />
       </View>
     </View>
@@ -53,12 +53,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    marginTop: 16,
+    paddingHorizontal: 14,
+    paddingTop: 18,
   },
   cardWrapper: {
     width: '48%',
-    marginBottom: 16,
+    marginBottom: 14,
   },
 });
 
