@@ -219,9 +219,9 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         shadowOffset: { width: 0, height: 4 },
       },
-      android: {
-        elevation: 6,
-      },
+      // android: {
+      //   elevation: 6,
+      // },
     }),
   },
   avatar: {
