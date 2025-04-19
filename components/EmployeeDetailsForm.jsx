@@ -188,23 +188,23 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
               <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
                 <Text style={styles.label}>{item.placeholder}</Text>
                 {["department", "designation", "employeeType", "employeeCategory", "technology"].includes(item.key) ? (
-      <DropDownPicker
-        open={openDropdown[item.key]}
-        value={dropdowns[item.key]}
-        items={options[item.key]}
-        setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
-        setValue={(callback) => {
-          const value = callback(dropdowns[item.key]);
-          setDropdowns({ ...dropdowns, [item.key]: value });
-          setData({ ...data, [item.key]: value });
-          setShowSave(true);
-        }}
-        placeholder={` ${item.placeholder}`}
-        style={{ zIndex: 1000 , borderColor: '#ccc', backgroundColor: "#f9f9f9"}}
-        containerStyle={{ zIndex: 1000 }}
-        dropDownContainerStyle={{ zIndex: 999 }}
-        placeholderStyle={{ color: "#999" }}
-      />
+    <DropDownPicker
+    open={openDropdown[item.key]}
+    value={dropdowns[item.key]}
+    items={options[item.key]}
+    setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
+    setValue={(callback) => {
+      const value = callback(dropdowns[item.key]);
+      setDropdowns({ ...dropdowns, [item.key]: value });
+      setData({ ...data, [item.key]: value });
+      setShowSave(true);
+    }}
+    placeholder={`Select ${item.placeholder}`}
+    style={styles.dropdown}
+    dropDownContainerStyle={styles.dropdownContainer}
+    placeholderStyle={styles.dropdownPlaceholder}
+  />
+  
                 ) : 
                 item.key === "joiningDate" ? (
                   <TouchableOpacity
@@ -395,4 +395,42 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#444",
   },
+
+
+
+
+
+
+
+
+
+
+
+
+
+  dropdown: {
+    height: 42,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    fontSize: 13,
+    fontFamily: "PlusR",
+    justifyContent: "center",
+    zIndex: 1000,
+  },
+  
+  dropdownContainer: {
+    backgroundColor: "#fff",
+    borderColor: "#ccc",
+    borderRadius: 10,
+    zIndex: 999,
+  },
+  
+  dropdownPlaceholder: {
+    color: "#999",
+    fontFamily: "PlusR",
+  }
+  
 });

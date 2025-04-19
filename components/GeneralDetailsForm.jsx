@@ -34,6 +34,10 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
       
     ],
     [{ key: "officialEmail", placeholder: "Official Email" },
+     
+      
+    ],
+    [
       { key: "officialMobile", placeholder: "Official Mobile" },
       
     ],
@@ -44,14 +48,17 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     ],
     [
       { key: "salary", placeholder: "Salary" },
-      { key: "category", placeholder: "Category" },
+      { key: "joiningDate", placeholder: "Joining Date" },
+      
       
     ],
+
     [
-      { key: "joiningDate", placeholder: "Joining Date" },
+      { key: "category", placeholder: "Category" },
       { key: "senior", placeholder: "Senior (Report To)" },
 
     ],
+
     [
       { key: "bloodGroup", placeholder: "Blood Group" },
       { key: "maritalStatus", placeholder: "Marital Status" },
@@ -132,26 +139,24 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
               <Text style={styles.label}>{item.placeholder}</Text>
 
               {dropdownKeys.includes(item.key) ? (
-                <DropDownPicker
-                  open={openDropdown[item.key] || false}
-                  value={dropdowns[item.key] || null}
-                  items={options[item.key]}
-                  setOpen={(o) =>
-                    setOpenDropdown({ ...openDropdown, [item.key]: o })
-                  }
-                  setValue={(callback) => {
-                    const val = callback(dropdowns[item.key]);
-                    handleDropdownChange(item.key, val);
-                  }}
-                  placeholder={` ${item.placeholder}`}
-                  style={{
-                    borderColor: "#ccc",
-                    backgroundColor: "#f9f9f9",
-                  }}
-                  containerStyle={{ zIndex: 1000 }}
-                  dropDownContainerStyle={{ zIndex: 999 }}
-                  placeholderStyle={{ color: "#999" }}
-                />
+              <DropDownPicker
+              open={openDropdown[item.key]}
+              value={dropdowns[item.key]}
+              items={options[item.key]}
+              setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
+              setValue={(callback) => {
+                const value = callback(dropdowns[item.key]);
+                setDropdowns({ ...dropdowns, [item.key]: value });
+                setData({ ...data, [item.key]: value });
+                setShowSave(true);
+              }}
+              placeholder={`Select ${item.placeholder}`}
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdownContainer}
+              placeholderStyle={styles.dropdownPlaceholder}
+            />
+            
+             
               ) : item.key === "joiningDate" ? (
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(true)}
@@ -245,7 +250,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     marginBottom: 20,
-    marginTop: 70,
+    marginTop: 50,
   },
   headerTextContainer: {
     flex: 1,
@@ -316,6 +321,35 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 16,
   },
+
+
+
+  dropdown: {
+    height: 42,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    fontSize: 13,
+    fontFamily: "PlusR",
+    justifyContent: "center",
+    zIndex: 1000,
+  },
+  
+  dropdownContainer: {
+    backgroundColor: "#fff",
+    borderColor: "#ccc",
+    borderRadius: 10,
+    zIndex: 999,
+  },
+  
+  dropdownPlaceholder: {
+    color: "#999",
+    fontFamily: "PlusR",
+  }
+  
+  
 
 
 
