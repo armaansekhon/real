@@ -14,11 +14,13 @@ import { Dimensions } from "react-native";
 import { Platform } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import useTestAPIs from "../../hooks/useTestAPIs";
 
 const { height } = Dimensions.get("window");
 
 const Onboard = () => {
   const Router = useRouter();
+  // useTestAPIs();
 
   return (
     <>
@@ -61,8 +63,8 @@ const Onboard = () => {
       onPress={() => {
         console.log("Navigating to Login");
         // Router.push("/(auth)/Login");
-        // Router.push("/(drawer)/(tabs)/Home");
-        Router.push("/(drawer)/HR/E-Manage/AddEmp");
+        Router.push("/(drawer)/(tabs)/Home");
+        // Router.push("/(drawer)/HR/E-Manage/AddEmp");
       }}
     >
       <Ionicons
