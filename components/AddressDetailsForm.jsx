@@ -21,58 +21,66 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [dropdowns, setDropdowns] = useState({
-    department: null,
-    designation: null,
-    employeeType: null,
-    employeeCategory: null,
-    technology: null,
+    country: null,
+    district: null,
+    state: null,
+    city: null,
+    addressLine1: null,
+    addressLine2: null,
   });
 
   const [openDropdown, setOpenDropdown] = useState({
-    department: false,
-    designation: false,
-    employeeType: false,
-    employeeCategory: false,
-    technology: false,
+    country: false,
+    district: false,
+    state: false,
+    city: false,
+    addressLine1: false,
+    addressLine2: false,
   });
 
   const groupedFields = [
     [
-      { key: "department", placeholder: "Department" },
-      { key: "designation", placeholder: "Designation" },
+      { key: "country", placeholder: "Country" },
+      { key: "district", placeholder: "District" },
     ],
-    [{ key: "employeeType", placeholder: "Employee Type" }],
-    [
-      { key: "name", placeholder: "Name" },
-      { key: "joiningDate", placeholder: "Joining Date" },
+    [{ key: "state", placeholder: "State" },
+    { key: "city", placeholder: "City" },
     ],
     [
-      { key: "fatherName", placeholder: "Father Name" },
-      { key: "motherName", placeholder: "Mother Name" },
+      { key: "addressLine1", placeholder: "Address Line 1" },
+
+    ],
+    [
+
+      { key: "addressLine2", placeholder: "Address Line 2" },
     ],
   ];
 
   const options = {
-    department: [
-      { label: "HR", value: "HR" },
-      { label: "Engineering", value: "Engineering" },
-      { label: "Sales", value: "Sales" },
+    country: [
+      { label: "India", value: "India" },
+      { label: "Other", value: "Other" },
     ],
-    designation: [
+    district: [
       { label: "Manager", value: "Manager" },
       { label: "Developer", value: "Developer" },
       { label: "Intern", value: "Intern" },
     ],
-    employeeType: [
+    state: [
       { label: "Full-Time", value: "Full-Time" },
       { label: "Part-Time", value: "Part-Time" },
       { label: "Contract", value: "Contract" },
     ],
-    employeeCategory: [
+   city: [
       { label: "Permanent", value: "Permanent" },
       { label: "Temporary", value: "Temporary" },
     ],
-    technology: [
+    addressLine1: [
+      { label: "React", value: "React" },
+      { label: "Node.js", value: "Node.js" },
+      { label: "Python", value: "Python" },
+    ],
+    addressLine2: [
       { label: "React", value: "React" },
       { label: "Node.js", value: "Node.js" },
       { label: "Python", value: "Python" },
@@ -83,15 +91,20 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>Employee</Text>
+          <Text style={styles.headerTitle}>Address</Text>
           <Text style={styles.headerSubTitle}>Details</Text>
           <Text style={styles.headerDesc}>
-            Fill out the Employee Details below
+            Fill out the Address Details below
           </Text>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.flexGrid}>
+      <ScrollView  
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={true}
+      
+      contentContainerStyle={styles.flexGrid}>
         {groupedFields.map((row, rowIndex) => (
           <View
             key={rowIndex}
@@ -101,7 +114,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
               <View key={item.key} style={styles.inputWrapper}>
                 <Text style={styles.label}>{item.placeholder}</Text>
 
-                {["department", "designation", "employeeType", "employeeCategory", "technology"].includes(item.key) ? (
+                {["country", "district", "state", "city", "addressLine1", "addressLine2"].includes(item.key) ? (
                   <DropDownPicker
                     open={openDropdown[item.key]}
                     value={dropdowns[item.key]}
@@ -147,7 +160,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
             ))}
           </View>
         ))}
-      </ScrollView>
+    
 
       {showDatePicker && (
         <DateTimePicker
@@ -165,18 +178,33 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           }}
         />
       )}
+        </ScrollView>
 
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button} onPress={onBack}>
-          <Text style={styles.buttonText}>Back</Text>
+        <TouchableOpacity style={styles.button1} onPress={onBack}>
+            <Ionicons
+                        name="chevron-back-circle-sharp"
+                        size={55}
+                        color="black"
+                      />
+          {/* <Text style={styles.buttonText}>Back</Text> */}
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.button}
+          style={styles.button2}
+
+         
           onPress={() => {
             const updatedData = { ...data };
-            onSubmit(updatedData);
+            onSubmit(updatedData);   
           }}
         >
+
+{/* <Ionicons
+          name="checkmark-done-circle-sharp"
+          size={55}
+          color="black"
+
+        /> */}
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </View>
@@ -188,92 +216,155 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingBottom: 16,
   },
+
   headerRow: {
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  headerTextContainer: {
-    marginTop: 10,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-  headerSubTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#555",
-  },
-  headerDesc: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#777",
-  },
-  flexGrid: {
-    padding: 16,
-  },
-  rowContainer: {
     flexDirection: "row",
-    gap: 10,
-    marginBottom: 16,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    // marginTop: 70,
+     marginTop: Platform.OS === 'ios' ? 60 : 70,
   },
-  inputWrapper: {
+
+  headerTextContainer: {
     flex: 1,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6,
-    color: "#333",
+
+  placeholder: {
+    backgroundColor: "#eee",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
+
+  headerTitle: {
+    fontSize: 35,
+    fontFamily: "PlusSB",
   },
-  dateInput: {
+
+  headerSubTitle: {
+    fontSize: 30,
+    fontFamily: "PlusSB",
+    color: "#5aaf57",
+    marginTop: -5,
+  },
+
+  headerDesc: {
+    fontSize: 13,
+    fontFamily: "PlusR",
+    marginTop: 5,
+  },
+
+  flexGrid: {
+    flexDirection: "column",
+    gap: 16,
+    paddingHorizontal: 16, // adds side spacing
+    marginTop: 10,
+  },
+
+  rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    height: 40,
+    gap: 12, // more space between items
+  },
+
+  inputWrapper: {
+    flex: 1,
+    marginBottom: 4,
+    minWidth: 100,
+  },
+
+  input: {
+    height: 42,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    fontSize: 13,
+    fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2, // subtle shadow for Android
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  label: {
+    fontSize: 12,
+    fontFamily: "PlusR",
+    fontWeight: "600",
+    marginBottom: 4,
+    color: "#444",
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+  dropdown: {
+    height: 42,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    fontSize: 13,
+    fontFamily: "PlusR",
+    justifyContent: "center",
+    zIndex: 1000,
+  },
+  
+  dropdownContainer: {
     backgroundColor: "#fff",
+    borderColor: "#ccc",
+    borderRadius: 10,
+    zIndex: 999,
   },
-  selectText: {
-    color: "#666",
-    fontSize: 14,
+  
+  dropdownPlaceholder: {
+    color: "#999",
+    fontFamily: "PlusR",
   },
+
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
+    padding: 16,
   },
-  button: {
-    backgroundColor: "#5aaf57",
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
-  },
+
+//   button2: {
+// alignSelf: "flex-end",
+
+//   },
+  button1: {
+    alignSelf: "flex-start"
+    
+      },
+
+      buttonText: {
+        color: "#fff",               
+        borderColor: "#000",        
+        borderWidth: 2,            
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 26,
+        fontFamily: "PlusSB",       
+        fontSize: 17,            
+        textAlign: "center",
+        backgroundColor: "#000",
+      },
+      
 });
