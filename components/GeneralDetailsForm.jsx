@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -127,7 +128,13 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   </View>
 
   {/* ScrollView only for form fields */}
-  <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+  <ScrollView 
+    keyboardShouldPersistTaps="handled"
+    keyboardDismissMode="on-drag"
+    showsVerticalScrollIndicator={false}
+    contentContainerStyle={{ paddingBottom: 200 }}>
+
+    
     <View style={styles.flexGrid}>
       {groupedFields.map((row, rowIndex) => (
         <View
@@ -139,23 +146,22 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
               <Text style={styles.label}>{item.placeholder}</Text>
 
               {dropdownKeys.includes(item.key) ? (
-              <DropDownPicker
-              open={openDropdown[item.key]}
-              value={dropdowns[item.key]}
-              items={options[item.key]}
-              setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
-              setValue={(callback) => {
-                const value = callback(dropdowns[item.key]);
-                setDropdowns({ ...dropdowns, [item.key]: value });
-                setData({ ...data, [item.key]: value });
-                setShowSave(true);
-              }}
-              placeholder={`Select ${item.placeholder}`}
-              style={styles.dropdown}
-              dropDownContainerStyle={styles.dropdownContainer}
-              placeholderStyle={styles.dropdownPlaceholder}
-            />
-            
+               <DropDownPicker
+               open={openDropdown[item.key]}
+               value={dropdowns[item.key]}
+               items={options[item.key]}
+               setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
+               setValue={(callback) => {
+                 const value = callback(dropdowns[item.key]);
+                 setDropdowns({ ...dropdowns, [item.key]: value });
+                 setData({ ...data, [item.key]: value });
+                 setShowSave(true);
+               }}
+               placeholder={`Select ${item.placeholder}`}
+               style={styles.dropdown}
+               dropDownContainerStyle={styles.dropdownContainer}
+               placeholderStyle={styles.dropdownPlaceholder}
+             />
              
               ) : item.key === "joiningDate" ? (
                 <TouchableOpacity
@@ -243,6 +249,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+   
   },
   headerRow: {
     flexDirection: "row",
@@ -250,8 +257,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     marginBottom: 20,
-    marginTop: 50,
+    // marginTop: 50,
+    marginTop: Platform.OS === 'ios' ? 60 : 50,
   },
+
   headerTextContainer: {
     flex: 1,
   },
@@ -324,6 +333,9 @@ const styles = StyleSheet.create({
 
 
 
+
+
+
   dropdown: {
     height: 42,
     backgroundColor: "#f9f9f9",
@@ -348,7 +360,6 @@ const styles = StyleSheet.create({
     color: "#999",
     fontFamily: "PlusR",
   }
-  
   
 
 

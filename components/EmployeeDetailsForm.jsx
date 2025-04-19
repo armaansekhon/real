@@ -21,6 +21,9 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import DropDownPicker from "react-native-dropdown-picker";
 
 
+
+
+
 const { height } = Dimensions.get("window");
 
 export default function EmployeeDetailsForm({ initialData, onNext }) {
@@ -179,7 +182,14 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           <Ionicons name="save-outline" size={24} color="#fff" />
         </TouchableOpacity>
       )}
+<ScrollView
 
+
+keyboardShouldPersistTaps="handled"
+keyboardDismissMode="on-drag"
+showsVerticalScrollIndicator={false}
+>
+  
       <View style={styles.flexGrid}>
         {groupedFields.map((row, rowIndex) => (
           <View key={rowIndex} style={[styles.rowContainer, { zIndex: 1000 - rowIndex * 10 }]}>
@@ -268,6 +278,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           }}
         />
       )}
+      </ScrollView>
 
       {/* Next button replaced with icon */}
       <TouchableOpacity style={styles.nextButton} onPress={() => onNext(data)}>
@@ -306,7 +317,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     marginBottom: 20,
-    marginTop: 70,
+    // marginTop: 70,
+    marginTop: Platform.OS === 'ios' ? 60 : 70,
   },
 
   headerTextContainer: {
