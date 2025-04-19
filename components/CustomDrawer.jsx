@@ -147,7 +147,7 @@ const CustomDrawer = ({ navigation }) => {
           <View style={styles.headerTextContainer}>
           <Text style={styles.welcomeText}>
               {/* {/* Welcome <Text style={styles.adminText}>{user.name}</Text> */}
-              Welcome <Text style={styles.adminText}>Admin</Text> 
+              Hello !  <Text style={styles.adminText}>Admin</Text> 
             </Text>
             <Text style={styles.designation}>Executive</Text>
           </View>
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
     backgroundColor:"#f0fff0",
+    // #f8f9fa
     paddingVertical: 20,
     paddingHorizontal: 15,
   },

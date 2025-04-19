@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 
 
 import { useUser } from '../../../context/UserContext';
+import Adminhome from '../../../components/Adminhome';
 
 
 const Home = () => {
@@ -21,16 +22,12 @@ const Home = () => {
   // console.log("hello",type);
   return (
  
-    <SafeAreaView style={{ flex: 1  , backgroundColor:"white"}}>
-    <View style={{ flex: 1, justifyContent: "center", backgroundColor:"white", alignItems: "center" }}>
-      <Text>Welcome to the Home Screen!</Text>
-      <Text>Welcome {user?.name || 'Guest'}!</Text>
-      <Text>User Type: {userType}</Text>
-    </View>
-
-    {/* Add the CustomTabBar component */}
+ 
+    
+      <Adminhome></Adminhome>
+    
    
-  </SafeAreaView>
+ 
 
   );
 };
