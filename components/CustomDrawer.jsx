@@ -147,7 +147,7 @@ const CustomDrawer = ({ navigation }) => {
           <View style={styles.headerTextContainer}>
           <Text style={styles.welcomeText}>
               {/* {/* Welcome <Text style={styles.adminText}>{user.name}</Text> */}
-              Welcome <Text style={styles.adminText}>Admin</Text> 
+              Hello !  <Text style={styles.adminText}>Admin</Text> 
             </Text>
             <Text style={styles.designation}>Executive</Text>
           </View>
@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
     backgroundColor:"#f0fff0",
+    // #f8f9fa
     paddingVertical: 20,
     paddingHorizontal: 15,
   },
@@ -180,12 +181,16 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
+    
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: Platform.OS === "ios" ? 75 : 30,
     paddingBottom:20,
     backgroundColor: "#f8f9fa",
+    top:0,
+    left:0,
+    right:0,
     // borderBottomWidth: 1,
     borderColor: "green",
     marginBottom: 10,
@@ -267,7 +272,7 @@ marginBottom:30,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    marginBottom: Platform.OS === "ios" ? 60 : 30,
+    marginBottom: Platform.OS === "ios" ? 50 : 10,
   },
   loginButtonText: {
     color: "#444",
