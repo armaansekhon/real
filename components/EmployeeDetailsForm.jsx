@@ -18,13 +18,39 @@ import { Dimensions } from "react-native";
 
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import DropDownPicker from "react-native-dropdown-picker";
-
-
-
+import { Dropdown } from "react-native-element-dropdown";
 
 
 const { height } = Dimensions.get("window");
+
+
+const CustomDropdown = ({ value, setValue, data, placeholder }) => {
+  const [isFocus, setIsFocus] = useState(false);
+
+  return (
+    <Dropdown
+      style={[styles.dropdown, isFocus && { borderColor: "#5aaf57" }]}
+      placeholderStyle={styles.dropdownPlaceholder}
+      selectedTextStyle={styles.dropdownPlaceholder}
+      data={data}
+      maxHeight={200}
+      labelField="label"
+      valueField="value"
+      placeholder={placeholder}
+      value={value}
+      onFocus={() => setIsFocus(true)}
+      onBlur={() => setIsFocus(false)}
+      onChange={(item) => {
+        setValue(item.value);
+        setIsFocus(false);
+      }}
+    />
+  );
+};
+
+
+
+
 
 export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [data, setData] = useState(initialData || {});
@@ -198,22 +224,15 @@ showsVerticalScrollIndicator={false}
               <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
                 <Text style={styles.label}>{item.placeholder}</Text>
                 {["department", "designation", "employeeType", "employeeCategory", "technology"].includes(item.key) ? (
-    <DropDownPicker
-    open={openDropdown[item.key]}
-    value={dropdowns[item.key]}
-    items={options[item.key]}
-    setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
-    setValue={(callback) => {
-      const value = callback(dropdowns[item.key]);
-      setDropdowns({ ...dropdowns, [item.key]: value });
-      setData({ ...data, [item.key]: value });
-      setShowSave(true);
-    }}
-    placeholder={`Select ${item.placeholder}`}
-    style={styles.dropdown}
-    dropDownContainerStyle={styles.dropdownContainer}
-    placeholderStyle={styles.dropdownPlaceholder}
-  />
+      <CustomDropdown
+      value={dropdowns[item.key]}
+      setValue={(val) => {
+        setDropdowns({ ...dropdowns, [item.key]: val });
+        setData({ ...data, [item.key]: val });
+      }}
+      data={options[item.key]}
+      placeholder={` ${item.placeholder}`}
+    />
   
                 ) : 
                 item.key === "joiningDate" ? (
@@ -386,7 +405,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     borderRadius: 10,
     paddingHorizontal: 14,
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
