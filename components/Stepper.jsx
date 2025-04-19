@@ -9,9 +9,7 @@ import {
 } from 'react-native';
 
 const Stepper = ({ currentStep, labels, onStepPress }) => {
-  const animatedWidths = useRef(
-    labels.map(() => new Animated.Value(0))
-  ).current;
+  const animatedWidths = useRef(labels.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
     animatedWidths.forEach((animVal, index) => {
@@ -46,14 +44,18 @@ const Stepper = ({ currentStep, labels, onStepPress }) => {
                     styles.circle,
                     {
                       backgroundColor: isCompleted
-                        ? '#3b82f6'
+                        ? '#32cd32'
                         : isActive
                         ? '#5aaf57'
                         : '#ccc',
                     },
                   ]}
                 >
-                  <Text style={styles.circleText}>{index + 1}</Text>
+                  {isCompleted ? (
+                    <Text style={styles.checkmark}>✔</Text>
+                  ) : (
+                    <View style={styles.innerDot} />
+                  )}
                 </View>
                 <Text
                   style={[
@@ -66,20 +68,22 @@ const Stepper = ({ currentStep, labels, onStepPress }) => {
                 </Text>
               </Pressable>
 
-              {/* Line only if not last */}
               {!isLast && (
-                <Animated.View
-                  style={[
-                    styles.line,
-                    {
-                      backgroundColor: '#32cd32',
-                      width: animatedWidths[index].interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ['0%', '100%'],
-                      }),
-                    },
-                  ]}
-                />
+    <View style={styles.lineWrapper}>
+    <View style={styles.staticLine} />
+    <Animated.View
+      style={[
+        styles.animatedLine,
+        {
+          width: animatedWidths[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0%', '100%'],
+          }),
+        },
+      ]}
+    />
+  </View>
+  
               )}
             </View>
           );
@@ -97,7 +101,10 @@ const styles = StyleSheet.create({
   stepperContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
+    width: '100%',
+    marginLeft: 30,
+    marginTop: 90
   },
   stepSection: {
     flex: 1,
@@ -109,22 +116,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circle: {
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  circleText: {
+  innerDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
+  checkmark: {
+    fontSize: 12,
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 11,
   },
   label: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#666',
     textAlign: 'center',
     marginTop: 4,
+    fontFamily: 'PlusR',
   },
   completedLabel: {
     color: '#5aaf57',
@@ -136,11 +150,37 @@ const styles = StyleSheet.create({
   },
   line: {
     height: 2,
-    backgroundColor: '#5aaf57',
     marginHorizontal: 8,
     marginTop: -15,
     alignSelf: 'center',
+    left: -23,
   },
+
+
+
+
+
+
+  lineWrapper: {
+    position: 'relative',
+    flexGrow: 1,
+    height: 2,
+    marginHorizontal: -5,  // slightly more space
+    marginTop: -15,
+    justifyContent: 'center',
+  },
+  staticLine: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#ccc',
+    borderRadius: 1,
+    
+  },
+  animatedLine: {
+    height: 2,
+    backgroundColor: '#32cd32',
+    borderRadius: 1,
+  },
+  
 });
 
 export default Stepper;
