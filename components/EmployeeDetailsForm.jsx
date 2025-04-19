@@ -271,7 +271,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
 
       {/* Next button replaced with icon */}
       <TouchableOpacity style={styles.nextButton} onPress={() => onNext(data)}>
-        <Ionicons name="arrow-forward-circle" size={50} color="#4CAF50" />
+        <Ionicons name="arrow-forward-circle" size={55} color="black" />
       </TouchableOpacity>
     </SafeAreaView>
   );

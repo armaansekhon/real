@@ -108,12 +108,15 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   {/* Header stays outside ScrollView */}
   <View style={styles.headerRow}>
     <View style={styles.headerTextContainer}>
-      <Text style={styles.headerTitle}>General</Text>
-      <Text style={styles.headerSubTitle}>Details</Text>
+      <Text style={styles.headerTitle}>General <Text style={styles.greenText}>Details</Text></Text>
+      {/* <Text style={styles.headerSubTitle}>Details</Text> */}
       <Text style={styles.headerDesc}>
         Fill out the General Details below
       </Text>
+
+      
     </View>
+  
   </View>
 
   {/* ScrollView only for form fields */}
@@ -209,10 +212,22 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   {/* Buttons */}
   <View style={styles.buttonsContainer}>
     <TouchableOpacity onPress={onBack}>
-      <Text>Back</Text>
+    <Ionicons
+              name="chevron-back-circle-sharp"
+              size={55}
+              color="black"
+            />
+
+  
+      {/* <Text>Back</Text> */}
     </TouchableOpacity>
     <TouchableOpacity onPress={() => onNext(data)}>
-      <Text>Next</Text>
+    <Ionicons
+              name="chevron-forward-circle-sharp"
+              size={55}
+              color="black"
+            />
+      {/* <Text>Next</Text> */}
     </TouchableOpacity>
   </View>
 </SafeAreaView>
@@ -238,6 +253,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 35,
     fontFamily: "PlusSB",
+  },
+  
+  greenText: {
+    color: "#5aaf57",
+    // fontFamily: "PlusSB",
   },
   headerSubTitle: {
     fontSize: 30,
