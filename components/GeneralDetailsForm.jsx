@@ -12,12 +12,38 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import DropDownPicker from "react-native-dropdown-picker";
+import { Dropdown } from "react-native-element-dropdown";
 import RNPickerSelect from "react-native-picker-select";
 
-// ...imports stay same
 
 const { height } = Dimensions.get("window");
+
+
+
+const CustomDropdown = ({ value, setValue, data, placeholder }) => {
+  const [isFocus, setIsFocus] = useState(false);
+
+  return (
+    <Dropdown
+      style={[styles.dropdown, isFocus && { borderColor: "#5aaf57", }]}
+      placeholderStyle={styles.dropdownPlaceholder}
+      selectedTextStyle={styles.dropdownPlaceholder}
+      data={data}
+      maxHeight={200}
+      labelField="label"
+      valueField="value"
+      placeholder={placeholder}
+      value={value}
+      onFocus={() => setIsFocus(true)}
+      onBlur={() => setIsFocus(false)}
+      onChange={(item) => {
+        setValue(item.value);
+        setIsFocus(false);
+      }}
+    />
+  );
+};
+
 
 export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   const [data, setData] = useState(initialData || {});
@@ -56,7 +82,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
 
     [
       { key: "category", placeholder: "Category" },
-      { key: "senior", placeholder: "Senior (Report To)" },
+      { key: "senior", placeholder: "Report To" },
 
     ],
 
@@ -132,7 +158,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     keyboardShouldPersistTaps="handled"
     keyboardDismissMode="on-drag"
     showsVerticalScrollIndicator={false}
-    contentContainerStyle={{ paddingBottom: 200 }}>
+    contentContainerStyle={{ paddingBottom: 80 }}>
 
     
     <View style={styles.flexGrid}>
@@ -146,23 +172,15 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
               <Text style={styles.label}>{item.placeholder}</Text>
 
               {dropdownKeys.includes(item.key) ? (
-               <DropDownPicker
-               open={openDropdown[item.key]}
-               value={dropdowns[item.key]}
-               items={options[item.key]}
-               setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
-               setValue={(callback) => {
-                 const value = callback(dropdowns[item.key]);
-                 setDropdowns({ ...dropdowns, [item.key]: value });
-                 setData({ ...data, [item.key]: value });
-                 setShowSave(true);
-               }}
-               placeholder={`Select ${item.placeholder}`}
-               style={styles.dropdown}
-               dropDownContainerStyle={styles.dropdownContainer}
-               placeholderStyle={styles.dropdownPlaceholder}
-             />
-             
+                <CustomDropdown
+                value={dropdowns[item.key]}
+                setValue={(val) => {
+                  setDropdowns({ ...dropdowns, [item.key]: val });
+                  setData({ ...data, [item.key]: val });
+                }}
+                data={options[item.key]}
+                placeholder={` ${item.placeholder}`}
+              />
               ) : item.key === "joiningDate" ? (
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(true)}
@@ -170,7 +188,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
                 >
                   <Text
                     style={{
-                      color: data.joiningDate ? "#000" : "#999",
+                      color: data.joiningDate ? "#000" : "#333",
                       fontFamily: "PlusR",
                       fontSize: 13,
                     }}
@@ -187,7 +205,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
                 <TextInput
                   style={styles.input}
                   placeholder={item.placeholder}
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#333"
                   value={data[item.key] || ""}
                   onChangeText={(text) =>
                     setData({ ...data, [item.key]: text })
@@ -309,19 +327,18 @@ const styles = StyleSheet.create({
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 2,
+    // elevation: 2,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   label: {
     fontSize: 12,
-    fontFamily: "PlusR",
-    fontWeight: "600",
+    fontFamily: "PlusSB",
     marginBottom: 4,
     color: "#444",
   },
@@ -343,7 +360,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderColor: "#ccc",
     borderWidth: 1,
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: "PlusR",
     justifyContent: "center",
     zIndex: 1000,
@@ -357,8 +374,9 @@ const styles = StyleSheet.create({
   },
   
   dropdownPlaceholder: {
-    color: "#999",
+    color: "#333",
     fontFamily: "PlusR",
+    fontSize: 14
   }
   
 
