@@ -18,10 +18,33 @@ import { Dimensions } from "react-native";
 
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import DropDownPicker from "react-native-dropdown-picker";
-
+import { Dropdown } from "react-native-element-dropdown";
 
 const { height } = Dimensions.get("window");
+
+const CustomDropdown = ({ value, setValue, data, placeholder }) => {
+  const [isFocus, setIsFocus] = useState(false);
+
+  return (
+    <Dropdown
+      style={[styles.dropdown, isFocus && { borderColor: "#5aaf57" }]}
+      placeholderStyle={styles.dropdownPlaceholder}
+      selectedTextStyle={styles.dropdownPlaceholder}
+      data={data}
+      maxHeight={200}
+      labelField="label"
+      valueField="value"
+      placeholder={placeholder}
+      value={value}
+      onFocus={() => setIsFocus(true)}
+      onBlur={() => setIsFocus(false)}
+      onChange={(item) => {
+        setValue(item.value);
+        setIsFocus(false);
+      }}
+    />
+  );
+};
 
 export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [data, setData] = useState(initialData || {});
@@ -102,7 +125,6 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
     ],
   };
 
-
   const [dropdowns, setDropdowns] = useState({
     department: null,
     designation: null,
@@ -110,7 +132,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
     employeeCategory: null,
     technology: null,
   });
-  
+
   const [openDropdown, setOpenDropdown] = useState({
     department: false,
     designation: false,
@@ -118,7 +140,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
     employeeCategory: false,
     technology: false,
   });
-  
+
   const options = {
     department: [
       { label: "HR", value: "HR" },
@@ -145,7 +167,6 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       { label: "Python", value: "Python" },
     ],
   };
-  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -179,95 +200,100 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           <Ionicons name="save-outline" size={24} color="#fff" />
         </TouchableOpacity>
       )}
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.flexGrid}>
+          {groupedFields.map((row, rowIndex) => (
+            <View
+              key={rowIndex}
+              style={[styles.rowContainer, { zIndex: 1000 - rowIndex * 10 }]}
+            >
+              {row.map((item) => (
+                <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
+                  <Text style={styles.label}>{item.placeholder}</Text>
+                  {[
+                    "department",
+                    "designation",
+                    "employeeType",
+                    "employeeCategory",
+                    "technology",
+                  ].includes(item.key) ? (
+                    <CustomDropdown
+                      value={dropdowns[item.key]}
+                      setValue={(val) => {
+                        setDropdowns({ ...dropdowns, [item.key]: val });
+                        setData({ ...data, [item.key]: val });
+                      }}
+                      data={options[item.key]}
+                      placeholder={` ${item.placeholder}`}
+                    />
+                  ) : item.key === "joiningDate" ? (
+                    <TouchableOpacity
+                      onPress={() => setShowDatePicker(true)}
+                      style={[styles.input]}
+                    >
+                      <Text style={[styles.select, { color: "#333", fontFamily: "PlusR" }]}>
+                        {data.joiningDate || "Select Date"}
+                      </Text>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color="#777"
+                      />
+                    </TouchableOpacity>
+                  ) : dropdownOptions[item.key] ? (
+                    <RNPickerSelect
+                      onValueChange={(value) =>
+                        setData({ ...data, [item.key]: value })
+                      }
+                      items={dropdownOptions[item.key]}
+                      value={data[item.key] || ""}
+                      style={{
+                        inputIOS: styles.input,
+                        inputAndroid: styles.input,
+                      }}
+                      useNativeAndroidPickerStyle={false}
+                      placeholder={{
+                        label: `Select ${item.placeholder}`,
+                        value: null,
+                      }}
+                    />
+                  ) : (
+                    <TextInput
+                      style={styles.input}
+                      placeholder={item.placeholder}
+                      value={data[item.key] || ""}
+                      onChangeText={(text) =>
+                        setData({ ...data, [item.key]: text })
+                      }
+                    />
+                  )}
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
 
-      <View style={styles.flexGrid}>
-        {groupedFields.map((row, rowIndex) => (
-          <View key={rowIndex} style={[styles.rowContainer, { zIndex: 1000 - rowIndex * 10 }]}>
-
-            {row.map((item) => (
-              <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
-                <Text style={styles.label}>{item.placeholder}</Text>
-                {["department", "designation", "employeeType", "employeeCategory", "technology"].includes(item.key) ? (
-    <DropDownPicker
-    open={openDropdown[item.key]}
-    value={dropdowns[item.key]}
-    items={options[item.key]}
-    setOpen={(o) => setOpenDropdown({ ...openDropdown, [item.key]: o })}
-    setValue={(callback) => {
-      const value = callback(dropdowns[item.key]);
-      setDropdowns({ ...dropdowns, [item.key]: value });
-      setData({ ...data, [item.key]: value });
-      setShowSave(true);
-    }}
-    placeholder={`Select ${item.placeholder}`}
-    style={styles.dropdown}
-    dropDownContainerStyle={styles.dropdownContainer}
-    placeholderStyle={styles.dropdownPlaceholder}
-  />
-  
-                ) : 
-                item.key === "joiningDate" ? (
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker(true)}
-                    style={[
-                      styles.input,
-                     
-                    ]}
-                  >
-                    <Text style={[styles.select, { color: "#999"}]}>{data.joiningDate || "Select Date"}</Text>
-                    <Ionicons name="calendar-outline" size={18} color="#777" />
-                  </TouchableOpacity>
-                ) : dropdownOptions[item.key] ? (
-                  <RNPickerSelect
-                    onValueChange={(value) =>
-                      setData({ ...data, [item.key]: value })
-                    }
-                    items={dropdownOptions[item.key]}
-                    value={data[item.key] || ""}
-                    style={{
-                      inputIOS: styles.input,
-                      inputAndroid: styles.input,
-                    }}
-                    useNativeAndroidPickerStyle={false}
-                    placeholder={{
-                      label: `Select ${item.placeholder}`,
-                      value: null,
-                    }}
-                  />
-                ) : (
-                  <TextInput
-                    style={styles.input}
-                    placeholder={item.placeholder}
-                    value={data[item.key] || ""}
-                    onChangeText={(text) =>
-                      setData({ ...data, [item.key]: text })
-                    }
-                  />
-                )}
-            
-              </View>
-              
-            ))}
-          </View>
-        ))}
-      </View>
-
-      {showDatePicker && (
-        <DateTimePicker
-          value={data.joiningDate ? new Date(data.joiningDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setData({
-                ...data,
-                joiningDate: selectedDate.toISOString().split("T")[0],
-              });
-            }
-          }}
-        />
-      )}
+        {showDatePicker && (
+          <DateTimePicker
+            value={data.joiningDate ? new Date(data.joiningDate) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                setData({
+                  ...data,
+                  joiningDate: selectedDate.toISOString().split("T")[0],
+                });
+              }
+            }}
+          />
+        )}
+      </ScrollView>
 
       {/* Next button replaced with icon */}
       <TouchableOpacity style={styles.nextButton} onPress={() => onNext(data)}>
@@ -306,7 +332,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     marginBottom: 20,
-    marginTop: 70,
+    // marginTop: 70,
+    marginTop: Platform.OS === "ios" ? 60 : 70,
   },
 
   headerTextContainer: {
@@ -372,17 +399,18 @@ const styles = StyleSheet.create({
   input: {
     height: 42,
     backgroundColor: "#f9f9f9",
+  
     borderRadius: 10,
     paddingHorizontal: 14,
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2, // subtle shadow for Android
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 2,
+    elevation: 0, // subtle shadow for Android
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -390,23 +418,10 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 12,
-    fontFamily: "PlusR",
-    fontWeight: "600",
+    fontFamily: "PlusSB",
     marginBottom: 4,
     color: "#444",
   },
-
-
-
-
-
-
-
-
-
-
-
-
 
   dropdown: {
     height: 42,
@@ -420,17 +435,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 1000,
   },
-  
-  dropdownContainer: {
-    backgroundColor: "#fff",
-    borderColor: "#ccc",
-    borderRadius: 10,
-    zIndex: 999,
-  },
-  
+
+  // dropdownContainer: {
+  //   backgroundColor: "#fff",
+  //   borderColor: "#ccc",
+  //   borderRadius: 10,
+  //   zIndex: 999,
+  // },
+
   dropdownPlaceholder: {
-    color: "#999",
+    color: "#333",
     fontFamily: "PlusR",
-  }
-  
+    fontSize: 14,
+  },
 });

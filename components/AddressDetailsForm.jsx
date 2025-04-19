@@ -8,71 +8,88 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Platform,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Dimensions } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Dropdown } from "react-native-element-dropdown";
 
-const { height } = Dimensions.get("window");
+
+const CustomDropdown = ({ value, setValue, data, placeholder }) => {
+  const [isFocus, setIsFocus] = useState(false);
+
+  return (
+    <Dropdown
+      style={[styles.dropdown, isFocus && { borderColor: "#5aaf57" }]}
+      placeholderStyle={styles.dropdownPlaceholder}
+      selectedTextStyle={styles.dropdownPlaceholder}
+      data={data}
+      maxHeight={200}
+      labelField="label"
+      valueField="value"
+      placeholder={placeholder}
+      value={value}
+      onFocus={() => setIsFocus(true)}
+      onBlur={() => setIsFocus(false)}
+      onChange={(item) => {
+        setValue(item.value);
+        setIsFocus(false);
+      }}
+    />
+  );
+};
 
 export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [dropdowns, setDropdowns] = useState({
-    department: null,
-    designation: null,
-    employeeType: null,
-    employeeCategory: null,
-    technology: null,
-  });
-
-  const [openDropdown, setOpenDropdown] = useState({
-    department: false,
-    designation: false,
-    employeeType: false,
-    employeeCategory: false,
-    technology: false,
+    country: null,
+    district: null,
+    state: null,
+    city: null,
+    addressLine1: null,
+    addressLine2: null,
   });
 
   const groupedFields = [
     [
-      { key: "department", placeholder: "Department" },
-      { key: "designation", placeholder: "Designation" },
-    ],
-    [{ key: "employeeType", placeholder: "Employee Type" }],
-    [
-      { key: "name", placeholder: "Name" },
-      { key: "joiningDate", placeholder: "Joining Date" },
+      { key: "country", placeholder: "Country" },
+      { key: "district", placeholder: "District" },
     ],
     [
-      { key: "fatherName", placeholder: "Father Name" },
-      { key: "motherName", placeholder: "Mother Name" },
+      { key: "state", placeholder: "State" },
+      { key: "city", placeholder: "City" },
     ],
+    [{ key: "addressLine1", placeholder: "Address Line 1" }],
+    [{ key: "addressLine2", placeholder: "Address Line 2" }],
   ];
 
   const options = {
-    department: [
-      { label: "HR", value: "HR" },
-      { label: "Engineering", value: "Engineering" },
-      { label: "Sales", value: "Sales" },
+    country: [
+      { label: "India", value: "India" },
+      { label: "Other", value: "Other" },
     ],
-    designation: [
+    district: [
       { label: "Manager", value: "Manager" },
       { label: "Developer", value: "Developer" },
       { label: "Intern", value: "Intern" },
     ],
-    employeeType: [
+    state: [
       { label: "Full-Time", value: "Full-Time" },
       { label: "Part-Time", value: "Part-Time" },
       { label: "Contract", value: "Contract" },
     ],
-    employeeCategory: [
+    city: [
       { label: "Permanent", value: "Permanent" },
       { label: "Temporary", value: "Temporary" },
     ],
-    technology: [
+    addressLine1: [
+      { label: "React", value: "React" },
+      { label: "Node.js", value: "Node.js" },
+      { label: "Python", value: "Python" },
+    ],
+    addressLine2: [
       { label: "React", value: "React" },
       { label: "Node.js", value: "Node.js" },
       { label: "Python", value: "Python" },
@@ -83,15 +100,20 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>Employee</Text>
+          <Text style={styles.headerTitle}>Address</Text>
           <Text style={styles.headerSubTitle}>Details</Text>
           <Text style={styles.headerDesc}>
-            Fill out the Employee Details below
+            Fill out the Address Details below
           </Text>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.flexGrid}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={true}
+        contentContainerStyle={styles.flexGrid}
+      >
         {groupedFields.map((row, rowIndex) => (
           <View
             key={rowIndex}
@@ -101,77 +123,49 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
               <View key={item.key} style={styles.inputWrapper}>
                 <Text style={styles.label}>{item.placeholder}</Text>
 
-                {["department", "designation", "employeeType", "employeeCategory", "technology"].includes(item.key) ? (
-                  <DropDownPicker
-                    open={openDropdown[item.key]}
-                    value={dropdowns[item.key]}
-                    items={options[item.key]}
-                    setOpen={(o) =>
-                      setOpenDropdown({ ...openDropdown, [item.key]: o })
-                    }
-                    setValue={(callback) => {
-                      const value = callback(dropdowns[item.key]);
-                      setDropdowns({ ...dropdowns, [item.key]: value });
-                      setData({ ...data, [item.key]: value });
-                    }}
-                    placeholder={` ${item.placeholder}`}
-                    style={{
-                      borderColor: "#ccc",
-                      backgroundColor: "#f9f9f9",
-                    }}
-                    containerStyle={{ zIndex: 1000 }}
-                    dropDownContainerStyle={{ zIndex: 999 }}
-                    placeholderStyle={{ color: "#999" }}
-                  />
-                ) : item.key === "joiningDate" ? (
-                  <TouchableOpacity
-                    onPress={() => setShowDatePicker(true)}
-                    style={styles.dateInput}
-                  >
-                    <Text style={styles.selectText}>
-                      {data.joiningDate || "Select Date"}
-                    </Text>
-                    <Ionicons name="calendar-outline" size={18} color="#777" />
-                  </TouchableOpacity>
-                ) : (
-                  <TextInput
-                    style={styles.input}
-                    placeholder={item.placeholder}
-                    value={data[item.key] || ""}
-                    onChangeText={(text) =>
-                      setData({ ...data, [item.key]: text })
-                    }
-                  />
-                )}
+                <CustomDropdown
+                  value={dropdowns[item.key]}
+                  setValue={(val) => {
+                    setDropdowns({ ...dropdowns, [item.key]: val });
+                    setData({ ...data, [item.key]: val });
+                  }}
+                  data={options[item.key]}
+                  placeholder={` ${item.placeholder}`}
+                />
               </View>
             ))}
           </View>
         ))}
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={data.joiningDate ? new Date(data.joiningDate) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                setData({
+                  ...data,
+                  joiningDate: selectedDate.toISOString().split("T")[0],
+                });
+              }
+            }}
+          />
+        )}
       </ScrollView>
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={data.joiningDate ? new Date(data.joiningDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setData({
-                ...data,
-                joiningDate: selectedDate.toISOString().split("T")[0],
-              });
-            }
-          }}
-        />
-      )}
-
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button} onPress={onBack}>
-          <Text style={styles.buttonText}>Back</Text>
+        <TouchableOpacity style={styles.button1} onPress={onBack}>
+          <Ionicons
+            name="chevron-back-circle-sharp"
+            size={55}
+            color="black"
+          />
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={styles.button}
+          style={styles.button2}
           onPress={() => {
             const updatedData = { ...data };
             onSubmit(updatedData);
@@ -188,92 +182,125 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingBottom: 16,
   },
+
   headerRow: {
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  headerTextContainer: {
-    marginTop: 10,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-  headerSubTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#555",
-  },
-  headerDesc: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#777",
-  },
-  flexGrid: {
-    padding: 16,
-  },
-  rowContainer: {
     flexDirection: "row",
-    gap: 10,
-    marginBottom: 16,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginTop: Platform.OS === "ios" ? 60 : 70,
+    marginBottom: 20,
   },
-  inputWrapper: {
+
+  headerTextContainer: {
     flex: 1,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6,
-    color: "#333",
+
+  headerTitle: {
+    fontSize: 35,
+    fontFamily: "PlusSB",
   },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
+
+  headerSubTitle: {
+    fontSize: 30,
+    fontFamily: "PlusSB",
+    color: "#5aaf57",
+    marginTop: -5,
   },
-  dateInput: {
+
+  headerDesc: {
+    fontSize: 13,
+    fontFamily: "PlusR",
+    marginTop: 5,
+  },
+
+  flexGrid: {
+    flexDirection: "column",
+    gap: 16,
+    paddingHorizontal: 16,
+    marginTop: 10,
+  },
+
+  rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    height: 40,
+    gap: 12,
+  },
+
+  inputWrapper: {
+    flex: 1,
+    marginBottom: 4,
+    minWidth: 100,
+  },
+
+  input: {
+    height: 42,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    fontSize: 13,
+    fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  selectText: {
-    color: "#666",
+
+  label: {
+    fontSize: 12,
+    fontFamily: "PlusSB",
+    fontWeight: "600",
+    marginBottom: 4,
+    color: "#222",
+  },
+
+  dropdown: {
+    height: 42,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    fontSize: 13,
+    fontFamily: "PlusR",
+    justifyContent: "center",
+  },
+
+  dropdownPlaceholder: {
+    color: "#333",
+    fontFamily: "PlusR",
     fontSize: 14,
   },
+
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
+    padding: 16,
   },
-  button: {
-    backgroundColor: "#5aaf57",
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+
+  button1: {
+    alignSelf: "flex-start",
   },
+
+  button2: {
+    alignSelf: "flex-end",
+  },
+
   buttonText: {
     color: "#fff",
-    fontSize: 14,
-    fontWeight: "600",
+    backgroundColor: "#000",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 26,
+    fontFamily: "PlusSB",
+    fontSize: 17,
+    textAlign: "center",
   },
 });
