@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, SafeAreaView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
 import EmployeeDetailsForm from '../../../../components/EmployeeDetailsForm';
 import GeneralDetailsForm from '../../../../components/GeneralDetailsForm';
 import AddressDetailsForm from '../../../../components/AddressDetailsForm';
-
 import Stepper from '../../../../components/Stepper';
 
-export default function AddEmployee() {
-  const [step, setStep] = useState(0);
+const { height, width } = Dimensions.get('window');
 
+export default function AddEmployee({ navigation }) {
+  const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     employeeDetails: {},
     generalDetails: {},
@@ -28,26 +38,36 @@ export default function AddEmployee() {
   const handleSubmit = (finalData) => {
     console.log('Final Submitted Data: ', finalData);
     Alert.alert('Success!', 'All data submitted.');
-    
     setFormData({
       employeeDetails: {},
       generalDetails: {},
       addressDetails: {},
     });
     setStep(0);
-
   };
 
-
-
   return (
-   <SafeAreaView style={styles.container}>
-    <Stepper
-    currentStep={step}
-    labels={['Employee', 'General', 'Address']}
-    onStepPress={(index) => setStep(index)} // allows backward navigation
-    />
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color="#333" />
+        </TouchableOpacity>
 
+        <View style={styles.stepperContainer}>
+          <Stepper
+            currentStep={step}
+            labels={['Employee', 'General', 'Address']}
+            onStepPress={(index) => setStep(index)}
+          />
+        </View>
+
+        {/* <TouchableOpacity onPress={() => Alert.alert('Notifications')}>
+          <Ionicons name="notifications-outline" size={26} color="#333" />
+        </TouchableOpacity> */}
+      </View>
+
+      {/* Step Forms */}
       {step === 0 && (
         <EmployeeDetailsForm
           initialData={formData.employeeDetails}
@@ -76,14 +96,11 @@ export default function AddEmployee() {
               ...formData,
               addressDetails: data,
             };
-            setFormData(finalData); // optional for future reuse
+            setFormData(finalData);
             handleSubmit(finalData);
           }}
         />
       )}
-
-
-
     </SafeAreaView>
   );
 }
@@ -91,9 +108,26 @@ export default function AddEmployee() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
-    // paddingVertical: 16,
-    backgroundColor: '#fff', // light background
-    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    // elevation: 4,
+    zIndex: 10,
+  },
+
+  stepperContainer: {
+    position: 'absolute',
+    left: 38,
+    right: 0,
+    alignItems: 'center',
+    zIndex: -1,
+
   },
 });
