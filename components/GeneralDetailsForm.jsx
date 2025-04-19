@@ -25,7 +25,7 @@ const CustomDropdown = ({ value, setValue, data, placeholder }) => {
 
   return (
     <Dropdown
-      style={[styles.dropdown, isFocus && { borderColor: "#5aaf57" }]}
+      style={[styles.dropdown, isFocus && { borderColor: "#5aaf57", }]}
       placeholderStyle={styles.dropdownPlaceholder}
       selectedTextStyle={styles.dropdownPlaceholder}
       data={data}
@@ -82,7 +82,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
 
     [
       { key: "category", placeholder: "Category" },
-      { key: "senior", placeholder: "Senior (Report To)" },
+      { key: "senior", placeholder: "Report To" },
 
     ],
 
@@ -188,7 +188,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
                 >
                   <Text
                     style={{
-                      color: data.joiningDate ? "#000" : "#999",
+                      color: data.joiningDate ? "#000" : "#333",
                       fontFamily: "PlusR",
                       fontSize: 13,
                     }}
@@ -205,7 +205,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
                 <TextInput
                   style={styles.input}
                   placeholder={item.placeholder}
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#333"
                   value={data[item.key] || ""}
                   onChangeText={(text) =>
                     setData({ ...data, [item.key]: text })
@@ -327,19 +327,18 @@ const styles = StyleSheet.create({
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 2,
+    // elevation: 2,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   label: {
     fontSize: 12,
-    fontFamily: "PlusR",
-    fontWeight: "600",
+    fontFamily: "PlusSB",
     marginBottom: 4,
     color: "#444",
   },
@@ -361,7 +360,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderColor: "#ccc",
     borderWidth: 1,
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: "PlusR",
     justifyContent: "center",
     zIndex: 1000,
@@ -375,8 +374,9 @@ const styles = StyleSheet.create({
   },
   
   dropdownPlaceholder: {
-    color: "#999",
+    color: "#333",
     fontFamily: "PlusR",
+    fontSize: 14
   }
   
 
