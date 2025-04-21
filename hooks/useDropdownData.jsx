@@ -14,7 +14,7 @@ const fetchData = async (endpoint) => {
     const secretKey = await getSecretKey();
 
     if (!secretKey) {
-      console.error("❌ No secret_key found in SecureStore");
+      console.error(" No secret_key found in SecureStore");
       return [];
     }
 
@@ -28,25 +28,29 @@ const fetchData = async (endpoint) => {
     const text = await response.text();
 
     if (!response.ok) {
-      console.error(`❌ Error response from ${endpoint}:`, text);
+      console.error(`Error response from ${endpoint}:`, text);
       return [];
     }
 
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       const json = JSON.parse(text);
+
+      if (typeof json === "object" && !Array.isArray(json)) {
+        return Object.entries(json).map(([key, value]) => ({ label: value, value: key }));
+      }
       return Array.isArray(json) ? json : json.data || [];
     } else {
-      console.warn(`⚠️ Unexpected response type from ${endpoint}:`, text);
+      console.warn(` Unexpected response type from ${endpoint}:`, text);
       return [];
     }
   } catch (error) {
-    console.error(`❌ Error fetching ${endpoint}:`, error);
+    console.error(`Error fetching ${endpoint}:`, error);
     return [];
   }
 };
 
-export default function useDropdownData(selectedDepartmentId, selectedCountryId, selectedStateId) {
+export default function useDropdownData(selectedDepartmentId, selectedCountryId, selectedStateId, selectedDesignationId) {
   const [departments, setDepartments] = useState([]);
   const [designations, setDesignations] = useState([]);
   const [employeeTypes, setEmployeeTypes] = useState([]);
@@ -55,6 +59,9 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
   const [states, setStates] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [maritalStatuses, setMaritalStatuses] = useState([]);
+  const [nationalities, setNationalities] = useState([]);
+  const [genders, setGenders] = useState([]);
+  const [seniors, setSeniors] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,7 +74,9 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
       setCountries(await fetchData("countries"));
       setStates(await fetchData("states"));
       setDistricts(await fetchData("districts"));
-      setMaritalStatuses(await fetchData("categories"));
+      setMaritalStatuses(await fetchData("getMaritalStatus"));
+      setNationalities(await fetchData("nationality"));
+      setGenders(await fetchData("genders"));
       setLoading(false);
     };
     loadInitialData();
@@ -103,6 +112,17 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
     loadByState();
   }, [selectedStateId]);
 
+
+  useEffect(() => {
+    const loadSeniors = async () => {
+      if (selectedDesignationId) {
+        const data = await fetchData(`seniors/${selectedDesignationId}`);
+        setSeniors(data);
+      }
+    };
+    loadSeniors();
+  }, [selectedDesignationId]);
+
   const formatDropdown = (dataList, labelKey = "name", valueKey = "id") =>
     dataList.map((item) => ({
       label: item[labelKey],
@@ -118,6 +138,9 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
     countries: formatDropdown(countries, "country", "id"),
     states: formatDropdown(states, "state", "id"),
     districts: formatDropdown(districts, "district", "id"),
-    maritalStatuses: formatDropdown(maritalStatuses, "category", "id"),
+    maritalStatuses,
+    nationalities,
+    genders,
+    seniors: formatDropdown(seniors, "name", "id"),
   };
 }

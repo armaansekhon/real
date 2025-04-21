@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 
+import useDropdownData from "../hooks/useDropdownData";
 
 const CustomDropdown = ({ value, setValue, data, placeholder }) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -43,6 +44,21 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+
+  
+  const { countries, states, districts } = useDropdownData(data.country, data.state);
+
+
+  const handleValueChange = (key, value) => {
+    setData((prev) => ({
+      ...prev,
+      [key]: value,
+      ...(key === "country" && { state: null, district: null }),
+      ...(key === "state" && { district: null }),
+    }));
+  };
+  
+
   const [dropdowns, setDropdowns] = useState({
     country: null,
     district: null,
@@ -65,36 +81,36 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     [{ key: "addressLine2", placeholder: "Address Line 2" }],
   ];
 
-  const options = {
-    country: [
-      { label: "India", value: "India" },
-      { label: "Other", value: "Other" },
-    ],
-    district: [
-      { label: "Manager", value: "Manager" },
-      { label: "Developer", value: "Developer" },
-      { label: "Intern", value: "Intern" },
-    ],
-    state: [
-      { label: "Full-Time", value: "Full-Time" },
-      { label: "Part-Time", value: "Part-Time" },
-      { label: "Contract", value: "Contract" },
-    ],
-    city: [
-      { label: "Permanent", value: "Permanent" },
-      { label: "Temporary", value: "Temporary" },
-    ],
-    addressLine1: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-    addressLine2: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-  };
+  // const options = {
+  //   country: [
+  //     { label: "India", value: "India" },
+  //     { label: "Other", value: "Other" },
+  //   ],
+  //   district: [
+  //     { label: "Manager", value: "Manager" },
+  //     { label: "Developer", value: "Developer" },
+  //     { label: "Intern", value: "Intern" },
+  //   ],
+  //   state: [
+  //     { label: "Full-Time", value: "Full-Time" },
+  //     { label: "Part-Time", value: "Part-Time" },
+  //     { label: "Contract", value: "Contract" },
+  //   ],
+  //   city: [
+  //     { label: "Permanent", value: "Permanent" },
+  //     { label: "Temporary", value: "Temporary" },
+  //   ],
+  //   addressLine1: [
+  //     { label: "React", value: "React" },
+  //     { label: "Node.js", value: "Node.js" },
+  //     { label: "Python", value: "Python" },
+  //   ],
+  //   addressLine2: [
+  //     { label: "React", value: "React" },
+  //     { label: "Node.js", value: "Node.js" },
+  //     { label: "Python", value: "Python" },
+  //   ],
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -124,14 +140,20 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
                 <Text style={styles.label}>{item.placeholder}</Text>
 
                 <CustomDropdown
-                  value={dropdowns[item.key]}
-                  setValue={(val) => {
-                    setDropdowns({ ...dropdowns, [item.key]: val });
-                    setData({ ...data, [item.key]: val });
-                  }}
-                  data={options[item.key]}
-                  placeholder={` ${item.placeholder}`}
-                />
+  value={data[item.key]}
+  setValue={(val) => handleValueChange(item.key, val)}
+  data={
+    item.key === "country"
+      ? countries
+      : item.key === "state"
+      ? states
+      : item.key === "district"
+      ? districts
+      : []
+  }
+  placeholder={` ${item.placeholder}`}
+/>
+
               </View>
             ))}
           </View>

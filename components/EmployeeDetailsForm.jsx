@@ -158,32 +158,32 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
   //   technology: false,
   // });
 
-  const options = {
-    department: [
-      { label: "HR", value: "HR" },
-      { label: "Engineering", value: "Engineering" },
-      { label: "Sales", value: "Sales" },
-    ],
-    designation: [
-      { label: "Manager", value: "Manager" },
-      { label: "Developer", value: "Developer" },
-      { label: "Intern", value: "Intern" },
-    ],
-    employeeType: [
-      { label: "Full-Time", value: "Full-Time" },
-      { label: "Part-Time", value: "Part-Time" },
-      { label: "Contract", value: "Contract" },
-    ],
-    employeeCategory: [
-      { label: "Permanent", value: "Permanent" },
-      { label: "Temporary", value: "Temporary" },
-    ],
-    technology: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-  };
+  // const options = {
+  //   department: [
+  //     { label: "HR", value: "HR" },
+  //     { label: "Engineering", value: "Engineering" },
+  //     { label: "Sales", value: "Sales" },
+  //   ],
+  //   designation: [
+  //     { label: "Manager", value: "Manager" },
+  //     { label: "Developer", value: "Developer" },
+  //     { label: "Intern", value: "Intern" },
+  //   ],
+  //   employeeType: [
+  //     { label: "Full-Time", value: "Full-Time" },
+  //     { label: "Part-Time", value: "Part-Time" },
+  //     { label: "Contract", value: "Contract" },
+  //   ],
+  //   employeeCategory: [
+  //     { label: "Permanent", value: "Permanent" },
+  //     { label: "Temporary", value: "Temporary" },
+  //   ],
+  //   technology: [
+  //     { label: "React", value: "React" },
+  //     { label: "Node.js", value: "Node.js" },
+  //     { label: "Python", value: "Python" },
+  //   ],
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -231,7 +231,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
               {row.map((item) => (
                 <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
                   <Text style={styles.label}>{item.placeholder}</Text>
-                  {["department", "designation", "employeeType", "employeeCategory", "technology"].includes(item.key) ? (
+                  {["department", "designation", "employeeType", "technology"].includes(item.key) ? (
   <CustomDropdown
     value={data[item.key]}
     setValue={(val) => handleValueChange(item.key, val)}
