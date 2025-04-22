@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,11 +13,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
+// import { useAddressData } from "../hooks/useAddressData";
 
 import useDropdownData from "../hooks/useDropdownData";
 
 const CustomDropdown = ({ value, setValue, data, placeholder }) => {
   const [isFocus, setIsFocus] = useState(false);
+  // console.log("data", data);
 
   return (
     <Dropdown
@@ -42,12 +44,10 @@ const CustomDropdown = ({ value, setValue, data, placeholder }) => {
 
 export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [countryId, setCountryId] = useState(null);
+  const [stateId, setStateId] = useState(null);
 
-
-  
-  const { countries, states, districts } = useDropdownData(data.country, data.state);
-
+  // const { countries, states, districts } = useAddressData(countryId, stateId);
 
   const handleValueChange = (key, value) => {
     setData((prev) => ({
@@ -56,16 +56,43 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       ...(key === "country" && { state: null, district: null }),
       ...(key === "state" && { district: null }),
     }));
-  };
   
+    if (key === "country") {
+      setCountryId(value);
+      setStateId(null);
+    }
+  
+    if (key === "state") {
+      setStateId(value);
+    }
+  };
+
+
+  const { countries, states, districts } = useDropdownData(data.country, data.state);
+
+
+ 
+  
+  // const handleValueChange = (key, value) => {
+  //   setData((prev) => ({
+  //     ...prev,
+  //     [key]: value,
+  //     ...(key === "country" && { state: null, district: null }),
+  //     ...(key === "state" && { district: null }),
+  //   }));
+  // };
+  
+
+
 
   const [dropdowns, setDropdowns] = useState({
     country: null,
     district: null,
     state: null,
-    city: null,
-    addressLine1: null,
-    addressLine2: null,
+    // city: null,
+  
+    // addressLine1: null,
+    // addressLine2: null,
   });
 
   const groupedFields = [
@@ -81,36 +108,29 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     [{ key: "addressLine2", placeholder: "Address Line 2" }],
   ];
 
-  // const options = {
-  //   country: [
-  //     { label: "India", value: "India" },
-  //     { label: "Other", value: "Other" },
-  //   ],
-  //   district: [
-  //     { label: "Manager", value: "Manager" },
-  //     { label: "Developer", value: "Developer" },
-  //     { label: "Intern", value: "Intern" },
-  //   ],
-  //   state: [
-  //     { label: "Full-Time", value: "Full-Time" },
-  //     { label: "Part-Time", value: "Part-Time" },
-  //     { label: "Contract", value: "Contract" },
-  //   ],
-  //   city: [
-  //     { label: "Permanent", value: "Permanent" },
-  //     { label: "Temporary", value: "Temporary" },
-  //   ],
-  //   addressLine1: [
-  //     { label: "React", value: "React" },
-  //     { label: "Node.js", value: "Node.js" },
-  //     { label: "Python", value: "Python" },
-  //   ],
-  //   addressLine2: [
-  //     { label: "React", value: "React" },
-  //     { label: "Node.js", value: "Node.js" },
-  //     { label: "Python", value: "Python" },
-  //   ],
-  // };
+
+  const options = {
+    country: [
+      { label: "India", value: "India" },
+      { label: "Other", value: "Other" },
+    ],
+    district: [
+      { label: "Other", value: "Other" },
+    ],
+    state: [
+      { label: "Chandigarh", value: "Chandigarh" },
+
+    ],
+
+  };
+
+  const dropdownKeys = Object.keys(options);
+
+  const handleDropdownChange = (key, value) => {
+    setDropdowns({ ...dropdowns, [key]: value });
+    setData({ ...data, [key]: value });
+    setShowSave(true);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -138,8 +158,8 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
             {row.map((item) => (
               <View key={item.key} style={styles.inputWrapper}>
                 <Text style={styles.label}>{item.placeholder}</Text>
-
-                <CustomDropdown
+                {dropdownKeys.includes(item.key) ? (
+<CustomDropdown
   value={data[item.key]}
   setValue={(val) => handleValueChange(item.key, val)}
   data={
@@ -149,17 +169,30 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       ? states
       : item.key === "district"
       ? districts
-      : []
+      : options[item.key] || []
   }
   placeholder={` ${item.placeholder}`}
 />
+
+                ) : (
+                   <TextInput
+                      style={styles.input}
+                      placeholder={item.placeholder}
+                      placeholderTextColor="#333"
+                      value={data[item.key] || ""}
+                      onChangeText={(text) =>
+                        setData({ ...data, [item.key]: text })
+                      }
+                    />
+                )}
+
 
               </View>
             ))}
           </View>
         ))}
 
-        {showDatePicker && (
+        {/* {showDatePicker && (
           <DateTimePicker
             value={data.joiningDate ? new Date(data.joiningDate) : new Date()}
             mode="date"
@@ -174,7 +207,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
               }
             }}
           />
-        )}
+        )} */}
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -190,6 +223,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           style={styles.button2}
           onPress={() => {
             const updatedData = { ...data };
+            console.log("updated data", updatedData);
             onSubmit(updatedData);
           }}
         >

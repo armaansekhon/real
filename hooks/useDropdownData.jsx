@@ -9,12 +9,12 @@ const getSecretKey = async () => {
   return key;
 };
 
+
 const fetchData = async (endpoint) => {
   try {
     const secretKey = await getSecretKey();
-
     if (!secretKey) {
-      console.error(" No secret_key found in SecureStore");
+      console.error("No secret_key found in SecureStore");
       return [];
     }
 
@@ -25,30 +25,85 @@ const fetchData = async (endpoint) => {
       },
     });
 
-    const text = await response.text();
+    const rawText = await response.text();
 
-    if (!response.ok) {
-      console.error(`Error response from ${endpoint}:`, text);
+    // console.log(`🧾 Raw response from ${endpoint}:`, rawText); // <-- Add this line
+
+    let data;
+
+    // Try parsing once
+    try {
+      data = JSON.parse(rawText);
+    } catch (err1) {
+      console.error(` First parse failed from ${endpoint}:`, err1.message);
       return [];
     }
 
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      const json = JSON.parse(text);
-
-      if (typeof json === "object" && !Array.isArray(json)) {
-        return Object.entries(json).map(([key, value]) => ({ label: value, value: key }));
+    // Try parsing again if it's still a string
+    if (typeof data === "string") {
+      try {
+        data = JSON.parse(data);
+      } catch (err2) {
+        console.error(` Second parse failed from ${endpoint}:`, err2.message);
+        return [];
       }
-      return Array.isArray(json) ? json : json.data || [];
-    } else {
-      console.warn(` Unexpected response type from ${endpoint}:`, text);
-      return [];
     }
-  } catch (error) {
-    console.error(`Error fetching ${endpoint}:`, error);
+
+    // Just return a fallback if still not usable
+    if (Array.isArray(data)) return data;
+    if (typeof data === "object") return Object.entries(data).map(([label, value]) => ({ label, value }));
+
+    return [];
+  } catch (err) {
+    console.error(`Error fetching ${endpoint}:`, err.message);
     return [];
   }
 };
+
+
+
+
+// const fetchData = async (endpoint) => {
+//   try {
+//     const secretKey = await getSecretKey();
+
+//     if (!secretKey) {
+//       console.error(" No secret_key found in SecureStore");
+//       return [];
+//     }
+
+//     const response = await fetch(`${BASE_URL}/${endpoint}`, {
+//       headers: {
+//         "Content-Type": "application/json",
+//         secret_key: secretKey,
+//       },
+//     });
+
+//     const text = await response.text();
+
+//     if (!response.ok) {
+//       console.error(`Error response from ${endpoint}:`, text);
+//       return [];
+//     }
+
+//     const contentType = response.headers.get("content-type");
+//     if (contentType && contentType.includes("application/json")) {
+//       const json = JSON.parse(text);
+      
+
+//       if (typeof json === "object" && !Array.isArray(json)) {
+//         return Object.entries(json).map(([key, value]) => ({ label: value, value: key }));
+//       }
+//       return Array.isArray(json) ? json : json.data || [];
+//     } else {
+//       console.warn(` Unexpected response type from ${endpoint}:`, text);
+//       return [];
+//     }
+//   } catch (error) {
+//     console.error(`Error fetching ${endpoint}:`, error);
+//     return [];
+//   }
+// };
 
 export default function useDropdownData(selectedDepartmentId, selectedCountryId, selectedStateId, selectedDesignationId) {
   const [departments, setDepartments] = useState([]);
@@ -63,6 +118,11 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
   const [genders, setGenders] = useState([]);
   const [seniors, setSeniors] = useState([]);
   const [loading, setLoading] = useState(true);
+
+
+
+
+  
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -84,13 +144,14 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
 
   useEffect(() => {
     const loadByDepartment = async () => {
-      if (selectedDepartmentId) {
+      if (selectedDepartmentId && selectedDepartmentId !== "") {
         const data = await fetchData(`getDesignationByDepartmentId/${selectedDepartmentId}`);
         setDesignations(data);
       }
     };
     loadByDepartment();
   }, [selectedDepartmentId]);
+  
 
   useEffect(() => {
     const loadByCountry = async () => {
@@ -113,6 +174,7 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
   }, [selectedStateId]);
 
 
+
   useEffect(() => {
     const loadSeniors = async () => {
       if (selectedDesignationId) {
@@ -122,6 +184,18 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
     };
     loadSeniors();
   }, [selectedDesignationId]);
+
+
+
+
+  useEffect(() => {
+    const testCountries = async () => {
+      const countries = await fetchData("countries");
+      // console.log("✅ Final Parsed Countries:", countries);
+    };
+    testCountries();
+  }, []);
+  
 
   const formatDropdown = (dataList, labelKey = "name", valueKey = "id") =>
     dataList.map((item) => ({

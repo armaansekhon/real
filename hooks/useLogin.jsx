@@ -25,6 +25,7 @@ const useLogin = () => {
   
       if (response.ok && data.secretKey) {
         await SecureStore.setItemAsync('auth_token', data.secretKey);
+        console.log("secret key", data.secretKey);
         setUser(data.user);
         setUserType(data.user.userCategoryCode);
    

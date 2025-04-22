@@ -15,6 +15,9 @@ import GeneralDetailsForm from '../../../../components/GeneralDetailsForm';
 import AddressDetailsForm from '../../../../components/AddressDetailsForm';
 import Stepper from '../../../../components/Stepper';
 
+import { addNewEmployee } from '../../../../services/api';
+
+
 const { height, width } = Dimensions.get('window');
 
 export default function AddEmployee({ navigation }) {
@@ -35,16 +38,29 @@ export default function AddEmployee({ navigation }) {
   const goNext = () => setStep(prev => prev + 1);
   const goBack = () => setStep(prev => prev - 1);
 
-  const handleSubmit = (finalData) => {
-    console.log('Final Submitted Data: ', finalData);
-    Alert.alert('Success!', 'All data submitted.');
-    setFormData({
-      employeeDetails: {},
-      generalDetails: {},
-      addressDetails: {},
-    });
-    setStep(0);
+
+
+  const handleSubmit = async (finalData) => {
+    
+    console.log('Submit button clicked');
+    try {
+      const image = finalData.employeeDetails.profileImage; // assume this field is added in the form
+      const result = await addNewEmployee(finalData, image);
+      Alert.alert('Success!', 'Employee added successfully.');
+      console.log('API Result:', result);
+  
+      setFormData({
+        employeeDetails: {},
+        generalDetails: {},
+        addressDetails: {},
+      });
+      setStep(0);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', err.message || 'Failed to add employee.');
+    }
   };
+  
 
   return (
     <SafeAreaView style={styles.container}>
