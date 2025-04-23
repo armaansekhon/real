@@ -134,10 +134,10 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     ],
     bloodGroup: [
       { label: "A+", value: "A+" },
-      { label: "B+", value: "B+" },
-      { label: "AB+", value: "AB+" },
-      { label: "O+", value: "O+" },
-      { label: "O-", value: "O-" },
+      // { label: "B+", value: "B+" },
+      // { label: "AB+", value: "AB+" },
+      // { label: "O+", value: "O+" },
+      // { label: "O-", value: "O-" },
     ],
     maritalStatus: [
       { label: "Single", value: "Single" },

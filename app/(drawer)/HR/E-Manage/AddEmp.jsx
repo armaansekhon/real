@@ -41,14 +41,29 @@ export default function AddEmployee({ navigation }) {
 
 
   const handleSubmit = async (finalData) => {
-    
     console.log('Submit button clicked');
     try {
-      const image = finalData.employeeDetails.profileImage; // assume this field is added in the form
-      const result = await addNewEmployee(finalData, image);
+      // Destructure nested sections
+      const { employeeDetails, generalDetails, addressDetails } = finalData;
+  
+      // Combine into a flat object
+      const mergedData = {
+        ...employeeDetails,
+        ...generalDetails,
+        ...addressDetails,
+      };
+  
+      const image = employeeDetails?.profileImage;
+  
+      // Log flat merged data for verification
+      console.log('Final Payload to API:', mergedData);
+  
+      // Submit the merged data
+      const result = await addNewEmployee(mergedData, image);
       Alert.alert('Success!', 'Employee added successfully.');
       console.log('API Result:', result);
   
+      // Reset form and step
       setFormData({
         employeeDetails: {},
         generalDetails: {},
@@ -60,6 +75,29 @@ export default function AddEmployee({ navigation }) {
       Alert.alert('Error', err.message || 'Failed to add employee.');
     }
   };
+  
+
+
+  // const handleSubmit = async (finalData) => {
+
+  //   console.log('Submit button clicked');
+  //   try {
+  //     const image = finalData.employeeDetails.profileImage; // assume this field is added in the form
+  //     const result = await addNewEmployee(finalData, image);
+  //     Alert.alert('Success!', 'Employee added successfully.');
+  //     console.log('API Result:', result);
+  
+  //     setFormData({
+  //       employeeDetails: {},
+  //       generalDetails: {},
+  //       addressDetails: {},
+  //     });
+  //     setStep(0);
+  //   } catch (err) {
+  //     console.error(err);
+  //     Alert.alert('Error', err.message || 'Failed to add employee.');
+  //   }
+  // };
   
 
   return (
@@ -107,11 +145,12 @@ export default function AddEmployee({ navigation }) {
         <AddressDetailsForm
           initialData={formData.addressDetails}
           onBack={goBack}
-          onSubmit={data => {
+          onSubmit={addressData => {
             const finalData = {
               ...formData,
-              addressDetails: data,
+              addressDetails: addressData,
             };
+            console.log("final data", finalData);
             setFormData(finalData);
             handleSubmit(finalData);
           }}

@@ -219,6 +219,41 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           />
         </TouchableOpacity>
 
+
+
+        ************NEW ON SUBMIT HANDLER***************************************************
+        <TouchableOpacity
+  style={styles.button2}
+  onPress={() => {
+    console.log("Address Data Submitted:", data);
+    onSubmit(data); // make sure this is passed to parent as `addressDetails`
+  }}
+>
+  <Text style={styles.buttonText}>Submit</Text>
+</TouchableOpacity>
+
+        {/* <TouchableOpacity
+  style={styles.button2}
+  onPress={() => {
+    const updatedData = { ...data };
+
+    // Flatten nested formData here
+    const { employeeDetails, generalDetails, addressDetails } = updatedData;
+    const mergedData = {
+      ...employeeDetails,
+      ...generalDetails,
+      ...addressDetails,
+    };
+
+    console.log("Flattened merged data", mergedData);
+
+    onSubmit(mergedData); // Pass flattened data to the final submit handler
+  }}
+>
+  <Text style={styles.buttonText}>Submit</Text>
+</TouchableOpacity> */}
+
+{/* 
         <TouchableOpacity
           style={styles.button2}
           onPress={() => {
@@ -228,7 +263,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           }}
         >
           <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </SafeAreaView>
   );
