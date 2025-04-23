@@ -25,12 +25,6 @@ const useLogin = () => {
   
       if (response.ok && data.secretKey) {
         await SecureStore.setItemAsync('auth_token', data.secretKey);
-        await SecureStore.setItemAsync('currentDayDate', data.currentDay);
-        await SecureStore.setItemAsync('loginUserId', String(data.user.id));
-     
-       console.log(data.secretKey)
-       console.log(data.currentDay)
-       setimg(data.employeePic)
         setUser(data.user);
         setUserType(data.user.userCategoryCode);
    

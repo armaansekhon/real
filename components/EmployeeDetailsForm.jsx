@@ -22,6 +22,8 @@ import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 
+import useDropdownData from "../hooks/useDropdownData";
+
 const { height } = Dimensions.get("window");
 
 const CustomDropdown = ({ value, setValue, data, placeholder }) => {
@@ -53,6 +55,21 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [imageUri, setImageUri] = useState(null);
   const [showSave, setShowSave] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+ 
+
+  const { departments, designations, employeeTypes, loading } = useDropdownData(
+    data.department
+  );
+
+  const handleValueChange = (key, value) => {
+    setData((prev) => ({
+      ...prev,
+      [key]: value,
+      ...(key === "department" && { designation: null }), // reset designation if department changes
+    }));
+  };
+
+
 
   useEffect(() => {
     (async () => {
@@ -76,6 +93,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
+      setImageUri(uri);  // Store the URI properly
       setData({ ...data, profileImage: uri }); // Save in data
       setShowSave(true);
     }
@@ -169,25 +187,6 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       { label: "Python", value: "Python" },
     ],
   };
-  const validateFields = () => {
-    const requiredFields = [
-      "department",
-      "designation",
-      "employeeType",
-      "name",
-     
-      "joiningDate",
-    ];
-  
-    for (const field of requiredFields) {
-      if (!data[field] || data[field].trim() === "") {
-        Alert.alert("Missing Field", `Please fill in ${field}`);
-        return false;
-      }
-    }
-  
-    return true;
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -234,17 +233,13 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
             >
               {row.map((item) => (
                 <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
-                 <Text style={styles.label}>
-  {item.placeholder}
-  {["department", "designation", "employeeType", "name",  "joiningDate"].includes(item.key) && (
-    <Text style={{ color: "red" }}> *</Text>
-  )}
-</Text>
+                  <Text style={styles.label}>{item.placeholder}</Text>
                   {[
                     "department",
                     "designation",
                     "employeeType",
-                    
+                    "employeeCategory",
+                    "technology",
                   ].includes(item.key) ? (
                     <CustomDropdown
                       value={dropdowns[item.key]}
