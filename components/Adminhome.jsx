@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? 50 : 60,
+    paddingTop: Platform.OS === 'android' ? 15 : 60,
     paddingBottom: 20,
     zIndex: 10,
     elevation: 5,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   centerTextContainer: {
-    marginTop: HEADER_MIN_HEIGHT-10 ,
+    marginTop: Platform.OS === 'ios' ? HEADER_MIN_HEIGHT-10 : HEADER_MIN_HEIGHT-40 ,
   alignItems: 'center',
   // position: 'absolute',
   width: '100%',
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
  
   card: {
     position: 'absolute',
-    top: HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.2,
+    top: Platform.OS === 'ios' ?  HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.2 : HEADER_MAX_HEIGHT - CARD_HEIGHT / 1,
     alignSelf: 'center',
     width: width * 0.75,
     height: CARD_HEIGHT,
@@ -294,7 +294,7 @@ transform:[{scale:4.5}],
     color: '#196f3d',
   },
   scrollContent: {
-    paddingTop: HEADER_MAX_HEIGHT -160 ,
+    paddingTop: Platform.OS === 'ios' ? HEADER_MAX_HEIGHT -160 : HEADER_MAX_HEIGHT - 120 ,
     // paddingBottom: 40,
     // borderWidth:1,
     
