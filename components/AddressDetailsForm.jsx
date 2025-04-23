@@ -14,7 +14,6 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 
-
 const CustomDropdown = ({ value, setValue, data, placeholder }) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -48,8 +47,6 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     district: null,
     state: null,
     city: null,
-    addressLine1: null,
-    addressLine2: null,
   });
 
   const groupedFields = [
@@ -84,16 +81,32 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       { label: "Permanent", value: "Permanent" },
       { label: "Temporary", value: "Temporary" },
     ],
-    addressLine1: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-    addressLine2: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
+  };
+
+  const validateForm = () => {
+    let isFormValid = true;
+
+    // Check all required dropdowns
+    Object.keys(dropdowns).forEach((key) => {
+      if (!dropdowns[key]) {
+        isFormValid = false;
+        alert(`Please select an option for ${key.replace(/([A-Z])/g, " $1").trim()}`);
+      }
+    });
+
+    // Check all required text fields
+    Object.keys(data).forEach((key) => {
+      if (!data[key] || data[key].trim() === "") {
+        isFormValid = false;
+        alert(`Please fill in the ${key.replace(/([A-Z])/g, " $1").trim()} field`);
+      }
+    });
+
+    return isFormValid;
+  };
+
+  const getRequiredMark = (key) => {
+    return <Text style={{ color: 'red', fontSize: 12, marginLeft: 2 }}>*</Text>;
   };
 
   return (
@@ -121,17 +134,32 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           >
             {row.map((item) => (
               <View key={item.key} style={styles.inputWrapper}>
-                <Text style={styles.label}>{item.placeholder}</Text>
+                <Text style={styles.label}>
+                  {item.placeholder}
+                  {getRequiredMark(item.key)}
+                </Text>
 
-                <CustomDropdown
-                  value={dropdowns[item.key]}
-                  setValue={(val) => {
-                    setDropdowns({ ...dropdowns, [item.key]: val });
-                    setData({ ...data, [item.key]: val });
-                  }}
-                  data={options[item.key]}
-                  placeholder={` ${item.placeholder}`}
-                />
+                {item.key === "addressLine1" || item.key === "addressLine2" ? (
+                  <TextInput
+                    style={styles.input}
+                    placeholder={item.placeholder}
+                    placeholderTextColor="#333"
+                    value={data[item.key] || ""}
+                    onChangeText={(text) =>
+                      setData({ ...data, [item.key]: text })
+                    }
+                  />
+                ) : (
+                  <CustomDropdown
+                    value={dropdowns[item.key]}
+                    setValue={(val) => {
+                      setDropdowns({ ...dropdowns, [item.key]: val });
+                      setData({ ...data, [item.key]: val });
+                    }}
+                    data={options[item.key]}
+                    placeholder={` ${item.placeholder}`}
+                  />
+                )}
               </View>
             ))}
           </View>
@@ -167,8 +195,10 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
         <TouchableOpacity
           style={styles.button2}
           onPress={() => {
-            const updatedData = { ...data };
-            onSubmit(updatedData);
+            if (validateForm()) {
+              const updatedData = { ...data };
+              onSubmit(updatedData);
+            }
           }}
         >
           <Text style={styles.buttonText}>Submit</Text>
@@ -248,9 +278,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
 
   label: {

@@ -65,6 +65,7 @@ const Onboard = () => {
         Router.push("/(auth)/Login");
         // Router.push("/(drawer)/(tabs)/Home");
         // Router.push("/(drawer)/HR/E-Manage/AddEmp");
+        // Router.push("/(drawer)/HR/E-Manage/MarkAttend");
       }}
     >
       <Ionicons
