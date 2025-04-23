@@ -17,8 +17,10 @@ import { Dropdown } from "react-native-element-dropdown";
 
 import useDropdownData from "../hooks/useDropdownData";
 
-const CustomDropdown = ({ value, setValue, data, placeholder }) => {
+const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "label", valueField = "value"}) => {
   const [isFocus, setIsFocus] = useState(false);
+
+  // const [selectedCountry, setSelectedCountry] = useState(null);
   // console.log("data", data);
 
   return (
@@ -28,14 +30,18 @@ const CustomDropdown = ({ value, setValue, data, placeholder }) => {
       selectedTextStyle={styles.dropdownPlaceholder}
       data={data}
       maxHeight={200}
-      labelField="label"
-      valueField="value"
+      // labelField={labelField}
+      // valueField={valueField}
+      labelField="country"
+      valueField="id"
       placeholder={placeholder}
       value={value}
       onFocus={() => setIsFocus(true)}
       onBlur={() => setIsFocus(false)}
       onChange={(item) => {
-        setValue(item.value);
+        setValue(item[valueField]);
+        setValue(item.id);
+        // setSelectedCountry(item.id);
         setIsFocus(false);
       }}
     />
@@ -58,6 +64,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     }));
   
     if (key === "country") {
+      console.log("Country dropdown selected value:", value);
       setCountryId(value);
       setStateId(null);
     }
@@ -69,6 +76,8 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
 
 
   const { countries, states, districts } = useDropdownData(data.country, data.state);
+
+
 
 
  
@@ -84,16 +93,15 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   
 
 
+  console.log("States fetched for country:", states);
 
-  const [dropdowns, setDropdowns] = useState({
-    country: null,
-    district: null,
-    state: null,
-    // city: null,
   
-    // addressLine1: null,
-    // addressLine2: null,
-  });
+  // const [dropdowns, setDropdowns] = useState({
+  //   country: null,
+  //   district: null,
+  //   state: null,
+
+  // });
 
   const groupedFields = [
     [
@@ -111,14 +119,14 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
 
   const options = {
     country: [
-      { label: "India", value: "India" },
-      { label: "Other", value: "Other" },
+      { label: "India", value: 1 },
+      { label: "Other", value: 2 },
     ],
     district: [
-      { label: "Other", value: "Other" },
+      { label: "Other", value: 2 },
     ],
     state: [
-      { label: "Chandigarh", value: "Chandigarh" },
+      { label: "Chandigarh", value: 3 },
 
     ],
 
@@ -171,6 +179,8 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       ? districts
       : options[item.key] || []
   }
+  // labelField="label"
+  // valueField="value"
   placeholder={` ${item.placeholder}`}
 />
 

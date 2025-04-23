@@ -57,7 +57,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   // const [seniors, setSeniors] = useState(false);
 
 
-  const { bloodGroups , maritalStatuses, nationalities, genders, seniors, loading } = useDropdownData(
+  const { bloodGroups , maritalStatuses, nationalities, genders, seniors, categories, loading } = useDropdownData(
     data.department
   );
 
@@ -205,6 +205,8 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
         ? genders
         : item.key === "senior"
         ? seniors
+        : item.key === "category"
+        ? categories
         : options[item.key] || []
     }
     placeholder={` ${item.placeholder}`}

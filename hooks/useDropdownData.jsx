@@ -3,6 +3,8 @@ import * as SecureStore from "expo-secure-store";
 
 const BASE_URL = "http://192.168.6.210:8686/pipl/api/v1/employee";
 
+
+
 // Helper to fetch secret_key from SecureStore
 const getSecretKey = async () => {
   const key = await SecureStore.getItemAsync("auth_token");
@@ -13,6 +15,8 @@ const getSecretKey = async () => {
 const fetchData = async (endpoint) => {
   try {
     const secretKey = await getSecretKey();
+
+
     if (!secretKey) {
       console.error("No secret_key found in SecureStore");
       return [];
@@ -61,51 +65,7 @@ const fetchData = async (endpoint) => {
 };
 
 
-
-
-// const fetchData = async (endpoint) => {
-//   try {
-//     const secretKey = await getSecretKey();
-
-//     if (!secretKey) {
-//       console.error(" No secret_key found in SecureStore");
-//       return [];
-//     }
-
-//     const response = await fetch(`${BASE_URL}/${endpoint}`, {
-//       headers: {
-//         "Content-Type": "application/json",
-//         secret_key: secretKey,
-//       },
-//     });
-
-//     const text = await response.text();
-
-//     if (!response.ok) {
-//       console.error(`Error response from ${endpoint}:`, text);
-//       return [];
-//     }
-
-//     const contentType = response.headers.get("content-type");
-//     if (contentType && contentType.includes("application/json")) {
-//       const json = JSON.parse(text);
-      
-
-//       if (typeof json === "object" && !Array.isArray(json)) {
-//         return Object.entries(json).map(([key, value]) => ({ label: value, value: key }));
-//       }
-//       return Array.isArray(json) ? json : json.data || [];
-//     } else {
-//       console.warn(` Unexpected response type from ${endpoint}:`, text);
-//       return [];
-//     }
-//   } catch (error) {
-//     console.error(`Error fetching ${endpoint}:`, error);
-//     return [];
-//   }
-// };
-
-export default function useDropdownData(selectedDepartmentId, selectedCountryId, selectedStateId, selectedDesignationId) {
+export default function useDropdownData(selectedDepartmentId, countryId, stateId, selectedDesignationId) {
   const [departments, setDepartments] = useState([]);
   const [designations, setDesignations] = useState([]);
   const [employeeTypes, setEmployeeTypes] = useState([]);
@@ -117,6 +77,7 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
   const [nationalities, setNationalities] = useState([]);
   const [genders, setGenders] = useState([]);
   const [seniors, setSeniors] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
 
@@ -132,11 +93,12 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
       setEmployeeTypes(await fetchData("employeeTypes"));
       setBloodGroups(await fetchData("bloodGroups"));
       setCountries(await fetchData("countries"));
-      setStates(await fetchData("states"));
-      setDistricts(await fetchData("districts"));
+      // setStates(await fetchData("states"));
+      // setDistricts(await fetchData("districts"));
       setMaritalStatuses(await fetchData("getMaritalStatus"));
       setNationalities(await fetchData("nationality"));
       setGenders(await fetchData("genders"));
+      setCategories(await fetchData("categories"));
       setLoading(false);
     };
     loadInitialData();
@@ -151,27 +113,77 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
     };
     loadByDepartment();
   }, [selectedDepartmentId]);
-  
+
+
+
+  // useEffect(() => {
+  //   const loadByCountry = async () => {
+  //     if (selectedCountryId) {
+  //       const data = await fetchData(`getStatesByCountryId/${selectedCountryId}`);
+  //       setStates(data);
+  //       setDistricts([]);
+  //     }
+  //   };
+  //   loadByCountry();
+  // }, [selectedCountryId]);
+
+
+
 
   useEffect(() => {
-    const loadByCountry = async () => {
-      if (selectedCountryId) {
-        const data = await fetchData(`getStatesByCountryId/${selectedCountryId}`);
+    const loadCountries = async () => {
+      const data = await fetchData('countries');
+      console.log("Fetched countries:", data);
+      setCountries(
+        data.map((item) => ({
+          label: item.countryName,
+          value: item.id,
+        }))
+      );
+    };
+    loadCountries();
+  }, []);
+
+  // States by Country
+  useEffect(() => {
+    console.log("Selected country ID:", countryId);
+    const loadStates = async () => {
+      if (countryId) {
+        console.log("Fetching states for country ID:", countryId);
+        const data = await fetchData(`getStatesByCountryId/${countryId}`);
+        console.log("States response:", data);
         setStates(data);
+        setDistricts([]); // clear previous districts
       }
     };
-    loadByCountry();
-  }, [selectedCountryId]);
+    loadStates(countryId); 
+  }, [countryId]);
 
+  //  Districts by State
   useEffect(() => {
-    const loadByState = async () => {
-      if (selectedStateId) {
-        const data = await fetchData(`getDistrictByStateId/${selectedStateId}`);
+    const loadDistricts = async () => {
+      if (stateId) {
+        console.log("Fetching districts for state ID:", stateId);
+        const data = await fetchData(`getDistrictByStateId/${stateId}`);
         setDistricts(data);
       }
     };
-    loadByState();
-  }, [selectedStateId]);
+    loadDistricts();
+  }, [stateId]);
+
+  
+
+
+
+  // useEffect(() => {
+  //   const loadByState = async () => {
+  //     if (selectedStateId) {
+  //       const data = await fetchData(`getDistrictByStateId/${selectedStateId}`);
+  //       setDistricts(data);
+  //     }
+  //   };
+  //   loadByState();
+  // }, [selectedStateId]);
 
 
 
@@ -188,16 +200,16 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
 
 
 
-  useEffect(() => {
-    const testCountries = async () => {
-      const countries = await fetchData("countries");
-      // console.log("✅ Final Parsed Countries:", countries);
-    };
-    testCountries();
-  }, []);
+  // useEffect(() => {
+  //   const testCountries = async () => {
+  //     const countries = await fetchData("countries");
+  //     // console.log(" Final Parsed Countries:", countries);
+  //   };
+  //   testCountries();
+  // }, []);
   
 
-  const formatDropdown = (dataList, labelKey = "name", valueKey = "id") =>
+  const formatDropdown = (dataList = [], labelKey = "name", valueKey = "id") =>
     dataList.map((item) => ({
       label: item[labelKey],
       value: item[valueKey],
@@ -209,12 +221,16 @@ export default function useDropdownData(selectedDepartmentId, selectedCountryId,
     designations: formatDropdown(designations, "name", "id"),
     employeeTypes: formatDropdown(employeeTypes, "employeeType", "id"),
     bloodGroups: formatDropdown(bloodGroups, "bloodGroup", "id"),
-    countries: formatDropdown(countries, "country", "id"),
-    states: formatDropdown(states, "state", "id"),
-    districts: formatDropdown(districts, "district", "id"),
+    countries,
+    states,
+    districts,
+    // countries: formatDropdown(countries, "country", "id"),
+    // states: formatDropdown(states, "state", "id"),
+    // districts: formatDropdown(districts, "district", "id"),
     maritalStatuses,
     nationalities,
     genders,
+    categories: formatDropdown(categories, "category", "id"),
     seniors: formatDropdown(seniors, "name", "id"),
   };
 }
