@@ -15,6 +15,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 import RNPickerSelect from "react-native-picker-select";
 
+import useDropdownData from "../hooks/useDropdownData";
 
 const { height } = Dimensions.get("window");
 
@@ -49,6 +50,24 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   const [data, setData] = useState(initialData || {});
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showSave, setShowSave] = useState(false);
+  // const [bloodGroups, setBloodGroups] = useState(false);
+  // const [maritalStatuses, setMaritalStatuses] = useState(false);
+  // const [nationalities, setNationalities] = useState(false);
+  // const [genders, setGenders] = useState(false);
+  // const [seniors, setSeniors] = useState(false);
+
+
+  const { bloodGroups , maritalStatuses, nationalities, genders, seniors, categories, loading } = useDropdownData(
+    data.department
+  );
+
+  const handleValueChange = (key, value) => {
+    setData((prev) => ({
+      ...prev,
+      [key]: value,
+      ...(key === "department" && { designation: null }), // reset designation if department changes
+    }));
+  };
 
   const groupedFields = [
     [
@@ -115,10 +134,10 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     ],
     bloodGroup: [
       { label: "A+", value: "A+" },
-      { label: "B+", value: "B+" },
-      { label: "AB+", value: "AB+" },
-      { label: "O+", value: "O+" },
-      { label: "O-", value: "O-" },
+      // { label: "B+", value: "B+" },
+      // { label: "AB+", value: "AB+" },
+      // { label: "O+", value: "O+" },
+      // { label: "O-", value: "O-" },
     ],
     maritalStatus: [
       { label: "Single", value: "Single" },
@@ -128,8 +147,8 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
 
   const dropdownKeys = Object.keys(options);
 
-  const [dropdowns, setDropdowns] = useState({});
-  const [openDropdown, setOpenDropdown] = useState({});
+  // const [dropdowns, setDropdowns] = useState({});
+  // const [openDropdown, setOpenDropdown] = useState({});
 
   const handleDropdownChange = (key, value) => {
     setDropdowns({ ...dropdowns, [key]: value });
@@ -172,46 +191,72 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
               <Text style={styles.label}>{item.placeholder}</Text>
 
               {dropdownKeys.includes(item.key) ? (
-                <CustomDropdown
-                value={dropdowns[item.key]}
-                setValue={(val) => {
-                  setDropdowns({ ...dropdowns, [item.key]: val });
-                  setData({ ...data, [item.key]: val });
-                }}
-                data={options[item.key]}
-                placeholder={` ${item.placeholder}`}
-              />
-              ) : item.key === "joiningDate" ? (
-                <TouchableOpacity
-                  onPress={() => setShowDatePicker(true)}
-                  style={styles.input}
-                >
-                  <Text
-                    style={{
-                      color: data.joiningDate ? "#000" : "#333",
-                      fontFamily: "PlusR",
-                      fontSize: 13,
-                    }}
-                  >
-                    {data.joiningDate || "Select Date"}
-                  </Text>
-                  <Ionicons
-                    name="calendar-outline"
-                    size={18}
-                    color="#777"
-                  />
-                </TouchableOpacity>
-              ) : (
-                <TextInput
-                  style={styles.input}
-                  placeholder={item.placeholder}
-                  placeholderTextColor="#333"
-                  value={data[item.key] || ""}
-                  onChangeText={(text) =>
-                    setData({ ...data, [item.key]: text })
-                  }
-                />
-              )}
+  <CustomDropdown
+    value={data[item.key]}
+    setValue={(val) => handleValueChange(item.key, val)}
+    data={
+      item.key === "bloodGroup"
+        ? bloodGroups
+        : item.key === "maritalStatus"
+        ? maritalStatuses
+        : item.key === "nationality"
+        ? nationalities
+        : item.key === "gender"
+        ? genders
+        : item.key === "senior"
+        ? seniors
+        : item.key === "category"
+        ? categories
+        : options[item.key] || []
+    }
+    placeholder={` ${item.placeholder}`}
+  />
+) : item.key === "dob" ? (
+  <TouchableOpacity
+    onPress={() => setShowDatePicker("dob")}
+    style={styles.input}
+  >
+    <Text
+      style={{
+        color: data.dob ? "#000" : "#333",
+        fontFamily: "PlusR",
+        fontSize: 13,
+      }}
+    >
+      {data.dob || "Select Date"}
+    </Text>
+    <Ionicons name="calendar-outline" size={18} color="#777" />
+  </TouchableOpacity>
+) : item.key === "joiningDate" ? (
+  <TouchableOpacity
+    onPress={() => setShowDatePicker("joiningDate")}
+    style={styles.input}
+  >
+    <Text
+      style={{
+        color: data.joiningDate ? "#000" : "#333",
+        fontFamily: "PlusR",
+        fontSize: 13,
+      }}
+    >
+      {data.joiningDate || "Select Date"}
+    </Text>
+    <Ionicons name="calendar-outline" size={18} color="#777" />
+  </TouchableOpacity>
+) : (
+  <TextInput
+    style={styles.input}
+    placeholder={item.placeholder}
+    placeholderTextColor="#333"
+    value={data[item.key] || ""}
+    onChangeText={(text) =>
+      setData({ ...data, [item.key]: text })
+    }
+  />
+)}
+
+          
+            
             </View>
           ))}
         </View>
@@ -220,9 +265,11 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
 
     {showDatePicker && (
       <DateTimePicker
-        value={
-          data.joiningDate ? new Date(data.joiningDate) : new Date()
-        }
+      value={
+        data[showDatePicker]
+          ? new Date(data[showDatePicker])
+          : new Date()
+      }
         mode="date"
         display="default"
         onChange={(event, selectedDate) => {
@@ -230,7 +277,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
           if (selectedDate) {
             setData({
               ...data,
-              joiningDate: selectedDate.toISOString().split("T")[0],
+              [showDatePicker]: selectedDate.toISOString().split("T")[0],
             });
           }
         }}

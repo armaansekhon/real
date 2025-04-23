@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,10 +13,15 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
+// import { useAddressData } from "../hooks/useAddressData";
 
+import useDropdownData from "../hooks/useDropdownData";
 
-const CustomDropdown = ({ value, setValue, data, placeholder }) => {
+const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "label", valueField = "value"}) => {
   const [isFocus, setIsFocus] = useState(false);
+
+  // const [selectedCountry, setSelectedCountry] = useState(null);
+  // console.log("data", data);
 
   return (
     <Dropdown
@@ -25,14 +30,18 @@ const CustomDropdown = ({ value, setValue, data, placeholder }) => {
       selectedTextStyle={styles.dropdownPlaceholder}
       data={data}
       maxHeight={200}
-      labelField="label"
-      valueField="value"
+      // labelField={labelField}
+      // valueField={valueField}
+      labelField="country"
+      valueField="id"
       placeholder={placeholder}
       value={value}
       onFocus={() => setIsFocus(true)}
       onBlur={() => setIsFocus(false)}
       onChange={(item) => {
-        setValue(item.value);
+        setValue(item[valueField]);
+        setValue(item.id);
+        // setSelectedCountry(item.id);
         setIsFocus(false);
       }}
     />
@@ -41,16 +50,58 @@ const CustomDropdown = ({ value, setValue, data, placeholder }) => {
 
 export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [countryId, setCountryId] = useState(null);
+  const [stateId, setStateId] = useState(null);
 
-  const [dropdowns, setDropdowns] = useState({
-    country: null,
-    district: null,
-    state: null,
-    city: null,
-    addressLine1: null,
-    addressLine2: null,
-  });
+  // const { countries, states, districts } = useAddressData(countryId, stateId);
+
+  const handleValueChange = (key, value) => {
+    setData((prev) => ({
+      ...prev,
+      [key]: value,
+      ...(key === "country" && { state: null, district: null }),
+      ...(key === "state" && { district: null }),
+    }));
+  
+    if (key === "country") {
+      console.log("Country dropdown selected value:", value);
+      setCountryId(value);
+      setStateId(null);
+    }
+  
+    if (key === "state") {
+      setStateId(value);
+    }
+  };
+
+
+  const { countries, states, districts } = useDropdownData(data.country, data.state);
+
+
+
+
+ 
+  
+  // const handleValueChange = (key, value) => {
+  //   setData((prev) => ({
+  //     ...prev,
+  //     [key]: value,
+  //     ...(key === "country" && { state: null, district: null }),
+  //     ...(key === "state" && { district: null }),
+  //   }));
+  // };
+  
+
+
+  console.log("States fetched for country:", states);
+
+  
+  // const [dropdowns, setDropdowns] = useState({
+  //   country: null,
+  //   district: null,
+  //   state: null,
+
+  // });
 
   const groupedFields = [
     [
@@ -65,35 +116,28 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     [{ key: "addressLine2", placeholder: "Address Line 2" }],
   ];
 
+
   const options = {
     country: [
-      { label: "India", value: "India" },
-      { label: "Other", value: "Other" },
+      { label: "India", value: 1 },
+      { label: "Other", value: 2 },
     ],
     district: [
-      { label: "Manager", value: "Manager" },
-      { label: "Developer", value: "Developer" },
-      { label: "Intern", value: "Intern" },
+      { label: "Other", value: 2 },
     ],
     state: [
-      { label: "Full-Time", value: "Full-Time" },
-      { label: "Part-Time", value: "Part-Time" },
-      { label: "Contract", value: "Contract" },
+      { label: "Chandigarh", value: 3 },
+
     ],
-    city: [
-      { label: "Permanent", value: "Permanent" },
-      { label: "Temporary", value: "Temporary" },
-    ],
-    addressLine1: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-    addressLine2: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
+
+  };
+
+  const dropdownKeys = Object.keys(options);
+
+  const handleDropdownChange = (key, value) => {
+    setDropdowns({ ...dropdowns, [key]: value });
+    setData({ ...data, [key]: value });
+    setShowSave(true);
   };
 
   return (
@@ -122,22 +166,43 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
             {row.map((item) => (
               <View key={item.key} style={styles.inputWrapper}>
                 <Text style={styles.label}>{item.placeholder}</Text>
+                {dropdownKeys.includes(item.key) ? (
+<CustomDropdown
+  value={data[item.key]}
+  setValue={(val) => handleValueChange(item.key, val)}
+  data={
+    item.key === "country"
+      ? countries
+      : item.key === "state"
+      ? states
+      : item.key === "district"
+      ? districts
+      : options[item.key] || []
+  }
+  // labelField="label"
+  // valueField="value"
+  placeholder={` ${item.placeholder}`}
+/>
 
-                <CustomDropdown
-                  value={dropdowns[item.key]}
-                  setValue={(val) => {
-                    setDropdowns({ ...dropdowns, [item.key]: val });
-                    setData({ ...data, [item.key]: val });
-                  }}
-                  data={options[item.key]}
-                  placeholder={` ${item.placeholder}`}
-                />
+                ) : (
+                   <TextInput
+                      style={styles.input}
+                      placeholder={item.placeholder}
+                      placeholderTextColor="#333"
+                      value={data[item.key] || ""}
+                      onChangeText={(text) =>
+                        setData({ ...data, [item.key]: text })
+                      }
+                    />
+                )}
+
+
               </View>
             ))}
           </View>
         ))}
 
-        {showDatePicker && (
+        {/* {showDatePicker && (
           <DateTimePicker
             value={data.joiningDate ? new Date(data.joiningDate) : new Date()}
             mode="date"
@@ -152,7 +217,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
               }
             }}
           />
-        )}
+        )} */}
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -164,15 +229,51 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           />
         </TouchableOpacity>
 
+
+
+        ************NEW ON SUBMIT HANDLER***************************************************
+        <TouchableOpacity
+  style={styles.button2}
+  onPress={() => {
+    console.log("Address Data Submitted:", data);
+    onSubmit(data); // make sure this is passed to parent as `addressDetails`
+  }}
+>
+  <Text style={styles.buttonText}>Submit</Text>
+</TouchableOpacity>
+
+        {/* <TouchableOpacity
+  style={styles.button2}
+  onPress={() => {
+    const updatedData = { ...data };
+
+    // Flatten nested formData here
+    const { employeeDetails, generalDetails, addressDetails } = updatedData;
+    const mergedData = {
+      ...employeeDetails,
+      ...generalDetails,
+      ...addressDetails,
+    };
+
+    console.log("Flattened merged data", mergedData);
+
+    onSubmit(mergedData); // Pass flattened data to the final submit handler
+  }}
+>
+  <Text style={styles.buttonText}>Submit</Text>
+</TouchableOpacity> */}
+
+{/* 
         <TouchableOpacity
           style={styles.button2}
           onPress={() => {
             const updatedData = { ...data };
+            console.log("updated data", updatedData);
             onSubmit(updatedData);
           }}
         >
           <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </SafeAreaView>
   );
