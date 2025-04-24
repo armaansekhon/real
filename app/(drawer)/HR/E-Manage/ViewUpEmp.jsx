@@ -1,12 +1,523 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  Platform,
+  TextInput,
+  FlatList,
+  Image,
+  Modal,
+  ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
+import LottieView from "lottie-react-native";
+import { Feather, AntDesign, Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { Dimensions } from "react-native";
+
+import { getAllEmployees } from "../../../../services/api";
+
+const screenHeight = Dimensions.get("window").height;
 
 const ViewUpEmp = () => {
-  return (
-    <View>
-      <Text>ViewUpEmp</Text>
-    </View>
-  )
-}
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [employeeModalVisible, setEmployeeModalVisible] = useState(false);
 
-export default ViewUpEmp
+  const [employees, setEmployees] = useState([]);
+
+  const Router = useRouter();
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      const data = await getAllEmployees();
+      // const employeesWithPhotos = data.map((emp) => {
+      //   const base64Pic = emp.employeePic;
+      //   const isValidBase64 = base64Pic && base64Pic.length > 100; // adjust length check as needed
+
+      //   return {
+      //     id: emp.id.toString(),
+      //     name: emp.name,
+      //     department: emp.designation?.department?.department || "N/A",
+      //     email: emp.officialEmail || "N/A",
+      //     phone: emp.officialContact || "N/A",
+      //     gender: emp.gender,
+      //     designation: emp.designation?.name || "N/A",
+      //     pic: isValidBase64
+      //       ? `data:image/jpeg;base64,${base64Pic}`
+      //       : "https://randomuser.me/api/portraits/lego/1.jpg", // fallback URL
+      //   };
+      // });
+
+      const employeesWithPhotos = data.map((emp) => ({
+        id: emp.id.toString(),
+        usercode: emp.usercode,
+        name: emp.name,
+        department: emp.designation?.department?.department || "N/A",
+        email: emp.officialEmail || "N/A",
+        phone: emp.officialContact || "N/A",
+        gender: emp.gender,
+        age: emp.age,
+        category: emp.category?.category,
+        designation: emp.designation?.name || "N/A",
+        employeeType: emp.employeeType?.employeeType || "N/A",
+        employeeId: emp.employeeType?.id || "N/A",
+        pic:
+          emp.employeePic || "https://randomuser.me/api/portraits/lego/1.jpg",
+        // photo:
+        //   emp.gender === "male"
+        //     ? "https://randomuser.me/api/portraits/men/1.jpg"
+        //     : emp.gender === "female"
+        //     ? "https://randomuser.me/api/portraits/women/1.jpg"
+        //     : "https://randomuser.me/api/portraits/lego/1.jpg",
+      }));
+      setEmployees(employeesWithPhotos);
+    };
+    fetchEmployees();
+  }, []);
+
+  const handleSearch = () => {
+    console.log("Search query:", searchQuery);
+  };
+
+  const handleEmployeePress = (employee) => {
+    setSelectedEmployee(employee);
+    setEmployeeModalVisible(true);
+  };
+
+  const onSelectEmployee = (item) => {
+    setSelectedEmployee(item);
+    setEmployeeModalVisible(true);
+  };
+
+  const renderEmployee = ({ item }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => handleEmployeePress(item)}
+    >
+      {/* <Image source={{ uri:item.pic }} style={styles.avatar} /> */}
+      <Image
+        source={{ uri: `data:image/jpeg;base64, ${item.pic}` }}
+        style={styles.avatar}
+      />
+      <View style={styles.cardText}>
+        <Text style={styles.empName}>{item.name}</Text>
+        <Text style={styles.empDept}>{item.department}</Text>
+        <TouchableOpacity style={styles.iconContainer}>
+          {/* <Ionicons
+            style={styles.icon}
+            name="pencil-outline"
+            size={25}
+            color="black"
+            onPress={() => {
+              console.log("Navigating to Login");
+              Router.push("/(drawer)/HR/E-Manage/AddEmp");
+            }}
+
+          /> */}
+
+<Feather
+          name="search"
+          size={20}
+          color="#5aaf57"
+          style={styles.searchIcon}
+        />
+
+          {/* <Text style={styles.updateBtnText}>Update Details</Text> */}
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerRow}>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerTitle}>View</Text>
+          <Text style={styles.headerSubTitle}>Employees</Text>
+          <Text style={styles.headerDesc}>
+            Search for the employee in the Search Bar!
+          </Text>
+        </View>
+
+        <LottieView
+          source={require("../../../../assets/svg/EMP.json")}
+          autoPlay
+          loop
+          style={styles.lottie}
+        />
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Feather
+          name="search"
+          size={20}
+          color="#5aaf57"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search by name, department..."
+          placeholderTextColor="#aaa"
+          value={searchQuery}
+          onChangeText={(text) => {
+            setSearchQuery(text);
+            handleSearch();
+          }}
+        />
+        {searchQuery?.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <AntDesign name="closecircle" size={18} color="#aaa" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* <ViewUpEmpList onSelectedEmployee={setSelectedEmployee} /> */}
+
+      {/* Employee List */}
+      <FlatList
+        data={employees.filter((e) => {
+          const lowerCaseSearchQuery = searchQuery?.toLowerCase() || ""; // Ensure searchQuery is a string
+          const lowerCaseName = e.name?.toLowerCase() || ""; // Ensure name is a string
+          const lowerCaseDepartment = e.department?.toLowerCase() || ""; // Ensure department is a string
+
+          return (
+            lowerCaseName.includes(lowerCaseSearchQuery) ||
+            lowerCaseDepartment.includes(lowerCaseSearchQuery)
+          );
+
+        
+        })}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+        renderItem={({ item , index}) => (
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => onSelectEmployee(item)}
+          >
+<Text style={styles.index}>{index + 1}</Text>
+
+            {/* <Text style={styles.id}>{item.usercode}</Text> */}
+
+            <View style={styles.imageWrapper}>
+              {/* <Image source={{ uri: `data:image/jpeg;base64, ${item.pic}` }} style={styles.avatar} /> */}
+              <Image
+                source={
+                  item.pic
+                    ? { uri: `data:image/jpeg;base64, ${item.pic}` }
+                    : { uri: "https://randomuser.me/api/portraits/lego/1.jpg" }
+                }
+                style={styles.avatar}
+              />
+            </View>
+
+            <View style={styles.nameDeptWrapper}>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.department} numberOfLines={1}>{item.department }</Text>
+            </View>
+
+            {/* <Ionicons
+              style={styles.icon}
+              name="pencil-outline"
+              size={28}
+              color="black"
+              onPress={() => {
+                console.log("Navigating to Login");
+                Router.push("/(drawer)/HR/E-Manage/AddEmp");
+              }}
+            /> */}
+
+<Feather
+          name="edit"
+          size={20}
+          color="#5aaf57"
+          style={styles.icon}
+          onPress={() => {
+            console.log("Navigating to Login");
+            Router.push("/(drawer)/HR/E-Manage/AddEmp");
+          }}
+        />
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Employee Details Modal */}
+
+      <Modal
+        visible={employeeModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setEmployeeModalVisible(false)}
+      >
+        <TouchableWithoutFeedback
+          onPress={() => setEmployeeModalVisible(false)}
+        >
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View
+                style={[styles.modalContainer, { height: screenHeight * 0.7 }]}
+              >
+                <ScrollView
+                  keyboardShouldPersistTaps="handled"
+                  keyboardDismissMode="on-drag"
+                  contentContainerStyle={{
+                    alignItems: "center",
+                    paddingBottom: 20,
+                  }}
+                  nestedScrollEnabled
+                  showsVerticalScrollIndicator={true}
+                >
+                  <Image
+                    source={{
+                      uri: `data:image/jpeg;base64, ${selectedEmployee?.pic}`,
+                    }}
+                    style={styles.modalAvatar}
+                  />
+                  <Text style={styles.modalName}>{selectedEmployee?.name}</Text>
+                  <Text style={styles.modalInfo}>
+                    Usercode: {selectedEmployee?.usercode}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Department: {selectedEmployee?.department}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Designation: {selectedEmployee?.designation}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Employee Type: {selectedEmployee?.employeeType}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Email: {selectedEmployee?.email}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Phone: {selectedEmployee?.phone}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Gender: {selectedEmployee?.gender}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Category: {selectedEmployee?.category}
+                  </Text>
+                  <Text style={styles.modalInfo}>
+                    Age: {selectedEmployee?.age}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.closeBtn}
+                    onPress={() => setEmployeeModalVisible(false)}
+                  >
+                    <Text style={styles.closeBtnText}>Close</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: Platform.OS === "android" ? 25 : 0,
+    backgroundColor: "#fff",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginTop: Platform.OS === "ios" ? 60 : 70,
+    marginBottom: 20,
+  },
+
+  headerTextContainer: {
+    flex: 1,
+  },
+
+  headerTitle: {
+    fontSize: 35,
+    fontFamily: "PlusSB",
+    marginTop: -89,
+  },
+
+  headerSubTitle: {
+    fontSize: 30,
+    fontFamily: "PlusSB",
+    color: "#5aaf57",
+    marginTop: -5,
+  },
+
+  headerDesc: {
+    fontSize: 12,
+    fontFamily: "PlusR",
+    marginTop: 5,
+  },
+  lottie: {
+    width: 80,
+    height: 50,
+    transform: [{ scale: 2 }],
+    bottom: 15,
+    top: -45,
+    marginRight: 20,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
+    marginHorizontal: 15,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    shadowColor: "#32cd32",
+    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    marginTop: -20,
+  },
+  searchBar: {
+    flex: 1,
+    height: 40,
+    fontSize: 14,
+    fontFamily: "PlusR",
+    fontWeight: "600",
+    color: "#333",
+    paddingLeft: 8,
+  },
+  searchIcon: {
+    marginRight: 5,
+  },
+
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "85%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 16,
+    // paddingBottom: -200
+    // height will be overridden dynamically as shown above
+  },
+  modalAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 12,
+  },
+  modalName: {
+    fontSize: 18,
+    fontFamily: "PlusSB",
+    marginBottom: 9,
+  },
+  modalInfo: {
+    fontSize: 14,
+    fontFamily: "PlusR",
+    color: "#555",
+    marginBottom: 5,
+  },
+  closeBtn: {
+    marginTop: 15,
+    backgroundColor: "#5aaf57",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  closeBtnText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: "PlusR",
+  },
+
+  iconContainer: {
+    width: 45,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  icon: {
+    marginLeft: "auto",
+    paddingLeft: 10,
+    marginTop: -10,
+  },
+
+  //new
+
+  list: {
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 13,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+  },
+  nameDeptWrapper: {
+    flex: 1,
+    alignItems: "center",
+  },
+  // item: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   paddingVertical: 14,
+  //   borderBottomWidth: 1,
+  //   borderColor: "#ddd",
+  //   justifyContent: "space-between",
+  // },
+  id: {
+    width: 5,
+    fontSize: 13,
+    color: "#888",
+    textAlign: "center",
+    flex: 1,
+  },
+  index: {
+
+    fontSize: 13,
+    color: "#888",
+    textAlign: "center",
+    // flex: 1,
+  },
+  imageWrapper: {
+    flex: 1,
+    alignItems: "center",
+  
+  },
+  name: {
+    width: 200,
+    fontSize: 16,
+    color: "#111",
+    fontFamily: "PlusR",
+    textAlign: "center",
+    marginRight: 92,
+  },
+  department: {
+    width: 52,
+    fontSize: 11,
+    color: "#5aaf57",
+    fontFamily: "PlusR",
+    textAlign: "center",
+    marginRight: 92,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginRight: 30
+  },
+});
+
+export default ViewUpEmp;
