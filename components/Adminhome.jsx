@@ -111,7 +111,7 @@ const AdminDashboard = () => {
      style={styles.ani2}
    />
   </Animated.View>
-    Welcome <Text style={{ color:  '#5aaf57', fontFamily: 'PlusR', }}>Good Amrit</Text>
+    Welcome <Text style={{ color:  '#5aaf57', fontFamily: 'PlusR', }}>Admin</Text>
   </Animated.Text>
 </Animated.View>
 
