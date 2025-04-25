@@ -248,7 +248,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           onPress={() => {
             const updatedData = { ...data };
             onSubmit(updatedData);
-          }}
+          }}`
         >
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity> */}
