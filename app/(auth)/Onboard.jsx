@@ -61,7 +61,7 @@ const Onboard = () => {
     <TouchableOpacity
       style={styles.button}
       onPress={() => {
-        console.log("Navigating to Login");
+        // console.log("Navigating to Login");
         Router.push("/(auth)/Login");
         // Router.push("/(drawer)/(tabs)/Home");
         // Router.push("/(drawer)/HR/E-Manage/AddEmp");

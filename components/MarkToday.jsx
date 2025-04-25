@@ -12,6 +12,9 @@ import {
   SafeAreaView,
   TouchableWithoutFeedback,
   Keyboard,
+ 
+  InteractionManager,
+  KeyboardAvoidingView
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
@@ -34,6 +37,7 @@ const MarkToday = ({ onBack }) => {
   
   const { notations, loading } = useAttendanceNotations();
   const saveAttendance = useSaveAttendance();
+  
 
   useEffect(() => {
     if (Search.trim() === '') {
@@ -100,6 +104,9 @@ const MarkToday = ({ onBack }) => {
       await saveAttendance(attendanceList);
   
       // Alert.alert('Success', 'Attendance saved successfully!');
+      InteractionManager.runAfterInteractions(() => {
+        Alert.alert('Success', 'Attendance saved successfully!');
+      });
       
     } catch (error) {
       console.error('Failed to save all attendance:', error);
@@ -147,9 +154,11 @@ const MarkToday = ({ onBack }) => {
       </View>
     );
   };
+  
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.container}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <Ionicons style={styles.backText} name="chevron-back" size={24} color="black" />
@@ -158,7 +167,7 @@ const MarkToday = ({ onBack }) => {
         <Text style={styles.header}>
           Mark <Text style={styles.highlight}>Attendance</Text>
         </Text>
-        <Text style={{ color: "#444",marginBottom:20, fontFamily: "Plus" }}>Select a Date for Attendance</Text>
+        <Text style={{ color: "#444",marginBottom:20, fontFamily: "PlusR" }}>Mark  Todays Attendance</Text>
 
         {/* <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.dateBtn}>
           <Text style={styles.dateText}>{moment(date).format('MMMM D, YYYY')}</Text>
@@ -201,13 +210,19 @@ const MarkToday = ({ onBack }) => {
           data={filteredEmployees}
           keyExtractor={(item) => item.id}
           renderItem={renderEmployeeRow}
+          initialNumToRender={10}
           contentContainerStyle={{ paddingBottom: 100 }}
+            keyboardShouldPersistTaps="handled"
+            windowSize={5}
+  maxToRenderPerBatch={10}
+  removeClippedSubviews={true}
         />
 
         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
           <Text style={styles.submitText}>Save Attendance</Text>
         </TouchableOpacity>
       </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
@@ -215,9 +230,9 @@ const MarkToday = ({ onBack }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 18, backgroundColor: '#fff' },
   backButton: { marginBottom: 10 },
-  backText: { color: '#000', fontSize: 26, fontWeight: '900' },
-  header: { fontSize: 32, color: '#111', marginBottom: 10 },
-  highlight: { color: '#5aaf57' },
+  backText: { color: '#000', fontSize: 26, fontWeight: '1200' },
+  header: { fontSize: 32, color: '#111', marginBottom: 10 , fontFamily:"PlusSB" },
+  highlight: { fontFamily:"PlusSB",color: '#5aaf57' },
   dateBtn: {
     paddingVertical: 15,
     paddingHorizontal: 20,

@@ -114,7 +114,8 @@ const AdminDashboard = () => {
      style={styles.ani2}
    />
   </Animated.View>
-    Welcome <Text style={{ color:  '#5aaf57', fontFamily: 'PlusR', }}>{user.name}</Text>
+     Welcome <Text style={{ color: '#5aaf57', fontFamily: 'PlusR' }}>{user.name.split(' ')[0]}</Text>
+
   </Animated.Text>
 </Animated.View>
 
@@ -172,12 +173,13 @@ const AdminDashboard = () => {
         scrollEventThrottle={16}
       >
         <View style={{ height: 800, padding: 20 }}>
-        <AttendanceCard></AttendanceCard>
+      
          <AdminStatsSection></AdminStatsSection>
        
 
          <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
    {/* <AdminAppointments></AdminAppointments> */}
+   <AttendanceCard></AttendanceCard>
     
     </SafeAreaView>
 
@@ -303,7 +305,7 @@ transform:[{scale:4.5}],
   },
   scrollContent: {
     paddingTop: HEADER_MAX_HEIGHT -160 ,
-    // paddingBottom: 40,
+    paddingBottom: 20,
     // borderWidth:1,
     
   },
