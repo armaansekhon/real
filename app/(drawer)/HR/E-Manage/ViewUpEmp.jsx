@@ -20,6 +20,7 @@ import { useRouter } from "expo-router";
 import { Dimensions } from "react-native";
 
 import { getAllEmployees } from "../../../../services/api";
+import ViewEmp from "../../../../components/ViewEmp";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -199,6 +200,9 @@ const ViewUpEmp = () => {
           <TouchableOpacity
             style={styles.item}
             onPress={() => onSelectEmployee(item)}
+
+            // onPress={() => Router.push({ pathname: "/(drawer)/HR/E-Manage/ViewEmp", params: { id: item.id } })}
+
           >
 <Text style={styles.index}>{index + 1}</Text>
 
@@ -221,16 +225,7 @@ const ViewUpEmp = () => {
               <Text style={styles.department} numberOfLines={1}>{item.department }</Text>
             </View>
 
-            {/* <Ionicons
-              style={styles.icon}
-              name="pencil-outline"
-              size={28}
-              color="black"
-              onPress={() => {
-                console.log("Navigating to Login");
-                Router.push("/(drawer)/HR/E-Manage/AddEmp");
-              }}
-            /> */}
+  
 
 <Feather
           name="edit"
