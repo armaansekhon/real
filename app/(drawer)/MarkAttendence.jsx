@@ -15,7 +15,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
 import useMonthlyAttendance from '../../hooks/useMonthlyAttendance';
-
+import fetchMonthlyAttendance from '../../hooks/fetchMonthlyAtendance';
 const screenWidth = Dimensions.get('window').width;
 
 const AttendanceCalendarEmployee = ({ onBack }) => {
@@ -25,7 +25,19 @@ const AttendanceCalendarEmployee = ({ onBack }) => {
   const [employeeId, setEmployeeId] = useState(null);
   const [showLoader, setShowLoader] = useState(true);
   const navigation = useNavigation();
-  const { attendanceData, loading } = useMonthlyAttendance(employeeId, month, year);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchEmployeeId = async () => {
+      const id = await SecureStore.getItemAsync('userid');
+      console.log('Fetched Employee ID:', id);
+      setEmployeeId(id);
+    };
+    fetchEmployeeId();
+  }, []);
+
+
+  
 
   const [summary, setSummary] = useState({
     present: 0,
@@ -34,14 +46,7 @@ const AttendanceCalendarEmployee = ({ onBack }) => {
     halfLeave: 0,
   });
 
-  useEffect(() => {
-    const fetchEmployeeId = async () => {
-      const id = await SecureStore.getItemAsync('loginUserId');
-      setEmployeeId(id);
-    };
-    fetchEmployeeId();
-  }, []);
-
+ 
   useEffect(() => {
     if (!loading) {
       const timer = setTimeout(() => setShowLoader(false), 1700);
@@ -75,7 +80,7 @@ const AttendanceCalendarEmployee = ({ onBack }) => {
     setSummary(counts);
   }, [attendanceData]);
 
-  const markedDates = attendanceData.reduce((acc, item) => {
+  const markedDates = (attendanceData || []).reduce((acc, item) => {
     if (item.date && item.notation) {
       const dateKey = moment(item.date).format('YYYY-MM-DD');
       acc[dateKey] = {
@@ -94,13 +99,29 @@ const AttendanceCalendarEmployee = ({ onBack }) => {
     return acc;
   }, {});
 
+
+
   const handleMonthChange = (date) => {
     setShowLoader(true);
     setMonth(parseInt(date.month));
     setYear(parseInt(date.year));
   };
+  // const { attendanceData, loading } = useMonthlyAttendance(employeeId, month, year);
+  
 
-  if (!employeeId) return null;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!employeeId) return;
+  
+      setLoading(true);
+      const data = await fetchMonthlyAttendance(employeeId, month, year);
+      setAttendanceData(data);
+      setLoading(false);
+    };
+  
+    fetchData();
+  }, [employeeId, month, year]);
 
   return (
   

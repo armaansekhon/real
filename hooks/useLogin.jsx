@@ -29,6 +29,7 @@ const useLogin = () => {
         setUserType(data.user.userCategoryCode);
    
         await SecureStore.setItemAsync('userType', data.user.userCategoryCode);
+        await SecureStore.setItemAsync('userid', JSON.stringify(data.user.id));
         await SecureStore.setItemAsync('privileges', JSON.stringify(data.user.privileges || []))
         console.log('Token stored:', data.secretKey, "type:",data.user.userCategoryCode,"acess:",data.user.privileges );
 

@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PlusR',
     color: '#111',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   time: {
     width: 80,
