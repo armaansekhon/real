@@ -96,8 +96,9 @@ export const addNewEmployee = async (payload) => {
 
 
 
-// get all employees
-export const getAllEmployees = async () => {
+ {/*get all employees*/}
+
+export const getAllEmployees = async () => {  
   try {
     const secretKey = await SecureStore.getItemAsync("auth_token");
 
@@ -121,3 +122,33 @@ export const getAllEmployees = async () => {
     return [];
   }
 };
+
+
+
+{/*get all employees by id*/}
+
+export const getAllEmployeesbyId = async (id) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/employee/${id}`, {
+      method: "GET",
+      headers: {
+        secret_key: secretKey,
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch employees");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    return [];
+  }
+};
+

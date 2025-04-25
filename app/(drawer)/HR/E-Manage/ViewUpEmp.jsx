@@ -19,8 +19,8 @@ import { Feather, AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Dimensions } from "react-native";
 
-import { getAllEmployees } from "../../../../services/api";
-import ViewEmp from "../../../../components/ViewEmp";
+import { getAllEmployees, getAllEmployeesbyId } from "../../../../services/api";
+
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -30,29 +30,13 @@ const ViewUpEmp = () => {
   const [employeeModalVisible, setEmployeeModalVisible] = useState(false);
 
   const [employees, setEmployees] = useState([]);
+  // const [employeeDetails, setEmployeeDetails] = useState([]);
 
   const Router = useRouter();
 
   useEffect(() => {
     const fetchEmployees = async () => {
       const data = await getAllEmployees();
-      // const employeesWithPhotos = data.map((emp) => {
-      //   const base64Pic = emp.employeePic;
-      //   const isValidBase64 = base64Pic && base64Pic.length > 100; // adjust length check as needed
-
-      //   return {
-      //     id: emp.id.toString(),
-      //     name: emp.name,
-      //     department: emp.designation?.department?.department || "N/A",
-      //     email: emp.officialEmail || "N/A",
-      //     phone: emp.officialContact || "N/A",
-      //     gender: emp.gender,
-      //     designation: emp.designation?.name || "N/A",
-      //     pic: isValidBase64
-      //       ? `data:image/jpeg;base64,${base64Pic}`
-      //       : "https://randomuser.me/api/portraits/lego/1.jpg", // fallback URL
-      //   };
-      // });
 
       const employeesWithPhotos = data.map((emp) => ({
         id: emp.id.toString(),
@@ -80,6 +64,80 @@ const ViewUpEmp = () => {
     };
     fetchEmployees();
   }, []);
+
+
+//for emp with id
+// useEffect(() => {
+//   const fetchEmployeeDetails = async () => {
+//     const data = await getAllEmployeesbyId();
+
+//     const employeesWithDetails = data.map((emp) => ({
+//       id: emp.id?.toString() || "N/A",
+//       name: emp.name || "N/A",
+//       email: emp.email || "N/A",
+//       phone: emp.contact || "N/A",
+//       gender: emp.gender || "N/A",
+//       age: emp.age || "N/A", // Only include if available in your API
+//       category: emp.category || "N/A",
+//       department: emp.department || "N/A",
+//       designation: emp.designation || "N/A",
+//       employeeType: emp.employeeType || "N/A",
+//       employeeId: emp.employeeTypeId || "N/A", // Assuming there's a separate ID (if not, omit this)
+//       address: emp.employeeAddress?.[0]?.address1 || "N/A",
+//       pincode: emp.employeeAddress?.[0]?.pincode || "N/A",
+//       spouseName: emp.employeeSpouses?.[0]?.name || "N/A",
+//       childName: emp.employeeChilds?.[0]?.name || "N/A",
+//       education: emp.employeeEducations?.[0]?.classsName || "N/A",
+//       experience: emp.employeeExperiences?.[0]?.position || "N/A",
+//       pic: emp.employeePic 
+//         ? `data:${emp.employeeDocuments?.[0]?.documentType};base64,${emp.employeePic}`
+//         : item.pic,
+//     }));
+
+//     setEmployeeDetails(employeesWithDetails);
+//   };
+
+//   fetchEmployeeDetails();
+// }, []);
+
+
+
+
+// Fetch detailed employee info for modal
+const onSelectEmployeeDetails = async (item) => {
+  try {
+    const emp = await getAllEmployeesbyId(item.id); // Make sure this endpoint accepts ID
+
+    const detailedEmployee = {
+      ...item,
+      email: emp.email || item.email || "N/A",
+      phone: emp.contact || item.phone || "N/A",
+      gender: emp.gender || item.gender || "N/A",
+      age: emp.age || "N/A",
+      category: emp.category || item.category || "N/A",
+      department: emp.department || item.department || "N/A",
+      designation: emp.designation || item.designation || "N/A",
+      employeeType: emp.employeeType || item.employeeType || "N/A",
+      employeeId: emp.employeeTypeId || item.employeeId || "N/A",
+      address: emp.employeeAddress?.[0]?.address1 || "N/A",
+      pincode: emp.employeeAddress?.[0]?.pincode || "N/A",
+      spouseName: emp.employeeSpouses?.[0]?.name || "N/A",
+      childName: emp.employeeChilds?.[0]?.name || "N/A",
+      education: emp.employeeEducations?.[0]?.classsName || "N/A",
+      experience: emp.employeeExperiences?.[0]?.position || "N/A",
+      pic:
+        emp.employeePic && emp.employeePic.length < 1000
+          ? `data:${emp.employeeDocuments?.[0]?.documentType};base64,${emp.employeePic}`
+          : item.pic,
+    };
+
+    setSelectedEmployee(detailedEmployee);
+    setEmployeeModalVisible(true);
+  } catch (error) {
+    console.error("Error fetching employee details:", error);
+  }
+};
+
 
   const handleSearch = () => {
     console.log("Search query:", searchQuery);
@@ -199,7 +257,7 @@ const ViewUpEmp = () => {
         renderItem={({ item , index}) => (
           <TouchableOpacity
             style={styles.item}
-            onPress={() => onSelectEmployee(item)}
+            onPress={() => onSelectEmployeeDetails(item)}
 
             // onPress={() => Router.push({ pathname: "/(drawer)/HR/E-Manage/ViewEmp", params: { id: item.id } })}
 
@@ -301,6 +359,12 @@ const ViewUpEmp = () => {
                   <Text style={styles.modalInfo}>
                     Age: {selectedEmployee?.age}
                   </Text>
+                  <Text style={styles.modalInfo}>Spouse: {selectedEmployee?.spouseName}</Text>
+                  <Text style={styles.modalInfo}>Child: {selectedEmployee?.childName}</Text>
+                  <Text style={styles.modalInfo}>Education: {selectedEmployee?.education}</Text>
+                  <Text style={styles.modalInfo}>Experience: {selectedEmployee?.experience}</Text>
+                  <Text style={styles.modalInfo}>Address: {selectedEmployee?.address}</Text>
+                  <Text style={styles.modalInfo}>Pincode: {selectedEmployee?.pincode}</Text>
 
                   <TouchableOpacity
                     style={styles.closeBtn}
@@ -396,14 +460,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "center",
     alignItems: "center",
+
   },
   modalContainer: {
     width: "85%",
     backgroundColor: "white",
-    borderRadius: 10,
+    borderRadius: 30,
     padding: 16,
-    // paddingBottom: -200
-    // height will be overridden dynamically as shown above
+    // shadowColor: "#32cd32",
+    // elevation: 7,
+
   },
   modalAvatar: {
     width: 80,
