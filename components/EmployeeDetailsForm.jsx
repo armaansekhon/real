@@ -197,7 +197,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           <Text style={styles.headerTitle}>Employee</Text>
           <Text style={styles.headerSubTitle}>Details</Text>
           <Text style={styles.headerDesc}>
-            Fill out the Employee Details below
+            Fill out the Employee Details below 
           </Text>
         </View>
 
