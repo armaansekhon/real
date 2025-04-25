@@ -16,6 +16,8 @@ import { Ionicons, Feather } from '@expo/vector-icons'; // Icons!
 import LottieView from 'lottie-react-native';
 import AdminStatsSection from './AdminStatSection';
 import AdminAppointments from './AdminAppointments';
+import { useNavigation } from 'expo-router';
+
 
 const { height, width } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = height * 0.27;
@@ -27,6 +29,8 @@ const CARD_HEIGHT = height * 0.12;
 
 
 const AdminDashboard = () => {
+  const navigation = useNavigation();
+
   
 
   
@@ -116,9 +120,9 @@ const AdminDashboard = () => {
         {/* Top Row: Icons */}
       
         <View style={styles.headerTopRow}>
-          <TouchableOpacity>
-            <Ionicons name="menu" size={26} color="#000" />
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+  <Ionicons name="menu" size={26} color="#000" />
+</TouchableOpacity>
           <TouchableOpacity>
             <Feather name="user" size={24} color="#000" />
           </TouchableOpacity>

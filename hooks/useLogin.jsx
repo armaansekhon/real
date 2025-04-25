@@ -7,7 +7,7 @@ import { useUser } from '../context/UserContext';
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
-  const { setUser, setUserType } = useUser(); 
+  const { setUser, setUserType ,setimg} = useUser(); 
 
   const login = async (usercode, password) => {
     setLoading(true);
@@ -25,7 +25,6 @@ const useLogin = () => {
   
       if (response.ok && data.secretKey) {
         await SecureStore.setItemAsync('auth_token', data.secretKey);
-        console.log("secret key", data.secretKey);
         setUser(data.user);
         setUserType(data.user.userCategoryCode);
    

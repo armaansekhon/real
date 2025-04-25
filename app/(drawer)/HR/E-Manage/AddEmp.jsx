@@ -14,6 +14,7 @@ import EmployeeDetailsForm from '../../../../components/EmployeeDetailsForm';
 import GeneralDetailsForm from '../../../../components/GeneralDetailsForm';
 import AddressDetailsForm from '../../../../components/AddressDetailsForm';
 import Stepper from '../../../../components/Stepper';
+import { useNavigation } from 'expo-router';
 
 import { addNewEmployee } from '../../../../services/api';
 
@@ -27,6 +28,7 @@ export default function AddEmployee({ navigation }) {
     generalDetails: {},
     addressDetails: {},
   });
+  const Navigation=useNavigation();
 
   const updateFormData = (section, data) => {
     setFormData(prev => ({
@@ -104,7 +106,7 @@ export default function AddEmployee({ navigation }) {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        <TouchableOpacity onPress={() => Navigation.openDrawer()}>
           <Ionicons name="menu" size={28} color="#333" />
         </TouchableOpacity>
 

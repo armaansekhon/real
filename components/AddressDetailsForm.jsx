@@ -11,11 +11,9 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
+// import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
-// import { useAddressData } from "../hooks/useAddressData";
 
-import useDropdownData from "../hooks/useDropdownData";
 
 const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "label", valueField = "value"}) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -50,58 +48,16 @@ const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "labe
 
 export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
-  const [countryId, setCountryId] = useState(null);
-  const [stateId, setStateId] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // const { countries, states, districts } = useAddressData(countryId, stateId);
-
-  const handleValueChange = (key, value) => {
-    setData((prev) => ({
-      ...prev,
-      [key]: value,
-      ...(key === "country" && { state: null, district: null }),
-      ...(key === "state" && { district: null }),
-    }));
-  
-    if (key === "country") {
-      console.log("Country dropdown selected value:", value);
-      setCountryId(value);
-      setStateId(null);
-    }
-  
-    if (key === "state") {
-      setStateId(value);
-    }
-  };
-
-
-  const { countries, states, districts } = useDropdownData(data.country, data.state);
-
-
-
-
- 
-  
-  // const handleValueChange = (key, value) => {
-  //   setData((prev) => ({
-  //     ...prev,
-  //     [key]: value,
-  //     ...(key === "country" && { state: null, district: null }),
-  //     ...(key === "state" && { district: null }),
-  //   }));
-  // };
-  
-
-
-  console.log("States fetched for country:", states);
-
-  
-  // const [dropdowns, setDropdowns] = useState({
-  //   country: null,
-  //   district: null,
-  //   state: null,
-
-  // });
+  const [dropdowns, setDropdowns] = useState({
+    country: null,
+    district: null,
+    state: null,
+    city: null,
+    addressLine1: null,
+    addressLine2: null,
+  });
 
   const groupedFields = [
     [
@@ -126,18 +82,24 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       { label: "Other", value: 2 },
     ],
     state: [
-      { label: "Chandigarh", value: 3 },
-
+      { label: "Full-Time", value: "Full-Time" },
+      { label: "Part-Time", value: "Part-Time" },
+      { label: "Contract", value: "Contract" },
     ],
-
-  };
-
-  const dropdownKeys = Object.keys(options);
-
-  const handleDropdownChange = (key, value) => {
-    setDropdowns({ ...dropdowns, [key]: value });
-    setData({ ...data, [key]: value });
-    setShowSave(true);
+    city: [
+      { label: "Permanent", value: "Permanent" },
+      { label: "Temporary", value: "Temporary" },
+    ],
+    addressLine1: [
+      { label: "React", value: "React" },
+      { label: "Node.js", value: "Node.js" },
+      { label: "Python", value: "Python" },
+    ],
+    addressLine2: [
+      { label: "React", value: "React" },
+      { label: "Node.js", value: "Node.js" },
+      { label: "Python", value: "Python" },
+    ],
   };
 
   return (
@@ -166,37 +128,16 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
             {row.map((item) => (
               <View key={item.key} style={styles.inputWrapper}>
                 <Text style={styles.label}>{item.placeholder}</Text>
-                {dropdownKeys.includes(item.key) ? (
-<CustomDropdown
-  value={data[item.key]}
-  setValue={(val) => handleValueChange(item.key, val)}
-  data={
-    item.key === "country"
-      ? countries
-      : item.key === "state"
-      ? states
-      : item.key === "district"
-      ? districts
-      : options[item.key] || []
-  }
-  // labelField="label"
-  // valueField="value"
-  placeholder={` ${item.placeholder}`}
-/>
 
-                ) : (
-                   <TextInput
-                      style={styles.input}
-                      placeholder={item.placeholder}
-                      placeholderTextColor="#333"
-                      value={data[item.key] || ""}
-                      onChangeText={(text) =>
-                        setData({ ...data, [item.key]: text })
-                      }
-                    />
-                )}
-
-
+                <CustomDropdown
+                  value={dropdowns[item.key]}
+                  setValue={(val) => {
+                    setDropdowns({ ...dropdowns, [item.key]: val });
+                    setData({ ...data, [item.key]: val });
+                  }}
+                  data={options[item.key]}
+                  placeholder={` ${item.placeholder}`}
+                />
               </View>
             ))}
           </View>
@@ -268,7 +209,6 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           style={styles.button2}
           onPress={() => {
             const updatedData = { ...data };
-            console.log("updated data", updatedData);
             onSubmit(updatedData);
           }}
         >
@@ -349,9 +289,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
 
   label: {

@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const StatCard = ({ title, value, percentage, iconName, gradientColors }) => {
   return (
+    
     <LinearGradient
       colors={gradientColors}
       start={{ x: 0, y: 0 }}

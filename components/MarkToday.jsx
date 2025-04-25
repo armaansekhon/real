@@ -1,0 +1,331 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  Platform,
+  ScrollView,
+  TextInput,
+  SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
+import { Ionicons } from '@expo/vector-icons';
+import useAttendanceNotations from '../hooks/useAttendanceNotations';
+import useEmployeeList from '../hooks/useEmployeeList';
+import useSaveAttendance from '../hooks/useSaveAttendence';
+import { Alert } from 'react-native';
+
+
+
+
+const MarkToday = ({ onBack }) => {
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+  const [attendanceData, setAttendanceData] = useState({});
+  const [Search, setSearch] = useState('');
+  const { employees, loading: empLoading } = useEmployeeList();
+  const [filteredEmployees, SetFilteredEmployees] = useState([]);
+  
+  const { notations, loading } = useAttendanceNotations();
+  const saveAttendance = useSaveAttendance();
+
+  useEffect(() => {
+    if (Search.trim() === '') {
+      SetFilteredEmployees(employees);
+    } else {
+      const lowerQuery = Search.toLowerCase();
+      const filtered = employees.filter((emp) =>
+        emp.name.toLowerCase().includes(lowerQuery)
+      );
+      SetFilteredEmployees(filtered);
+    }
+  }, [Search, employees]);
+  useEffect(() => {
+    if (!loading && employees.length && notations.length) {
+      const mappedAttendance = {};
+  
+      employees.forEach((emp) => {
+        const matchedNotation = notations.find(
+          (note) => note.color.toLowerCase() === emp.attendance.toLowerCase()
+        );
+  
+        if (matchedNotation) {
+          mappedAttendance[emp.id] = matchedNotation.description;
+        }
+      });
+  
+      setAttendanceData(mappedAttendance);
+    }
+  }, [employees, notations, loading]);
+
+  // useEffect(() => {
+  //   const formatted = moment(date).format('YYYY-MM-DD');
+  //   const prev = previousAttendance[formatted];
+  //   setAttendanceData(prev || {});
+  // }, [date]);
+
+  const handleStatusSelect = (empId, status) => {
+    setAttendanceData((prev) => ({
+      ...prev,
+      [empId]: status,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // Step 1: Build an array of all attendance records
+      const attendanceList = Object.entries(attendanceData).map(([empId, statusDesc]) => {
+        const matchedNotation = notations.find(
+          (note) => note.description.toLowerCase() === statusDesc.toLowerCase()
+        );
+  
+        if (!matchedNotation) {
+          console.warn(`No matching notation for status: ${statusDesc}`);
+          return null; // filter out later
+        }
+  
+        return {
+          employeeId: empId,
+          colorCode: matchedNotation.color,
+        };
+      }).filter(Boolean); // Remove any nulls
+  
+      // Step 2: Send all at once
+      await saveAttendance(attendanceList);
+  
+      // Alert.alert('Success', 'Attendance saved successfully!');
+      
+    } catch (error) {
+      console.error('Failed to save all attendance:', error);
+    }
+  };
+  
+  const renderLegend = () => (
+    <View style={styles.legendRow}>
+      {notations.map((item) => (
+        <View key={item.id} style={styles.legendItem}>
+          <View style={[styles.legendBox, { backgroundColor: item.color }]} />
+          <Text style={styles.legendText}>{item.description}</Text>
+        </View>
+      ))}
+    </View>
+  );
+
+  const renderEmployeeRow = ({ item }) => {
+    const currentStatus = attendanceData[item.id];
+
+    return (
+      <View style={styles.tableRow}>
+        <View style={{ flex: 3 }}>
+          <Text style={styles.nameText}>{item.name}</Text>
+        </View>
+        <View style={styles.statusGroup}>
+          {notations.map((statusItem) => (
+            <TouchableOpacity
+              key={statusItem.description}
+              style={[
+                styles.statusCircle,
+                {
+                  backgroundColor: statusItem.color,
+                  opacity: currentStatus === statusItem.description ? 1 : 0.4,
+                },
+              ]}
+              onPress={() => handleStatusSelect(item.id, statusItem.description)}
+            >
+              {currentStatus === statusItem.description && (
+                <Ionicons name="checkmark" size={26} color="#fff" />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <Ionicons style={styles.backText} name="chevron-back" size={24} color="black" />
+        </TouchableOpacity>
+
+        <Text style={styles.header}>
+          Mark <Text style={styles.highlight}>Attendance</Text>
+        </Text>
+        <Text style={{ color: "#444",marginBottom:20, fontFamily: "Plus" }}>Select a Date for Attendance</Text>
+
+        {/* <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.dateBtn}>
+          <Text style={styles.dateText}>{moment(date).format('MMMM D, YYYY')}</Text>
+        </TouchableOpacity> */}
+
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#888" style={{ marginRight: 8 }} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name"
+            value={Search}
+            onChangeText={setSearch}
+          />
+        </View>
+
+        <Modal visible={showPicker} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.pickerModal}>
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={(event, selectedDate) => {
+                  setShowPicker(false);
+                  if (selectedDate) setDate(selectedDate);
+                }}
+              />
+              <TouchableOpacity onPress={() => setShowPicker(false)} style={styles.doneBtn}>
+                <Text style={styles.doneText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {renderLegend()}
+
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          style={styles.list}
+          data={filteredEmployees}
+          keyExtractor={(item) => item.id}
+          renderItem={renderEmployeeRow}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
+
+        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+          <Text style={styles.submitText}>Save Attendance</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 18, backgroundColor: '#fff' },
+  backButton: { marginBottom: 10 },
+  backText: { color: '#000', fontSize: 26, fontWeight: '900' },
+  header: { fontSize: 32, color: '#111', marginBottom: 10 },
+  highlight: { color: '#5aaf57' },
+  dateBtn: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginBottom: 12,
+  },
+  dateText: { fontSize: 18, fontFamily: "PlusSB", color: '#111' },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pickerModal: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    width: 300,
+    alignItems: 'center',
+  },
+  doneBtn: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 24,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+  },
+  doneText: { color: '#fff', fontWeight: '600' },
+  list: {
+    marginTop: 40,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    flexWrap: 'wrap',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 4,
+    marginVertical: 4,
+  },
+  legendBox: {
+    width: 16,
+    height: 16,
+    borderRadius: 3,
+    marginRight: 8,
+  },
+  legendText: { fontSize: 15, fontFamily: "PlusR", color: '#222' },
+  tableRow: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderColor: '#eee',
+    alignItems: 'center',
+  },
+  nameText: {
+    fontSize: 17,
+    color: '#222',
+    fontFamily: "PlusR",
+  },
+  statusGroup: {
+    flex: 4,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statusCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 0.25,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: Platform.OS === 'ios' ? 10 : 6,
+    marginBottom: 16,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#111',
+    fontFamily: "PlusR"
+  },
+  submitBtn: {
+    position: 'absolute',
+    bottom: 14,
+    left: 16,
+    right: 16,
+    padding: 14,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  submitText: {
+    color: '#000',
+    fontSize: 19,
+    fontFamily: "PlusR"
+  },
+});
+
+export default MarkToday;

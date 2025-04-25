@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { Alert } from "react-native";
+
 
 import { Dimensions } from "react-native";
 
@@ -117,6 +119,75 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
     ],
   ];
 
+  const dropdownOptions = {
+    department: [
+      { label: "HR", value: "HR" },
+      { label: "Engineering", value: "Engineering" },
+      { label: "Sales", value: "Sales" },
+    ],
+    designation: [
+      { label: "Manager", value: "Manager" },
+      { label: "Developer", value: "Developer" },
+      { label: "Analyst", value: "Analyst" },
+    ],
+    employeeType: [
+      { label: "Full-Time", value: "Full-Time" },
+      { label: "Part-Time", value: "Part-Time" },
+    ],
+    employeeCategory: [
+      { label: "Permanent", value: "Permanent" },
+      { label: "Contract", value: "Contract" },
+    ],
+    technology: [
+      { label: "React", value: "React" },
+      { label: "Node.js", value: "Node.js" },
+      { label: "Python", value: "Python" },
+    ],
+  };
+
+  const [dropdowns, setDropdowns] = useState({
+    department: null,
+    designation: null,
+    employeeType: null,
+    employeeCategory: null,
+    technology: null,
+  });
+
+  const [openDropdown, setOpenDropdown] = useState({
+    department: false,
+    designation: false,
+    employeeType: false,
+    employeeCategory: false,
+    technology: false,
+  });
+
+  const options = {
+    department: [
+      { label: "HR", value: "HR" },
+      { label: "Engineering", value: "Engineering" },
+      { label: "Sales", value: "Sales" },
+    ],
+    designation: [
+      { label: "Manager", value: "Manager" },
+      { label: "Developer", value: "Developer" },
+      { label: "Intern", value: "Intern" },
+    ],
+    employeeType: [
+      { label: "Full-Time", value: "Full-Time" },
+      { label: "Part-Time", value: "Part-Time" },
+      { label: "Contract", value: "Contract" },
+    ],
+    employeeCategory: [
+      { label: "Permanent", value: "Permanent" },
+      { label: "Temporary", value: "Temporary" },
+    ],
+    technology: [
+      { label: "React", value: "React" },
+      { label: "Node.js", value: "Node.js" },
+      { label: "Python", value: "Python" },
+    ],
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -163,42 +234,63 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
               {row.map((item) => (
                 <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
                   <Text style={styles.label}>{item.placeholder}</Text>
-                  {["department", "designation", "employeeType"].includes(item.key) ? (
-  <CustomDropdown
-    value={data[item.key]}
-    setValue={(val) => handleValueChange(item.key, val)}
-    data={
-      item.key === "department"
-        ? departments
-        : item.key === "designation"
-        ? designations
-        : item.key === "employeeType"
-        ? employeeTypes
-        : options[item.key] || []
-    }
-    placeholder={item.placeholder}
-  />
-) : item.key === "joiningDate" ? (
-  <TouchableOpacity
-    onPress={() => setShowDatePicker(true)}
-    style={[styles.input]}
-  >
-    <Text style={[styles.select, { color: "#333", fontFamily: "PlusR" }]}>
-      {data.joiningDate || "Select Date"}
-    </Text>
-    <Ionicons name="calendar-outline" size={18} color="#777" />
-  </TouchableOpacity>
-) : (
-  <TextInput
-    style={styles.input}
-    placeholder={item.placeholder}
-    value={data[item.key] || ""}
-    onChangeText={(text) =>
-      setData({ ...data, [item.key]: text })
-    }
-  />
-)}
-
+                  {[
+                    "department",
+                    "designation",
+                    "employeeType",
+                    "employeeCategory",
+                    "technology",
+                  ].includes(item.key) ? (
+                    <CustomDropdown
+                      value={dropdowns[item.key]}
+                      setValue={(val) => {
+                        setDropdowns({ ...dropdowns, [item.key]: val });
+                        setData({ ...data, [item.key]: val });
+                      }}
+                      data={options[item.key]}
+                      placeholder={` ${item.placeholder}`}
+                    />
+                  ) : item.key === "joiningDate" ? (
+                    <TouchableOpacity
+                      onPress={() => setShowDatePicker(true)}
+                      style={[styles.input]}
+                    >
+                      <Text style={[styles.select, { color: "#333", fontFamily: "PlusR" }]}>
+                        {data.joiningDate || "Select Date"}
+                      </Text>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color="#777"
+                      />
+                    </TouchableOpacity>
+                  ) : dropdownOptions[item.key] ? (
+                    <RNPickerSelect
+                      onValueChange={(value) =>
+                        setData({ ...data, [item.key]: value })
+                      }
+                      items={dropdownOptions[item.key]}
+                      value={data[item.key] || ""}
+                      style={{
+                        inputIOS: styles.input,
+                        inputAndroid: styles.input,
+                      }}
+                      useNativeAndroidPickerStyle={false}
+                      placeholder={{
+                        label: `Select ${item.placeholder}`,
+                        value: null,
+                      }}
+                    />
+                  ) : (
+                    <TextInput
+                      style={styles.input}
+                      placeholder={item.placeholder}
+                      value={data[item.key] || ""}
+                      onChangeText={(text) =>
+                        setData({ ...data, [item.key]: text })
+                      }
+                    />
+                  )}
                 </View>
               ))}
             </View>
@@ -224,7 +316,11 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       </ScrollView>
 
       {/* Next button replaced with icon */}
-      <TouchableOpacity style={styles.nextButton} onPress={() => onNext(data)}>
+      <TouchableOpacity style={styles.nextButton} onPress={() => {
+    if (validateFields()) {
+      onNext(data);
+    }
+  }}>
         <Ionicons name="arrow-forward-circle" size={55} color="black" />
       </TouchableOpacity>
     </SafeAreaView>

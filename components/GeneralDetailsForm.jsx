@@ -71,8 +71,9 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
 
   const groupedFields = [
     [
-      { key: "mobile", placeholder: "Mobile" },
-      { key: "email", placeholder: "Email" },
+      { key: "mobile",  placeholder: " Mobile " },
+      { key: "email",  placeholder: " Email " },
+      
     ],
     [
       { key: "gender", placeholder: "Gender" },
@@ -111,7 +112,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     ],
 
   ];
-
+  const requiredFields = ['mobile', 'email']; 
   const options = {
     gender: [
       { label: "Male", value: "Male" },
@@ -155,6 +156,30 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     setData({ ...data, [key]: value });
     setShowSave(true);
   };
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const mobileRegex = /^[0-9]{10}$/;
+  
+    if (!data.email || !emailRegex.test(data.email)) {
+      alert("Please enter a valid email address.");
+      return false;
+    }
+  
+    if (!data.mobile || !mobileRegex.test(data.mobile)) {
+      alert("Please enter a valid 10-digit mobile number.");
+      return false;
+    }
+  
+    return true;
+  };
+  const getRequiredMark = (key) => {
+    return requiredFields.includes(key) ? (
+      <Text style={{ color: 'red', fontSize: 12, marginLeft: 2 }}>
+        *
+      </Text>
+    ) : null;
+  };
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -188,7 +213,10 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
         >
           {row.map((item) => (
             <View key={item.key} style={styles.inputWrapper}>
-              <Text style={styles.label}>{item.placeholder}</Text>
+        <Text style={[styles.label, item.key === 'mobile' || item.key === 'email' ? styles.requiredLabel : null]}>
+  {item.placeholder}
+  {getRequiredMark(item.key)}
+</Text>
 
               {dropdownKeys.includes(item.key) ? (
   <CustomDropdown
@@ -297,7 +325,11 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   
       {/* <Text>Back</Text> */}
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => onNext(data)}>
+    <TouchableOpacity onPress={() => {
+  if (validateForm()) {
+    onNext(data);
+  }
+}}>
     <Ionicons
               name="chevron-forward-circle-sharp"
               size={55}
@@ -360,6 +392,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12,
   },
+  
   inputWrapper: {
     flex: 1,
     marginBottom: 4,

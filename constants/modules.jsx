@@ -38,6 +38,11 @@ export const defaultModules   = [
               path: "/(drawer)/HR/E-Manage/ViewUpEmp",
               title: "View/Update Employee",
             },
+            {
+              name: "MarkAttend",
+              path: "/(drawer)/HR/E-Manage/MarkAttend",
+              title: "Employee Attendence",
+            },
           ],
         },
       ],
@@ -50,9 +55,9 @@ export const defaultModules   = [
         icon: Loc,
       },
       {
-        name: "MarkAttendance",
-        path: "/(drawer)/MarkAttendance",
-        title: "Mark Attendance",
+        name: "MarkAttendence",
+        path: "/(drawer)/MarkAttendence",
+        title: "My Attendance",
         // icon: "person-outline",
         icon: CRM,
         alwaysVisible: true

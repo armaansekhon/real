@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import StatCard from './StatCard';
 
 const AdminStatsSection = () => {
@@ -24,8 +24,7 @@ const AdminStatsSection = () => {
           gradientColors={['#0F0F0F', '#2B2B2B']}
         />
       </View>
-
-      <View style={styles.cardWrapper}>
+<View style={styles.cardWrapper}>
         <StatCard
           title="Attendence"
           value="32"
@@ -33,7 +32,8 @@ const AdminStatsSection = () => {
           iconName="hand-left"
           gradientColors={['#0F0F0F', '#2B2B2B']}
         />
-      </View>
+      </View> 
+      
 
       <View style={styles.cardWrapper}>
         <StatCard
