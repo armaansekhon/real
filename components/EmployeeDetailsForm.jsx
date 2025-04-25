@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Alert } from "react-native";
 
+
 import { Dimensions } from "react-native";
 
 import RNPickerSelect from "react-native-picker-select";
@@ -54,6 +55,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [imageUri, setImageUri] = useState(null);
   const [showSave, setShowSave] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+ 
 
   const { departments, designations, employeeTypes, loading } = useDropdownData(
     data.department
@@ -66,6 +68,8 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       ...(key === "department" && { designation: null }), // reset designation if department changes
     }));
   };
+
+
 
   useEffect(() => {
     (async () => {
@@ -89,7 +93,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
-      setImageUri(uri); // Store the URI properly
+      setImageUri(uri);  // Store the URI properly
       setData({ ...data, profileImage: uri }); // Save in data
       setShowSave(true);
     }
@@ -140,25 +144,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       { label: "Python", value: "Python" },
     ],
   };
-  const validateFields = () => {
-    const requiredFields = [
-      "department",
-      "designation",
-      "employeeType",
-      "name",
 
-      "joiningDate",
-    ];
-
-    for (const field of requiredFields) {
-      if (!data[field] || data[field].trim() === "") {
-        Alert.alert("Missing Field", `Please fill in ${field}`);
-        return false;
-      }
-    }
-
-    return true;
-  };
   const [dropdowns, setDropdowns] = useState({
     department: null,
     designation: null,
@@ -247,19 +233,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
             >
               {row.map((item) => (
                 <View key={item.key} style={[styles.inputWrapper, { flex: 1 }]}>
-                  <Text style={styles.label}>
-                    {item.placeholder}
-                    {[
-                      "department",
-                      "designation",
-                      "employeeType",
-                      "name",
-                      "joiningDate",
-                    ].includes(item.key) && (
-                      <Text style={{ color: "red" }}> *</Text>
-                    )}
-                  </Text>
-
+                  <Text style={styles.label}>{item.placeholder}</Text>
                   {[
                     "department",
                     "designation",
@@ -281,12 +255,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                       onPress={() => setShowDatePicker(true)}
                       style={[styles.input]}
                     >
-                      <Text
-                        style={[
-                          styles.select,
-                          { color: "#333", fontFamily: "PlusR" },
-                        ]}
-                      >
+                      <Text style={[styles.select, { color: "#333", fontFamily: "PlusR" }]}>
                         {data.joiningDate || "Select Date"}
                       </Text>
                       <Ionicons
@@ -347,14 +316,11 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       </ScrollView>
 
       {/* Next button replaced with icon */}
-      <TouchableOpacity
-        style={styles.nextButton}
-        onPress={() => {
-          if (validateFields()) {
-            onNext(data);
-          }
-        }}
-      >
+      <TouchableOpacity style={styles.nextButton} onPress={() => {
+    if (validateFields()) {
+      onNext(data);
+    }
+  }}>
         <Ionicons name="arrow-forward-circle" size={55} color="black" />
       </TouchableOpacity>
     </SafeAreaView>
@@ -457,7 +423,7 @@ const styles = StyleSheet.create({
   input: {
     height: 42,
     backgroundColor: "#f9f9f9",
-
+  
     borderRadius: 10,
     paddingHorizontal: 14,
     fontSize: 14,
