@@ -84,12 +84,25 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       "designation",
       "employeeType",
       "name",
-
       "joiningDate",
     ];
 
+    // for (const field of requiredFields) {
+    //   if (!data[field] || data[field].trim() === "") {
+    //     Alert.alert("Missing Field", `Please fill in ${field}`);
+    //     return false;
+    //   }
+    // }
+
+
     for (const field of requiredFields) {
-      if (!data[field] || data[field].trim() === "") {
+      const value = data[field];
+  
+      if (
+        value === undefined ||
+        value === null ||
+        (typeof value === "string" && value.trim() === "")
+      ) {
         Alert.alert("Missing Field", `Please fill in ${field}`);
         return false;
       }
@@ -266,15 +279,38 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                     "employeeCategory",
                     "technology",
                   ].includes(item.key) ? (
+//                     <CustomDropdown
+//   value={data.department}
+//   setValue={(val) => handleValueChange("department", val)}
+//   data={departments} // Ensure this is populated
+//   placeholder="Select Department"
+// />
+                    // <CustomDropdown
+                    //   value={dropdowns[item.key]}
+                    //   setValue={(val) => {
+                    //     setDropdowns({ ...dropdowns, [item.key]: val });
+                    //     setData({ ...data, [item.key]: val });
+                    //   }}
+                    //   data={options[item.key]}
+                    //   placeholder={` ${item.placeholder}`}
+                    // />
+
+
+
                     <CustomDropdown
-                      value={dropdowns[item.key]}
-                      setValue={(val) => {
-                        setDropdowns({ ...dropdowns, [item.key]: val });
-                        setData({ ...data, [item.key]: val });
-                      }}
-                      data={options[item.key]}
-                      placeholder={` ${item.placeholder}`}
-                    />
+                    value={data[item.key]}
+                    setValue={(val) => handleValueChange(item.key, val)}
+                    data={
+                      item.key === "department"
+                        ? departments
+                        : item.key === "designation"
+                        ? designations
+                        : item.key === "employeeType"
+                        ? employeeTypes
+                        : options[item.key] || []
+                    }
+                    placeholder={` ${item.placeholder}`}
+                  />
                   ) : item.key === "joiningDate" ? (
                     <TouchableOpacity
                       onPress={() => setShowDatePicker(true)}
@@ -344,7 +380,6 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           />
         )}
       </ScrollView>
-
       {/* Next button replaced with icon */}
       <TouchableOpacity
         style={styles.nextButton}

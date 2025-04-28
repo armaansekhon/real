@@ -142,7 +142,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     ],
     maritalStatus: [
       { label: "Single", value: "Single" },
-      { label: "Married", value: "Married" },
+      // { label: "Married", value: "Married" },
     ],
   };
 

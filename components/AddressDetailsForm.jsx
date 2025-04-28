@@ -13,7 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 // import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
-
+import useDropdownData from "../hooks/useDropdownData";
 
 const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "label", valueField = "value"}) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -46,18 +46,23 @@ const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "labe
   );
 };
 
+
+
+
+
+
 export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [dropdowns, setDropdowns] = useState({
-    country: null,
-    district: null,
-    state: null,
-    city: null,
-    addressLine1: null,
-    addressLine2: null,
-  });
+  // const [dropdowns, setDropdowns] = useState({
+  //   country: null,
+  //   district: null,
+  //   state: null,
+  //   // city: null,
+  //   // addressLine1: null,
+  //   // addressLine2: null,
+  // });
   const validateForm = () => {
     let isFormValid = true;
 
@@ -109,21 +114,40 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       { label: "Part-Time", value: "Part-Time" },
       { label: "Contract", value: "Contract" },
     ],
-    city: [
-      { label: "Permanent", value: "Permanent" },
-      { label: "Temporary", value: "Temporary" },
-    ],
-    addressLine1: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-    addressLine2: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
+    // city: [
+    //   { label: "Permanent", value: "Permanent" },
+    //   { label: "Temporary", value: "Temporary" },
+    // ],
+    // addressLine1: [
+    //   { label: "React", value: "React" },
+    //   { label: "Node.js", value: "Node.js" },
+    //   { label: "Python", value: "Python" },
+    // ],
+    // addressLine2: [
+    //   { label: "React", value: "React" },
+    //   { label: "Node.js", value: "Node.js" },
+    //   { label: "Python", value: "Python" },
+    // ],
   };
+
+
+  const handleValueChange = (key, value) => {
+    setData((prevData) => ({
+      ...prevData,
+      [key]: value,
+    }));
+  
+    // Additional behavior based on the field selected
+    if (key === "country") {
+      console.log("Country dropdown selected value:", value);
+      setCountryId(value); // you must define setCountryId using useState
+      setStateId(null);    // same for setStateId
+    }
+  };
+
+
+  const { countries, states, districts } = useDropdownData(data.country, data.state);
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -148,12 +172,20 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
             key={rowIndex}
             style={[styles.rowContainer, { zIndex: 1000 - rowIndex * 10 }]}
           >
-            {row.map((item) => (
+             {row.map((item, itemIndex) => (
+      <View key={item?.key || itemIndex} style={styles.inputWrapper}>
+        <Text style={styles.label}>
+          {item?.placeholder || "Unknown Field"}
+          {item?.key && getRequiredMark(item.key)}
+        </Text>
+
+
+            {/* {row.map((item) => (
               <View key={item.key} style={styles.inputWrapper}>
               <Text style={styles.label}>
                   {item.placeholder}
                   {getRequiredMark(item.key)}
-                </Text>
+                </Text> */}
 
                 {item.key === "addressLine1" || item.key === "addressLine2" ? (
                   <TextInput
@@ -166,15 +198,42 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
                     }
                   />
                 ) : (
+
+
+
+                  //add this
+              //     ? districts
+              //     : options[item.key] || []
+              // }
+
+
+
+                  // <CustomDropdown
+                  //   value={dropdowns[item.key]}
+                  //   setValue={(val) => {
+                  //     setDropdowns({ ...dropdowns, [item.key]: val });
+                  //     setData({ ...data, [item.key]: val });
+                  //   }}
+                  //   data={options[item.key]}
+                  //   placeholder={` ${item.placeholder}`}
+                  // />
+
+
+
                   <CustomDropdown
-                    value={dropdowns[item.key]}
-                    setValue={(val) => {
-                      setDropdowns({ ...dropdowns, [item.key]: val });
-                      setData({ ...data, [item.key]: val });
-                    }}
-                    data={options[item.key]}
-                    placeholder={` ${item.placeholder}`}
-                  />
+                  value={data[item.key]}
+                  setValue={(val) => handleValueChange(item.key, val)}
+                  data={
+                    item.key === "country"
+                      ? countries
+                      : item.key === "state"
+                      ? states
+                      : item.key === "district"
+                      ? districts
+                      : options[item.key] || []
+                  }
+                  placeholder={` ${item.placeholder}`}
+                />
                 )}
               </View>
             ))}
