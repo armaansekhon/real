@@ -21,7 +21,7 @@ export const addNewEmployee = async (payload) => {
   try {
     const secretKey = await SecureStore.getItemAsync("auth_token");
 
-    // Sample API response (this should be fetched from the API)
+    // Sample API response 
     const categoryData = [
       { id: 341, category: "General" },
       { id: 342, category: "OBC" },
@@ -47,6 +47,7 @@ export const addNewEmployee = async (payload) => {
       category,
       addressLine2,
       addressLine1,
+      stateId,
       ...restPayload
     } = payload;
 

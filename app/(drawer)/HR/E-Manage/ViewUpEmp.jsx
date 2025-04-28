@@ -50,6 +50,7 @@ const ViewUpEmp = () => {
         designation: emp.designation?.name || "N/A",
         employeeType: emp.employeeType?.employeeType || "N/A",
         employeeId: emp.employeeType?.id || "N/A",
+        pincode: emp.employeeAddress?.id || "N/A",
         pic:
           emp.employeePic || "https://randomuser.me/api/portraits/lego/1.jpg",
         // photo:

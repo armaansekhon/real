@@ -65,7 +65,7 @@ export default function AddEmployee({ navigation }) {
               dob: emp.dob,
               joiningDate: emp.joiningDate,
               gender: emp.gender,
-              salary: emp.gender,
+              salary: emp.salary,
               nationality: emp.nationality,
               senior: emp.senior,
               category: emp.category,
@@ -77,6 +77,7 @@ export default function AddEmployee({ navigation }) {
               address2: emp.employeeAddress?.[0]?.address2,
               city: emp.employeeAddress?.[0]?.city,
               pincode: emp.employeeAddress?.[0]?.pincode,
+              // country: emp.employeeAddress?.[0]?.state?.[1]?.country,
             },
           });
         } catch (e) {
