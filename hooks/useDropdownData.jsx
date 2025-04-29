@@ -73,6 +73,11 @@ export default function useDropdownData(selectedDepartmentId, countryId, stateId
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [districts, setDistricts] = useState([]);
+
+  // const [countries, setCountries] = useState<{ id: number, country: string }[]>([]);
+  // const [states, setStates] = useState<{ id: number, state: string }[]>([]);
+  // const [districts, setDistricts] = useState<{ id: number, district: string }[]>([]);
+
   const [maritalStatuses, setMaritalStatuses] = useState([]);
   const [nationalities, setNationalities] = useState([]);
   const [genders, setGenders] = useState([]);
@@ -82,7 +87,11 @@ export default function useDropdownData(selectedDepartmentId, countryId, stateId
   const [loading, setLoading] = useState(true);
 
 
-
+  const [value, setValue] = useState({
+    country: "",
+    state: "",
+    district: "",
+  });
 
   
 
@@ -116,46 +125,80 @@ export default function useDropdownData(selectedDepartmentId, countryId, stateId
     loadByDepartment();
   }, [selectedDepartmentId]);
 
-
-
-  // useEffect(() => {
-  //   const loadByCountry = async () => {
-  //     if (selectedCountryId) {
-  //       const data = await fetchData(`getStatesByCountryId/${selectedCountryId}`);
-  //       setStates(data);
-  //       setDistricts([]);
-  //     }
-  //   };
-  //   loadByCountry();
-  // }, [selectedCountryId]);
-
-
-  // Fetch countries
   useEffect(() => {
     const loadCountries = async () => {
-      setLoading(true);
       const data = await fetchData("countries");
-      setCountries(
-        data.map((item) => ({
-          label: item.countryName,
-          value: item.id,
-        }))
-      );
-      setLoading(false);
+      setCountries(data);
     };
     loadCountries();
   }, []);
 
+  // const onCountryChange = async (countryId) => {
+  //   setValue((prev) => ({ ...prev, country: countryId, state: "", district: "" }));
+  //   const data = await fetchData(`getStatesByCountryId/${countryId}`);
+  //   setStates(data);
+  //   setDistricts([]);
+  // };
+
+
+
+  const onCountryChange = async (countryId) => {
+    if (!countryId) {
+      console.error("Invalid countryId:", countryId);
+      return;
+    }
+  
+    setValue((prev) => ({ ...prev, country: countryId, state: "", district: "" }));
+  
+    try {
+      const data = await fetchData(`getStatesByCountryId/${countryId}`);
+      setStates(data);
+      setDistricts([]); // Clear districts when country changes
+    } catch (error) {
+      console.error("Error fetching states:", error.message);
+      setStates([]); // Reset states on error
+    }
+  };
+
+  // const onStateChange = async (stateId) => {
+  //   setValue((prev) => ({ ...prev, state: stateId, district: "" }));
+  //   const data = await fetchData(`getDistrictByStateId/${stateId}`);
+  //   setDistricts(data);
+  // };
+
+
+  const onStateChange = async (stateId) => {
+    if (!stateId) {
+      console.error("Invalid stateId:", stateId);
+      return;
+    }
+  
+    setValue((prev) => ({ ...prev, state: stateId, district: "" }));
+  
+    try {
+      const data = await fetchData(`getDistrictByStateId/${stateId}`);
+      setDistricts(data);
+    } catch (error) {
+      console.error("Error fetching districts:", error.message);
+      setDistricts([]); // Reset districts on error
+    }
+  };
+
+
+
+  // // Fetch countries
   // useEffect(() => {
   //   const loadCountries = async () => {
-  //     const data = await fetchData('countries');
-  //     console.log("Fetched countries:", data);
-  //     setCountries(
-  //       data.map((item) => ({
-  //         label: item.countryName,
-  //         value: item.id,
-  //       }))
-  //     );
+  //     setLoading(true);
+  //     const data = await fetchData("countries");
+  //     setCountries(data); // where item = { id, country }
+  //     // setCountries(
+  //     //   data.map((item) => ({
+  //     //     label: item.countryName,
+  //     //     value: item.id,
+  //     //   }))
+  //     // );
+  //     setLoading(false);
   //   };
   //   loadCountries();
   // }, []);
@@ -165,38 +208,26 @@ export default function useDropdownData(selectedDepartmentId, countryId, stateId
 
 
 
-  // Fetch states by country
-  useEffect(() => {
-    const loadStates = async () => {
-      if (countryId) {
-        setLoading(true);
-        const data = await fetchData(`getStatesByCountryId/${countryId}`);
-        setStates(
-          data.map((item) => ({
-            label: item.stateName,
-            value: item.id,
-          }))
-        );
-        setDistricts([]); // Clear districts when country changes
-        setLoading(false);
-      }
-    };
-    loadStates();
-  }, [countryId]);
 
-  // // States by Country
+
+  // Fetch states by country
   // useEffect(() => {
-  //   console.log("Selected country ID:", countryId);
   //   const loadStates = async () => {
   //     if (countryId) {
-  //       console.log("Fetching states for country ID:", countryId);
+  //       setLoading(true);
   //       const data = await fetchData(`getStatesByCountryId/${countryId}`);
-  //       console.log("States response:", data);
-  //       setStates(data);
-  //       setDistricts([]); // clear previous districts
+  //       setStates(data);    // where item = { id, state }
+  //       // setStates(
+  //       //   data.map((item) => ({
+  //       //     label: item.stateName,
+  //       //     value: item.id,
+  //       //   }))
+  //       // );
+  //       setDistricts([]); // Clear districts when country changes
+  //       setLoading(false);
   //     }
   //   };
-  //   loadStates(countryId); 
+  //   loadStates();
   // }, [countryId]);
 
 
@@ -204,50 +235,28 @@ export default function useDropdownData(selectedDepartmentId, countryId, stateId
 
 
 
-  
-  // Fetch districts by state
-  useEffect(() => {
-    const loadDistricts = async () => {
-      if (stateId) {
-        setLoading(true);
-        const data = await fetchData(`getDistrictByStateId/${stateId}`);
-        setDistricts(
-          data.map((item) => ({
-            label: item.districtName,
-            value: item.id,
-          }))
-        );
-        setLoading(false);
-      }
-    };
-    loadDistricts();
-  }, [stateId]);
 
-  // //  Districts by State
+
+  
+  // // Fetch districts by state
   // useEffect(() => {
   //   const loadDistricts = async () => {
   //     if (stateId) {
-  //       console.log("Fetching districts for state ID:", stateId);
+  //       setLoading(true);
   //       const data = await fetchData(`getDistrictByStateId/${stateId}`);
-  //       setDistricts(data);
+  //       setDistricts(data); // where item = { id, district }
+  //       // setDistricts(
+  //       //   data.map((item) => ({
+  //       //     label: item.districtName,
+  //       //     value: item.id,
+  //       //   }))
+  //       // );
+  //       setLoading(false);
   //     }
   //   };
   //   loadDistricts();
   // }, [stateId]);
 
-  
-
-
-
-  // useEffect(() => {
-  //   const loadByState = async () => {
-  //     if (selectedStateId) {
-  //       const data = await fetchData(`getDistrictByStateId/${selectedStateId}`);
-  //       setDistricts(data);
-  //     }
-  //   };
-  //   loadByState();
-  // }, [selectedStateId]);
 
 
 
@@ -262,14 +271,6 @@ export default function useDropdownData(selectedDepartmentId, countryId, stateId
   }, [selectedDesignationId]);
 
 
-  // useEffect(() => {
-  //   const testCountries = async () => {
-  //     const countries = await fetchData("countries");
-  //     // console.log(" Final Parsed Countries:", countries);
-  //   };
-  //   testCountries();
-  // }, []);
-  
 
   const formatDropdown = (dataList = [], labelKey = "name", valueKey = "id") =>
     dataList.map((item) => ({

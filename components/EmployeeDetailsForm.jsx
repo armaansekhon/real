@@ -87,13 +87,6 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       "joiningDate",
     ];
 
-    // for (const field of requiredFields) {
-    //   if (!data[field] || data[field].trim() === "") {
-    //     Alert.alert("Missing Field", `Please fill in ${field}`);
-    //     return false;
-    //   }
-    // }
-
 
     for (const field of requiredFields) {
       const value = data[field];
@@ -279,21 +272,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                     "employeeCategory",
                     "technology",
                   ].includes(item.key) ? (
-//                     <CustomDropdown
-//   value={data.department}
-//   setValue={(val) => handleValueChange("department", val)}
-//   data={departments} // Ensure this is populated
-//   placeholder="Select Department"
-// />
-                    // <CustomDropdown
-                    //   value={dropdowns[item.key]}
-                    //   setValue={(val) => {
-                    //     setDropdowns({ ...dropdowns, [item.key]: val });
-                    //     setData({ ...data, [item.key]: val });
-                    //   }}
-                    //   data={options[item.key]}
-                    //   placeholder={` ${item.placeholder}`}
-                    // />
+
 
 
 
@@ -309,7 +288,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                         ? employeeTypes
                         : options[item.key] || []
                     }
-                    placeholder={` ${item.placeholder}`}
+                    placeholder={loading ? "Loading..." : `Select ${item.placeholder}`}
                   />
                   ) : item.key === "joiningDate" ? (
                     <TouchableOpacity

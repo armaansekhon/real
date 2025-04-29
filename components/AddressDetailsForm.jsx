@@ -22,28 +22,51 @@ const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "labe
   // console.log("data", data);
 
   return (
+
     <Dropdown
-      style={[styles.dropdown, isFocus && { borderColor: "#5aaf57" }]}
-      placeholderStyle={styles.dropdownPlaceholder}
-      selectedTextStyle={styles.dropdownPlaceholder}
-      data={data}
-      maxHeight={200}
-      // labelField={labelField}
-      // valueField={valueField}
-      labelField="label"
-      valueField="value"
-      placeholder={placeholder}
-      value={value}
-      onFocus={() => setIsFocus(true)}
-      onBlur={() => setIsFocus(false)}
-      onChange={(item) => {
-        setValue(item[valueField]);
-        // setValue(item.id);
-        setValue(item.value);
-        // setSelectedCountry(item.id);
-        setIsFocus(false);
-      }}
-    />
+  style={[styles.dropdown, isFocus && { borderColor: "#5aaf57" }]}
+  placeholderStyle={styles.dropdownPlaceholder}
+  selectedTextStyle={styles.dropdownPlaceholder}
+  data={data}
+  maxHeight={200}
+  labelField="country"
+  valueField="id"
+  placeholder={placeholder}
+  value={value}
+  onFocus={() => setIsFocus(true)}
+  onBlur={() => setIsFocus(false)}
+  onChange={(item) => {
+    if (item && item[valueField] !== undefined) {
+      setValue(item[valueField]);
+    } else {
+      console.warn("Dropdown item missing valueField:", item);
+    }
+    setIsFocus(false);
+  }}
+  
+/>
+    // <Dropdown
+    //   style={[styles.dropdown, isFocus && { borderColor: "#5aaf57" }]}
+    //   placeholderStyle={styles.dropdownPlaceholder}
+    //   selectedTextStyle={styles.dropdownPlaceholder}
+    //   data={data}
+    //   maxHeight={200}
+    //   // labelField={labelField}
+    //   // valueField={valueField}
+    //   labelField="label"
+    //   valueField="value"
+    //   placeholder={placeholder}
+    //   value={value}
+    //   onFocus={() => setIsFocus(true)}
+    //   onBlur={() => setIsFocus(false)}
+    //   onChange={(item) => {
+    //     setValue(item[valueField]);
+    //     // setValue(item.id);
+    //     setValue(item.value);
+    //     // setSelectedCountry(item.id);
+    //     setIsFocus(false);
+    //   }}
+    // />
   );
 };
 
@@ -56,14 +79,14 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // const [dropdowns, setDropdowns] = useState({
-  //   country: null,
-  //   district: null,
-  //   state: null,
-  //   // city: null,
-  //   // addressLine1: null,
-  //   // addressLine2: null,
-  // });
+  const [dropdowns, setDropdowns] = useState({
+    country: null,
+    district: null,
+    state: null,
+    // city: null,
+    // addressLine1: null,
+    // addressLine2: null,
+  });
   const validateForm = () => {
     let isFormValid = true;
 
@@ -119,9 +142,9 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       { label: "Other", value: 2 },
     ],
     state: [
-      { label: "Full-Time", value: "Full-Time" },
-      { label: "Part-Time", value: "Part-Time" },
-      { label: "Contract", value: "Contract" },
+      { label: "Full-Time", value: "1" },
+      { label: "Part-Time", value: "2" },
+   
     ],
 
   };
@@ -198,24 +221,84 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
                     }
                   />
                 ) : (
+                  <>
+
+                  {/* Country Dropdown */}
+                  {/* <CustomDropdown
+                  
+                  value={data.country}
+                  setValue={(val) => {
+                    handleValueChange("country", val);
+                    onCountryChange(val);
+                  }}
+                  data={countries}
+                  placeholder="Select Country"
+                /> */}
+<CustomDropdown
+  value={data.country}
+  setValue={(val) => handleValueChange("country", val)}
+  data={countries}
+  placeholder="Select Country"
+/>
+
+
+<CustomDropdown
+  value={data.state}
+  setValue={(val) => handleValueChange("state", val)}
+  data={states}
+  placeholder="Select State"
+/>
+
+<CustomDropdown
+  value={data.district}
+  setValue={(val) => handleValueChange("district", val)}
+  data={districts}
+  placeholder="Select District"
+/>
 
 
 
-                  <CustomDropdown
-                  value={data[item.key]}
-                  setValue={(val) => handleValueChange(item.key, val)}
-                  data={
-                    item.key === "country"
-                      ? countries
-                      : item.key === "state"
-                      ? states
-                      : item.key === "district"
-                      ? districts
-                      : []
-                      // : options[item.key] || []
-                  }
-                  placeholder={` ${item.placeholder}`}
-                />
+
+
+            {/* State Dropdown */}
+            {/* <CustomDropdown
+              value={value.state}
+              setValue={(val) => {
+                onStateChange(val);
+              }}
+              data={states}
+              placeholder="Select State"
+            /> */}
+
+
+            {/* District Dropdown */}
+            {/* <CustomDropdown
+              value={value.district}
+              setValue={(val) => {
+                setValue((prev) => ({ ...prev, district: val }));
+              }}
+              data={districts}
+              placeholder="Select District"
+            /> */}
+</>
+
+
+
+                //   <CustomDropdown
+                //   value={data[item.key]}
+                //   setValue={(val) => handleValueChange(item.key, val)}
+                //   data={
+                //     item.key === "country"
+                //       ? countries
+                //       : item.key === "state"
+                //       ? states
+                //       : item.key === "district"
+                //       ? districts
+                //       : []
+                //       // : options[item.key] || []
+                //   }
+                //   placeholder={` ${item.placeholder}`}
+                // />
                 )}
               </View>
             ))}
@@ -234,7 +317,7 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
 
 
 
-        ************NEW ON SUBMIT HANDLER***************************************************
+        {/* ************NEW ON SUBMIT HANDLER************************************* */}
         <TouchableOpacity
   style={styles.button2}
   onPress={() => {
@@ -245,10 +328,10 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
           ...data,
           stateId: data.state, // Map "state" to "stateId" if required
         };
-        delete finalPayload.state; // Remove "state" if not required
+        delete finalPayload.state; 
     
         console.log("Final Payload to API:", finalPayload);
-        onSubmit(finalPayload); // Pass the cleaned payload to the parent
+        onSubmit(finalPayload); 
       }}
     // onSubmit(data); // make sure this is passed to parent as `addressDetails`
 

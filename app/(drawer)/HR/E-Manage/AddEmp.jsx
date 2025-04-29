@@ -35,13 +35,14 @@ export default function AddEmployee({ navigation }) {
     addressDetails: {},
   });
 
-
+  const [loading, setLoading] = useState(true);
 
    // when editing, fetch existing and prefill
    useEffect(() => {
     if (isEdit) {
       (async () => {
         try {
+          setLoading(true); // Start loading
           const emp = await getAllEmployeesbyId(id);
           // split emp into your three sections:
           setFormData({
@@ -82,7 +83,10 @@ export default function AddEmployee({ navigation }) {
           });
         } catch (e) {
           console.error("Failed to load employee for edit:", e);
+        } finally {
+          setLoading(false); // End loading
         }
+
       })();
     }
   }, [id, isEdit]);
@@ -95,8 +99,18 @@ export default function AddEmployee({ navigation }) {
     }));
   };
 
-  const goNext = () => setStep((prev) => prev + 1);
-  const goBack = () => setStep((prev) => prev - 1);
+  // const goNext = () => setStep((prev) => prev + 1);
+  // const goBack = () => setStep((prev) => prev - 1);
+
+  const goNext = () => {
+    setStep((prev) => prev + 1);
+    setFormData({ ...formData }); // Trigger re-render
+  };
+
+  const goBack = () => {
+    setStep((prev) => prev - 1);
+    setFormData({ ...formData }); // Trigger re-render
+  };
 
   const handleSubmit = async (finalData) => {
     console.log("Submit button clicked");
@@ -155,7 +169,11 @@ export default function AddEmployee({ navigation }) {
   //   }
   // };
 
-  return (
+  return loading ? (
+      <View style={styles.loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    ) : (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.topBar}>
@@ -238,5 +256,18 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
     zIndex: -1,
+  },
+
+
+  loadingContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    zIndex: 100,
   },
 });
