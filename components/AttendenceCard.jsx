@@ -5,8 +5,10 @@ import LottieView from 'lottie-react-native';
 import moment from 'moment';
 import usePostAttendance from '../hooks/usePostAttendence';
 import useFetchAttendance from '../hooks/useFetchAttendance';
+import * as SecureStore from 'expo-secure-store';
 
 const { width, height } = Dimensions.get('window');
+
 
 const AttendanceCard = () => {
   const [clock, setClock] = useState('');
@@ -20,10 +22,23 @@ const AttendanceCard = () => {
   const { postAttendance } = usePostAttendance();
   const { attendance, loading, error, refetch } = useFetchAttendance();
 
+
+  const loadDate = async () => {
+    try {
+      const currentDayDate = await SecureStore.getItemAsync('currentDayDate');
+      const formattedDate = moment(currentDayDate).format('dddd, MMMM DD, YYYY');
+      setDate(formattedDate);
+
+    } catch (e) {
+      console.error('Date formatting error:', e);
+    }
+  };
+
   useEffect(() => {
+    loadDate();
     const interval = setInterval(() => {
       setClock(moment().format('hh:mm A'));
-      setDate(moment().format('dddd, MMMM Do YYYY'));
+      // setDate(formattedDate);
     }, 1000);
     return () => clearInterval(interval);
   }, []);

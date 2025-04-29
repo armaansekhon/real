@@ -6,9 +6,10 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); // stores full user info
   const [userType, setUserType] = useState(null); // just userCategoryCode
   const [img, setimg] = useState(null); // just userCategoryCode
+  const [date, setdate]= useState(null)
 
   return (
-    <UserContext.Provider value={{ user, setUser, userType, setUserType ,img ,setimg }}>
+    <UserContext.Provider value={{ user, setUser, userType, setUserType ,img ,setimg, date , setdate }}>
       {children}
     </UserContext.Provider>
   );

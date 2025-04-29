@@ -23,11 +23,14 @@ const EmployeeList = ({ onSelectEmployee }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [maxSelectableDate, setMaxSelectableDate] = useState(new Date());
+  const [refreshing, setRefreshing] = useState(false);
+
 
   const fetchEmployees = async (dateToUse) => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const formattedDate = moment(dateToUse).format('YYYY-MM-DD');
+
       console.log("Token:", secretKey);
       
       console.log("Date Used:", dateToUse );
@@ -156,6 +159,12 @@ const EmployeeList = ({ onSelectEmployee }) => {
           data={filteredEmployees}
           keyExtractor={(item) => item.employeeId.toString()}
           contentContainerStyle={styles.list}
+          refreshing={refreshing}
+          onRefresh={async () => {
+            setRefreshing(true);
+            await fetchEmployees(selectedDate); // refresh current date's data
+            setRefreshing(false);
+          }}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => onSelectEmployee(item)}
@@ -215,7 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PlusR',
     color: '#111',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   time: {
     width: 80,
