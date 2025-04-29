@@ -43,10 +43,42 @@ export const defaultModules   = [
               path: "/(drawer)/HR/E-Manage/MarkAttend",
               title: "Employee Attendence",
             },
+           
           ],
         },
       ],
     },
+
+    {
+      name:"Leaves",
+      path: "/(drawer)/Leaves",
+      title: "Leaves",
+
+      icon: Brief,
+     children: [
+      {
+        name: "ApplyLeave",
+        path: "/(drawer)/Leaves/ApplyLeave",
+        title: "Apply Leave",
+        alwaysVisible: true
+      },
+      {
+        name: "ManageLeaves",
+        path: "/(drawer)/Leaves/ManageLeaves",
+        title: "Manage Leave",
+       
+      },
+
+      ]
+
+    },
+
+
+
+
+
+
+
     {
         name: "Geolocation",
         path: "/(drawer)/Geolocation",

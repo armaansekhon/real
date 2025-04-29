@@ -8,7 +8,7 @@ const useSaveAttendance = () => {
   // Accepts an array of attendance data (employeeId + colorCode)
   const saveAttendance = useCallback(async (attendanceList) => {
     try {
-      const loginUserId = await SecureStore.getItemAsync('loginUserId');
+      const loginUserId = await SecureStore.getItemAsync('userid');
       const currentDayDate = await SecureStore.getItemAsync('currentDayDate');
       const secretKey = await SecureStore.getItemAsync('auth_token');
 

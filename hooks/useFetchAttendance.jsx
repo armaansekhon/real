@@ -14,7 +14,7 @@ const useFetchAttendance = () => {
       setError(null);
 
       // Fetch SecureStore values
-      const loginUserId = await SecureStore.getItemAsync('loginUserId');
+      const loginUserId = await SecureStore.getItemAsync('userid');
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const currentDayDate = await SecureStore.getItemAsync('currentDayDate');
 
@@ -23,6 +23,7 @@ const useFetchAttendance = () => {
       }
 
       const url = `${API_URL}/${Number(loginUserId)}/currentDayDate/${currentDayDate}`;
+      console.log("url", url)
 
       const response = await fetch(url, {
         method: 'GET',

@@ -13,10 +13,11 @@ const usePostAttendance = () => {
       setLoading(true);
       setError(null);
 
-      const loginUserId = await SecureStore.getItemAsync('loginUserId');
+      const loginUserId = await SecureStore.getItemAsync('userid');
    
         const secretKey = await SecureStore.getItemAsync('auth_token');
          const currentDayDate = await SecureStore.getItemAsync('currentDayDate');
+
 
       const payload = {
         employeeId: Number(loginUserId),

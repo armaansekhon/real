@@ -7,7 +7,7 @@ import { useUser } from '../context/UserContext';
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
-  const { setUser, setUserType ,setimg} = useUser(); 
+  const { setUser, setUserType ,setimg,setdate} = useUser(); 
 
   const login = async (usercode, password) => {
     setLoading(true);
@@ -27,14 +27,17 @@ const useLogin = () => {
         await SecureStore.setItemAsync('auth_token', data.secretKey);
         setUser(data.user);
         setUserType(data.user.userCategoryCode);
+        setimg(data.employeePic)
+        setdate(data.currentDay)
    
         await SecureStore.setItemAsync('userType', data.user.userCategoryCode);
         await SecureStore.setItemAsync('userid', JSON.stringify(data.user.id));
-        await SecureStore.setItemAsync('privileges', JSON.stringify(data.user.privileges || []))
-        console.log('Token stored:', data.secretKey, "type:",data.user.userCategoryCode,"acess:",data.user.privileges );
+        await SecureStore.setItemAsync('currentDayDate', (data.currentDay));
+        await SecureStore.setItemAsync('privileges', JSON.stringify(data.privileges || []))
+        console.log('Token stored:', data.secretKey, "type:",data.user.userCategoryCode,"acess:",data.user.privileges, data.currentDay);
 
         return { success: true,
-          privileges: data.user.privileges || [],
+          privileges: data.privileges || [],
          };
       } else {
         throw new Error(data.error || "Token not found in response");

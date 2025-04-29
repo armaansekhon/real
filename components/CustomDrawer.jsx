@@ -147,7 +147,7 @@ const CustomDrawer = ({ navigation }) => {
           <View style={styles.headerTextContainer}>
           <Text style={styles.welcomeText}>
               {/* {/* Welcome <Text style={styles.adminText}>{user.name}</Text> */}
-              Hello !  <Text style={styles.adminText}>Admin</Text> 
+              Hello !  <Text style={styles.adminText}>{user.name.split(' ')[0]}</Text> 
             </Text>
             <Text style={styles.designation}>Executive</Text>
           </View>
