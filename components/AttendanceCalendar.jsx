@@ -145,7 +145,7 @@ const AttendanceCalendar = ({ employee, onBack }) => {
           />
 
           <View style={styles.summaryContainer}>
-            <Text style={styles.summaryTitle}>Summary</Text>
+            <Text style={styles.summaryTitle}>Details</Text>
             <View style={styles.summaryRow}>
               <Text style={[styles.summaryItem, { color: '#62883d' }]}>
                 Present: {summary.present}
@@ -200,9 +200,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   summaryContainer: {
-    marginTop: 20,
+    marginTop: 30,
     padding: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
     borderRadius: 12,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -211,8 +211,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   summaryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 22,
+    // fontWeight: '600',
+    fontFamily:"PlusR",
     marginBottom: 10,
     color: '#333',
   },
@@ -222,8 +223,9 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   summaryItem: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 16,
+    // fontWeight: '500',
+    fontFamily:"PlusR"
   },
 });
 

@@ -21,7 +21,7 @@ export const addNewEmployee = async (payload) => {
   try {
     const secretKey = await SecureStore.getItemAsync("auth_token");
 
-    // Sample API response (this should be fetched from the API)
+    // Sample API response 
     const categoryData = [
       { id: 341, category: "General" },
       { id: 342, category: "OBC" },
@@ -47,6 +47,7 @@ export const addNewEmployee = async (payload) => {
       category,
       addressLine2,
       addressLine1,
+      stateId,
       ...restPayload
     } = payload;
 
@@ -152,3 +153,49 @@ export const getAllEmployeesbyId = async (id) => {
   }
 };
 
+
+
+{/*Update employee */}
+export const updateEmployee = async (id, payload, image) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    // build multipart form data
+    const formData = new FormData();
+    Object.entries(payload).forEach(([k, v]) => {
+      // append every field, substituting empty string for null/undefined
+      formData.append(k, v ?? "");
+    });
+
+    if (image) {
+      formData.append("profileImage", {
+        uri: image.uri,
+        name: image.fileName || "profile.jpg",
+        type: image.type || "image/jpeg",
+      });
+    }
+
+    const res = await fetch(
+      `${API_BASE_URL}/employee/updateEmployee/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          secret_key: secretKey,
+          Accept: "application/json",
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
+      }
+    );
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "Update failed");
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error("updateEmployee error:", err);
+    throw err;
+  }
+};

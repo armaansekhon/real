@@ -13,7 +13,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 // import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
-
+import useDropdownData from "../hooks/useDropdownData";
 
 const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "label", valueField = "value"}) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -30,15 +30,16 @@ const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "labe
       maxHeight={200}
       // labelField={labelField}
       // valueField={valueField}
-      labelField="country"
-      valueField="id"
+      labelField="label"
+      valueField="value"
       placeholder={placeholder}
       value={value}
       onFocus={() => setIsFocus(true)}
       onBlur={() => setIsFocus(false)}
       onChange={(item) => {
         setValue(item[valueField]);
-        setValue(item.id);
+        // setValue(item.id);
+        setValue(item.value);
         // setSelectedCountry(item.id);
         setIsFocus(false);
       }}
@@ -46,19 +47,47 @@ const CustomDropdown = ({ value, setValue, data, placeholder, labelField = "labe
   );
 };
 
+
+
+
+
+
 export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   const [data, setData] = useState(initialData || {});
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [dropdowns, setDropdowns] = useState({
-    country: null,
-    district: null,
-    state: null,
-    city: null,
-    addressLine1: null,
-    addressLine2: null,
-  });
+  // const [dropdowns, setDropdowns] = useState({
+  //   country: null,
+  //   district: null,
+  //   state: null,
+  //   // city: null,
+  //   // addressLine1: null,
+  //   // addressLine2: null,
+  // });
+  const validateForm = () => {
+    let isFormValid = true;
 
+    // Check all required dropdowns
+    Object.keys(dropdowns).forEach((key) => {
+      if (!dropdowns[key]) {
+        isFormValid = false;
+        alert(`Please select an option for ${key.replace(/([A-Z])/g, " $1").trim()}`);
+      }
+    });
+
+    // Check all required text fields
+    Object.keys(data).forEach((key) => {
+      if (!data[key] || data[key].trim() === "") {
+        isFormValid = false;
+        alert(`Please fill in the ${key.replace(/([A-Z])/g, " $1").trim()} field`);
+      }
+    });
+
+    return isFormValid;
+  };
+
+  const getRequiredMark = (key) => {
+    return <Text style={{ color: 'red', fontSize: 12, marginLeft: 2 }}>*</Text>;}
   const groupedFields = [
     [
       { key: "country", placeholder: "Country" },
@@ -67,9 +96,17 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
     [
       { key: "state", placeholder: "State" },
       { key: "city", placeholder: "City" },
+  
+     
     ],
-    [{ key: "addressLine1", placeholder: "Address Line 1" }],
-    [{ key: "addressLine2", placeholder: "Address Line 2" }],
+    [ { key: "addressLine1", placeholder: "Address Line 1" },
+     
+
+    ],
+    [
+    
+    { key: "addressLine2", placeholder: "Address Line 2" },
+    { key: "pincode", placeholder: "Pincode" },],
   ];
 
 
@@ -86,20 +123,34 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
       { label: "Part-Time", value: "Part-Time" },
       { label: "Contract", value: "Contract" },
     ],
-    city: [
-      { label: "Permanent", value: "Permanent" },
-      { label: "Temporary", value: "Temporary" },
-    ],
-    addressLine1: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-    addressLine2: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
+
+  };
+
+
+
+
+
+  const { countries, states, districts } = useDropdownData(data.country, data.state);
+  const handleValueChange = (key, value) => {
+    setData((prevData) => ({
+      ...prevData,
+      [key]: value,
+    }));
+  
+    // Reset dependent dropdowns
+    if (key === "country") {
+      setData((prevData) => ({
+        ...prevData,
+        state: null,
+        district: null,
+      }));
+    } else if (key === "state") {
+      setData((prevData) => ({
+        ...prevData,
+        district: null,
+      }));
+    }
+  
   };
 
   return (
@@ -125,40 +176,51 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
             key={rowIndex}
             style={[styles.rowContainer, { zIndex: 1000 - rowIndex * 10 }]}
           >
-            {row.map((item) => (
-              <View key={item.key} style={styles.inputWrapper}>
-                <Text style={styles.label}>{item.placeholder}</Text>
+             {row.map((item, itemIndex) => (
+      <View key={item?.key || itemIndex} style={styles.inputWrapper}>
+        <Text style={styles.label}>
+          {item?.placeholder || "Unknown Field"}
+          {item?.key && getRequiredMark(item.key)}
+        </Text>
 
-                <CustomDropdown
-                  value={dropdowns[item.key]}
-                  setValue={(val) => {
-                    setDropdowns({ ...dropdowns, [item.key]: val });
-                    setData({ ...data, [item.key]: val });
-                  }}
-                  data={options[item.key]}
+                {item.key === "addressLine1" || item.key === "addressLine2" || item.key ==="pincode"  || item.key ==="city" ? (
+                  <TextInput
+                    style={styles.input}
+                    placeholder={item.placeholder}
+                    placeholderTextColor="#333"
+                    value={data[item.key] || ""}
+                    onChangeText={(text) =>
+                      setData((prevData) => ({
+                        ...prevData,
+                        [item.key]: text,
+                      }))
+                      // setData({ ...data, [item.key]: text })
+                    }
+                  />
+                ) : (
+
+
+
+                  <CustomDropdown
+                  value={data[item.key]}
+                  setValue={(val) => handleValueChange(item.key, val)}
+                  data={
+                    item.key === "country"
+                      ? countries
+                      : item.key === "state"
+                      ? states
+                      : item.key === "district"
+                      ? districts
+                      : []
+                      // : options[item.key] || []
+                  }
                   placeholder={` ${item.placeholder}`}
                 />
+                )}
               </View>
             ))}
           </View>
         ))}
-
-        {/* {showDatePicker && (
-          <DateTimePicker
-            value={data.joiningDate ? new Date(data.joiningDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                setData({
-                  ...data,
-                  joiningDate: selectedDate.toISOString().split("T")[0],
-                });
-              }
-            }}
-          />
-        )} */}
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -177,43 +239,24 @@ export default function AddressDetailsForm({ initialData, onSubmit, onBack }) {
   style={styles.button2}
   onPress={() => {
     console.log("Address Data Submitted:", data);
-    onSubmit(data); // make sure this is passed to parent as `addressDetails`
-  }}
+
+        // Prepare the final payload
+        const finalPayload = {
+          ...data,
+          stateId: data.state, // Map "state" to "stateId" if required
+        };
+        delete finalPayload.state; // Remove "state" if not required
+    
+        console.log("Final Payload to API:", finalPayload);
+        onSubmit(finalPayload); // Pass the cleaned payload to the parent
+      }}
+    // onSubmit(data); // make sure this is passed to parent as `addressDetails`
+
 >
   <Text style={styles.buttonText}>Submit</Text>
 </TouchableOpacity>
 
-        {/* <TouchableOpacity
-  style={styles.button2}
-  onPress={() => {
-    const updatedData = { ...data };
-
-    // Flatten nested formData here
-    const { employeeDetails, generalDetails, addressDetails } = updatedData;
-    const mergedData = {
-      ...employeeDetails,
-      ...generalDetails,
-      ...addressDetails,
-    };
-
-    console.log("Flattened merged data", mergedData);
-
-    onSubmit(mergedData); // Pass flattened data to the final submit handler
-  }}
->
-  <Text style={styles.buttonText}>Submit</Text>
-</TouchableOpacity> */}
-
-{/* 
-        <TouchableOpacity
-          style={styles.button2}
-          onPress={() => {
-            const updatedData = { ...data };
-            onSubmit(updatedData);
-          }}
-        >
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity> */}
+  
       </View>
     </SafeAreaView>
   );
