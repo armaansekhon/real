@@ -3,8 +3,6 @@ import Loc from "../assets/svg/loc.svg"
 import CRM from "../assets/svg/CRM.svg"
 import Brief from "../assets/svg/breif.svg"
 
-
-
 export const defaultModules   = [
     {
       name: "Home",
@@ -79,6 +77,34 @@ export const defaultModules   = [
 
 
 
+    {
+        name: "InventoryManagement",
+        path: "/(drawer)/InventoryManagement",
+        title: "Inventory Management",
+        icon: Brief,
+        children: [
+          {
+            name: "ViewLeads",
+            path: "/(drawer)/InventoryManagement/ViewLeads",
+            title: "View Leads",
+          },
+          {
+            name: "AssignLead",
+            path: "/(drawer)/InventoryManagement/AssignLead",
+            title: "Assign Lead",
+          },
+          {
+            name: "AddLead",
+            path: "/(drawer)/InventoryManagement/AddLead",
+            title: "Add Lead",
+          },
+          {
+            name: "FollowUp",
+            path: "/(drawer)/InventoryManagement/FollowUp",
+            title: "Follow Up",
+          },
+        ],
+      },
     {
         name: "Geolocation",
         path: "/(drawer)/Geolocation",
