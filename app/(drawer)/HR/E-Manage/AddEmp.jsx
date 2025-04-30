@@ -35,7 +35,7 @@ export default function AddEmployee({ navigation }) {
     addressDetails: {},
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
    // when editing, fetch existing and prefill
    useEffect(() => {

@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { getAllJuniorRequestedLeaves } from "../../../services/api";
 import { useUser } from '../../../context/UserContext';
+import LeaveRequest from "../../../components/LeaveRequest";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -59,7 +60,7 @@ const ManageLeaves = () => {
         fromDate: item["From"],
         toDate: item["To"],
         status: item["Status"],
-        leaveCurrentlyAt: item["Leave Currently At"],
+        leaveAt: item["Leave Currently At"],
         // reason: item["Reason"],
       }));
       console.log("API Response:", data);
@@ -99,7 +100,7 @@ const ManageLeaves = () => {
       <TouchableOpacity
         style={styles.manageButton}
         onPress={() => {
-          // Later link to specific leave management screen
+          
           console.log(`Manage Leave ID: ${item.id}`);
         }}
       >

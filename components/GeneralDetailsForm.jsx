@@ -80,6 +80,7 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
       { key: "nationality", placeholder: "Nationality" },
       
     ],
+    [ { key: "category", placeholder: "Category" },],
     [{ key: "officialEmail", placeholder: "Official Email" },
      
       
@@ -100,11 +101,11 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
       
     ],
 
-    [
-      { key: "category", placeholder: "Category" },
-      { key: "senior", placeholder: "Report To" },
+    // [
+    //   { key: "category", placeholder: "Category" },
+    //   // { key: "senior", placeholder: "Report To" },
 
-    ],
+    // ],
 
     [
       { key: "bloodGroup", placeholder: "Blood Group" },
@@ -129,10 +130,10 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
       { label: "SC", value: "SC" },
       { label: "ST", value: "ST" },
     ],
-    senior: [
-      { label: "Manager A", value: "Manager A" },
-      { label: "Manager B", value: "Manager B" },
-    ],
+    // senior: [
+    //   { label: "Manager A", value: "Manager A" },
+    //   { label: "Manager B", value: "Manager B" },
+    // ],
     bloodGroup: [
       { label: "A+", value: "A+" },
       // { label: "B+", value: "B+" },
@@ -231,8 +232,8 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
         ? nationalities
         : item.key === "gender"
         ? genders
-        : item.key === "senior"
-        ? seniors
+        // : item.key === "senior"
+        // ? seniors
         : item.key === "category"
         ? categories
         : options[item.key] || []

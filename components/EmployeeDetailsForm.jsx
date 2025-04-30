@@ -55,7 +55,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [showSave, setShowSave] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const { departments, designations, employeeTypes, loading } = useDropdownData(
+  const { departments, designations, employeeTypes, seniors, loading } = useDropdownData(
     data.department
   );
 
@@ -85,6 +85,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       "employeeType",
       "name",
       "joiningDate",
+      // "senior",
     ];
 
 
@@ -125,6 +126,9 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       { key: "designation", placeholder: "Designation" },
     ],
     [
+    { key: "senior", placeholder: "Report To" },
+    ],
+    [
       { key: "employeeType", placeholder: "Employee Type" },
       // { key: "employeeCategory", placeholder: "Employee Category" },
     ],
@@ -150,6 +154,10 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       { label: "Developer", value: "Developer" },
       { label: "Analyst", value: "Analyst" },
     ],
+    senior: [
+      { label: "Manager A", value: "Manager A" },
+      { label: "Manager B", value: "Manager B" },
+    ],
     employeeType: [
       { label: "Full-Time", value: "Full-Time" },
       { label: "Part-Time", value: "Part-Time" },
@@ -168,17 +176,19 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [dropdowns, setDropdowns] = useState({
     department: null,
     designation: null,
+    senior: null,
     employeeType: null,
     employeeCategory: null,
-    technology: null,
+
   });
 
   const [openDropdown, setOpenDropdown] = useState({
     department: false,
     designation: false,
+    senior: false,
     employeeType: false,
     employeeCategory: false,
-    technology: false,
+ 
   });
 
   const options = {
@@ -188,6 +198,11 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       { label: "Sales", value: "Sales" },
     ],
     designation: [
+      { label: "Manager", value: "Manager" },
+      { label: "Developer", value: "Developer" },
+      { label: "Intern", value: "Intern" },
+    ],
+    senior: [
       { label: "Manager", value: "Manager" },
       { label: "Developer", value: "Developer" },
       { label: "Intern", value: "Intern" },
@@ -259,6 +274,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                       "department",
                       "designation",
                       "employeeType",
+                      "",
                       "name",
                       "joiningDate",
                     ].includes(item.key) && (
@@ -269,8 +285,9 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                     "department",
                     "designation",
                     "employeeType",
+                    "senior",
                     "employeeCategory",
-                    "technology",
+                    
                   ].includes(item.key) ? (
 
 
@@ -284,11 +301,13 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                         ? departments
                         : item.key === "designation"
                         ? designations
+                        : item.key === "senior"
+                        ? seniors
                         : item.key === "employeeType"
                         ? employeeTypes
                         : options[item.key] || []
                     }
-                    placeholder={loading ? "Loading..." : `Select ${item.placeholder}`}
+                    placeholder={loading ? "Loading..." : `${item.placeholder}`}
                   />
                   ) : item.key === "joiningDate" ? (
                     <TouchableOpacity
@@ -322,7 +341,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                       }}
                       useNativeAndroidPickerStyle={false}
                       placeholder={{
-                        label: `Select ${item.placeholder}`,
+                        label: ` ${item.placeholder}`,
                         value: null,
                       }}
                     />
