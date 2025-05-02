@@ -136,6 +136,42 @@ export const defaultModules   = [
         ],
       },
     {
+      name:"CRM",
+      path: "/(drawer)/CRM",
+      title: "CRM",
+
+      icon: CRM,
+     children: [
+      {
+        name: "AddLeads",
+        path: "/(drawer)/CRM/AddLeads",
+        title: "Add Leads",
+        alwaysVisible: true
+      },
+      {
+        name: "ManageLeads",
+        path: "/(drawer)/CRM/ManageLeads",
+        title: "Manage Leads",
+       
+      },
+      {
+        name: "Appointments",
+        path: "/(drawer)/CRM/Appointments",
+        title: "Appointments",
+       
+      },
+
+      ]
+
+    },
+
+
+
+
+
+
+
+    {
         name: "Geolocation",
         path: "/(drawer)/Geolocation",
         title: "Geolocation",
