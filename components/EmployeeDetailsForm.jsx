@@ -8,24 +8,80 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  FlatList,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Alert } from "react-native";
-
 import { Dimensions } from "react-native";
-
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
+import * as SecureStore from "expo-secure-store";
 
 import useDropdownData from "../hooks/useDropdownData";
 
 const { height } = Dimensions.get("window");
 
-const CustomDropdown = ({ value, setValue, data, placeholder }) => {
+const BASE_URL = "http://192.168.6.210:8686/pipl/api/v1/employee";
+
+const getSecretKey = async () => {
+  const key = await SecureStore.getItemAsync("auth_token");
+  return key;
+};
+
+const fetchData = async (endpoint) => {
+  try {
+    const secretKey = await getSecretKey();
+    if (!secretKey) {
+      console.error("No secret_key found in SecureStore");
+      return [];
+    }
+
+    const response = await fetch(`${BASE_URL}/${endpoint}`, {
+      headers: {
+        "Content-Type": "application/json",
+        secret_key: secretKey,
+      },
+    });
+
+    const rawText = await response.text();
+    console.log(`Raw response from ${endpoint}:`, rawText);
+    let data;
+
+    try {
+      data = JSON.parse(rawText);
+    } catch (err1) {
+      console.error(`First parse failed for ${endpoint}:`, err1.message);
+      return [];
+    }
+
+    if (typeof data === "string") {
+      try {
+        data = JSON.parse(data);
+      } catch (err2) {
+        console.error(`Second parse failed for ${endpoint}:`, err2.message);
+        return [];
+      }
+    }
+
+    console.log(`Parsed data from ${endpoint}:`, data);
+    if (Array.isArray(data)) return data;
+    if (typeof data === "object" && data.error) {
+      console.warn(`API error for ${endpoint}:`, data.error);
+      return [];
+    }
+    if (typeof data === "object")
+      return Object.entries(data).map(([label, value]) => ({ label, value }));
+
+    return [];
+  } catch (err) {
+    console.error(`Error fetching ${endpoint}:`, err.message);
+    return [];
+  }
+};
+
+const CustomDropdown = ({ value, setValue, data, placeholder, loading }) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (
@@ -37,7 +93,7 @@ const CustomDropdown = ({ value, setValue, data, placeholder }) => {
       maxHeight={200}
       labelField="label"
       valueField="value"
-      placeholder={placeholder}
+      placeholder={loading ? "Loading..." : placeholder}
       value={value}
       onFocus={() => setIsFocus(true)}
       onBlur={() => setIsFocus(false)}
@@ -51,19 +107,100 @@ const CustomDropdown = ({ value, setValue, data, placeholder }) => {
 
 export default function EmployeeDetailsForm({ initialData, onNext }) {
   const [data, setData] = useState(initialData || {});
-  const [imageUri, setImageUri] = useState(null);
+  const [image, setImage] = useState(null);
+  const [imagebyte,setimagebyte]=useState(null)
+
+
+
+  const [imagetype,setimageType]=useState(null);
+
   const [showSave, setShowSave] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [designations, setDesignations] = useState([]);
+  const [seniors, setSeniors] = useState([]);
+  const [loadingDepartments, setLoadingDepartments] = useState(true);
+  const [loadingDesignations, setLoadingDesignations] = useState(false);
+  const [loadingSeniors, setLoadingSeniors] = useState(false);
 
-  const { departments, designations, employeeTypes, seniors, loading } = useDropdownData(
-    data.department
-  );
+  const { employeeTypes, loading } = useDropdownData();
+
+  const formatDropdown = (dataList = [], labelKey = "name", valueKey = "id") =>
+    dataList.map((item) => ({
+      label: item[labelKey],
+      value: item[valueKey],
+    }));
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setLoadingDepartments(true);
+      const deptData = await fetchData("departments");
+      setDepartments(formatDropdown(deptData, "department", "id"));
+      setLoadingDepartments(false);
+    };
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    const loadByDepartment = async () => {
+      if (data.department && data.department !== "") {
+        setLoadingDesignations(true);
+        const desigData = await fetchData(
+          `getDesignationByDepartmentId/${data.department}`
+        );
+        console.log(
+          "Mapped designations:",
+          desigData.map((item) => ({
+            label: item.name || item.designation || "Unknown",
+            value: item.id,
+          }))
+        );
+        setDesignations(
+          formatDropdown(desigData, "name", "id")
+        );
+        setLoadingDesignations(false);
+      } else {
+        setDesignations([]);
+      }
+    };
+    loadByDepartment();
+  }, [data.department]);
+
+  useEffect(() => {
+    console.log("Fetching seniors for designationId:", data.designation);
+    const loadSeniors = async () => {
+      if (data.designation) {
+        setLoadingSeniors(true);
+        const seniorData = await fetchData(`seniors/${data.designation}`);
+        const mappedSeniors = Array.isArray(seniorData)
+          ? seniorData.map((item, index) => ({
+              label:
+                item.name ||
+                item.senior ||
+                item.fullName ||
+                item.n ||
+                `Senior ${index + 1}`,
+              value: item.id || item.employeeId || index,
+            }))
+          : [];
+        console.log("Mapped seniors:", mappedSeniors);
+        setSeniors(mappedSeniors);
+        setLoadingSeniors(false);
+      } else {
+        console.log("Clearing seniors: designationId is invalid");
+        setSeniors([]);
+      }
+    };
+    loadSeniors();
+  }, [data.designation]);
 
   const handleValueChange = (key, value) => {
+    console.log(`handleValueChange: key=${key}, value=${value}`);
     setData((prev) => ({
       ...prev,
       [key]: value,
-      ...(key === "department" && { designation: null }), // reset designation if department changes
+      ...(key === "department" && { designation: null, senior: null }),
+      ...(key === "designation" && { senior: null }),
     }));
   };
 
@@ -78,6 +215,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       }
     })();
   }, []);
+
   const validateFields = () => {
     const requiredFields = [
       "department",
@@ -85,13 +223,10 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
       "employeeType",
       "name",
       "joiningDate",
-      // "senior",
     ];
-
 
     for (const field of requiredFields) {
       const value = data[field];
-  
       if (
         value === undefined ||
         value === null ||
@@ -101,39 +236,90 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
         return false;
       }
     }
-
     return true;
   };
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
+      base64: true,
+      quality: 0.5,
     });
-
+  
     if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setImageUri(uri); // Store the URI properly
-      setData({ ...data, profileImage: uri }); // Save in data
-      setShowSave(true);
+      const seluri = result.assets[0];
+      setImage(seluri.uri);
+      const byte=seluri.base64;
+      setimagebyte(seluri.base64);
+  
+      // Update data with seluri.base64 directly instead of imagebyte
+     // setData({ ...data, employeePic: byte });
+      // console.log(" data printed :",data);
+  
+      if (seluri.uri) {
+        const fileExtension = seluri.uri.split('.').pop().toLowerCase();
+        const mimeType =
+          fileExtension === 'jpg' || fileExtension === 'jpeg'
+            ? 'image/jpeg'
+            : fileExtension === 'png'
+            ? 'image/png'
+            : fileExtension === 'webp'
+            ? 'image/webp'
+            : 'image/*';
+      //  console.log("mimeType :", mimeType);
+       // console.log("seluri.base64 :", seluri.base64);
+       const userSelectedImageType=mimeType;
+        setimageType(mimeType);
+    // Use mimeType directly
+
+        //console.log("byte :", byte);
+        setData({ ...data, employeePic: byte , pictureType: userSelectedImageType});
+        // setData({ ...data, });
+        //console.log(" data printed :",...data);
+       // setShowSave(true);
+      }
     }
   };
+
+  // const pickImage = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+      
+  //     base64:true,
+  //     quality: 0.5,
+  //   });
+
+  //   if (!result.canceled) {
+  //     const seluri = result.assets[0];
+  //     setImage(seluri.uri);
+  //     setimagebyte(seluri.base64)
+  //     setData({ ...data, employeePic:imagebyte});
+  //     console.log(" seluri.base64 :",data);
+
+  //     console.log(" seluri.base64 :",imagebyte);
+     
+    
+
+  //   if(seluri.uri){
+  //     const fileExtension=seluri.uri.split('.').pop.toLowerCase();
+  //     const mimeType=fileExtension==='jpg'||fileExtension==='jpeg'?'image/jpeg':fileExtension==='png'?'image/png':fileExtension ==='webp'?'image/webp':'image/*';
+  //     console.log(" mimeType :"+mimeType);
+  //     console.log(" seluri.base64 :"+seluri.base64);
+  //     console.log(mimeType);
+  //     setimageType(mimeType);
+  //     setData({...data, pictureType:imagetype});
+      
+  //     setShowSave(true);
+  //   }
+  // }
+  // };
 
   const groupedFields = [
     [
       { key: "department", placeholder: "Department" },
       { key: "designation", placeholder: "Designation" },
     ],
+    [{ key: "senior", placeholder: "Report To" }],
+    [{ key: "employeeType", placeholder: "Employee Type" }],
     [
-    { key: "senior", placeholder: "Report To" },
-    ],
-    [
-      { key: "employeeType", placeholder: "Employee Type" },
-      // { key: "employeeCategory", placeholder: "Employee Category" },
-    ],
-    [
-      // { key: "technology", placeholder: "Technology" },
       { key: "name", placeholder: "Name" },
       { key: "joiningDate", placeholder: "Joining Date" },
     ],
@@ -143,90 +329,8 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
     ],
   ];
 
-  const dropdownOptions = {
-    department: [
-      { label: "HR", value: "HR" },
-      { label: "Engineering", value: "Engineering" },
-      { label: "Sales", value: "Sales" },
-    ],
-    designation: [
-      { label: "Manager", value: "Manager" },
-      { label: "Developer", value: "Developer" },
-      { label: "Analyst", value: "Analyst" },
-    ],
-    senior: [
-      { label: "Manager A", value: "Manager A" },
-      { label: "Manager B", value: "Manager B" },
-    ],
-    employeeType: [
-      { label: "Full-Time", value: "Full-Time" },
-      { label: "Part-Time", value: "Part-Time" },
-    ],
-    employeeCategory: [
-      { label: "Permanent", value: "Permanent" },
-      { label: "Contract", value: "Contract" },
-    ],
-    technology: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-  };
-
-  const [dropdowns, setDropdowns] = useState({
-    department: null,
-    designation: null,
-    senior: null,
-    employeeType: null,
-    employeeCategory: null,
-
-  });
-
-  const [openDropdown, setOpenDropdown] = useState({
-    department: false,
-    designation: false,
-    senior: false,
-    employeeType: false,
-    employeeCategory: false,
- 
-  });
-
-  const options = {
-    department: [
-      { label: "HR", value: "HR" },
-      { label: "Engineering", value: "Engineering" },
-      { label: "Sales", value: "Sales" },
-    ],
-    designation: [
-      { label: "Manager", value: "Manager" },
-      { label: "Developer", value: "Developer" },
-      { label: "Intern", value: "Intern" },
-    ],
-    senior: [
-      { label: "Manager", value: "Manager" },
-      { label: "Developer", value: "Developer" },
-      { label: "Intern", value: "Intern" },
-    ],
-    employeeType: [
-      { label: "Full-Time", value: "Full-Time" },
-      { label: "Part-Time", value: "Part-Time" },
-      { label: "Contract", value: "Contract" },
-    ],
-    employeeCategory: [
-      { label: "Permanent", value: "Permanent" },
-      { label: "Temporary", value: "Temporary" },
-    ],
-    technology: [
-      { label: "React", value: "React" },
-      { label: "Node.js", value: "Node.js" },
-      { label: "Python", value: "Python" },
-    ],
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      {/* Header Row with Avatar */}
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Employee</Text>
@@ -235,10 +339,9 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
             Fill out the Employee Details below
           </Text>
         </View>
-
         <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-          {data.profileImage ? (
-            <Image source={{ uri: data.profileImage }} style={styles.avatar} />
+          {image ? (
+            <Image source={{ uri: image }} style={styles.avatar} />
           ) : (
             <View style={[styles.avatar, styles.placeholder]}>
               <Ionicons name="person-circle-outline" size={60} color="#ccc" />
@@ -255,6 +358,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           <Ionicons name="save-outline" size={24} color="#fff" />
         </TouchableOpacity>
       )}
+
       <ScrollView
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
@@ -274,41 +378,40 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                       "department",
                       "designation",
                       "employeeType",
-                      "",
                       "name",
                       "joiningDate",
                     ].includes(item.key) && (
                       <Text style={{ color: "red" }}>*</Text>
                     )}
-                  </Text>{" "}
-                  {[
-                    "department",
-                    "designation",
-                    "employeeType",
-                    "senior",
-                    "employeeCategory",
-                    
-                  ].includes(item.key) ? (
-
-
-
-
+                  </Text>
+                  {["department", "designation", "senior", "employeeType"].includes(
+                    item.key
+                  ) ? (
                     <CustomDropdown
-                    value={data[item.key]}
-                    setValue={(val) => handleValueChange(item.key, val)}
-                    data={
-                      item.key === "department"
-                        ? departments
-                        : item.key === "designation"
-                        ? designations
-                        : item.key === "senior"
-                        ? seniors
-                        : item.key === "employeeType"
-                        ? employeeTypes
-                        : options[item.key] || []
-                    }
-                    placeholder={loading ? "Loading..." : `${item.placeholder}`}
-                  />
+                      value={data[item.key]}
+                      setValue={(val) => handleValueChange(item.key, val)}
+                      data={
+                        item.key === "department"
+                          ? departments
+                          : item.key === "designation"
+                          ? designations
+                          : item.key === "senior"
+                          ? seniors
+                          : item.key === "employeeType"
+                          ? employeeTypes
+                          : []
+                      }
+                      placeholder={item.placeholder}
+                      loading={
+                        item.key === "department"
+                          ? loadingDepartments
+                          : item.key === "designation"
+                          ? loadingDesignations
+                          : item.key === "senior"
+                          ? loadingSeniors
+                          : loading
+                      }
+                    />
                   ) : item.key === "joiningDate" ? (
                     <TouchableOpacity
                       onPress={() => setShowDatePicker(true)}
@@ -328,23 +431,6 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
                         color="#777"
                       />
                     </TouchableOpacity>
-                  ) : dropdownOptions[item.key] ? (
-                    <RNPickerSelect
-                      onValueChange={(value) =>
-                        setData({ ...data, [item.key]: value })
-                      }
-                      items={dropdownOptions[item.key]}
-                      value={data[item.key] || ""}
-                      style={{
-                        inputIOS: styles.input,
-                        inputAndroid: styles.input,
-                      }}
-                      useNativeAndroidPickerStyle={false}
-                      placeholder={{
-                        label: ` ${item.placeholder}`,
-                        value: null,
-                      }}
-                    />
                   ) : (
                     <TextInput
                       style={styles.input}
@@ -378,7 +464,7 @@ export default function EmployeeDetailsForm({ initialData, onNext }) {
           />
         )}
       </ScrollView>
-      {/* Next button replaced with icon */}
+
       <TouchableOpacity
         style={styles.nextButton}
         onPress={() => {
@@ -398,121 +484,96 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
   nextButton: {
     alignItems: "center",
     marginTop: 20,
   },
-
-  saveButton: {
-    marginTop: 8,
+  saveIconButton: {
     backgroundColor: "#4CAF50",
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    borderRadius: 6,
+    padding: 10,
+    borderRadius: 50,
+    position: "absolute",
+    right: 20,
+    top: 20,
   },
-  saveText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     marginBottom: 20,
-    // marginTop: 70,
     marginTop: Platform.OS === "ios" ? 60 : 70,
   },
-
   headerTextContainer: {
     flex: 1,
   },
-
   avatarContainer: {
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 10,
   },
-
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 70,
     resizeMode: "cover",
   },
-
   placeholder: {
     backgroundColor: "#eee",
     alignItems: "center",
     justifyContent: "center",
   },
-
   headerTitle: {
     fontSize: 35,
     fontFamily: "PlusSB",
   },
-
   headerSubTitle: {
     fontSize: 30,
     fontFamily: "PlusSB",
     color: "#5aaf57",
     marginTop: -5,
   },
-
   headerDesc: {
     fontSize: 13,
     fontFamily: "PlusR",
     marginTop: 5,
   },
-
   flexGrid: {
     flexDirection: "column",
     gap: 16,
-    paddingHorizontal: 16, // adds side spacing
+    paddingHorizontal: 16,
     marginTop: 10,
   },
-
   rowContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 12, // more space between items
+    gap: 12,
   },
-
   inputWrapper: {
     flex: 1,
     marginBottom: 4,
     minWidth: 100,
   },
-
   input: {
     height: 42,
     backgroundColor: "#f9f9f9",
-
     borderRadius: 10,
     paddingHorizontal: 14,
     fontSize: 14,
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.05,
-    // shadowRadius: 2,
-    elevation: 0, // subtle shadow for Android
+    elevation: 0,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-
   label: {
     fontSize: 12,
     fontFamily: "PlusSB",
     marginBottom: 4,
     color: "#444",
   },
-
   dropdown: {
     height: 42,
     backgroundColor: "#f9f9f9",
@@ -525,14 +586,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 1000,
   },
-
-  // dropdownContainer: {
-  //   backgroundColor: "#fff",
-  //   borderColor: "#ccc",
-  //   borderRadius: 10,
-  //   zIndex: 999,
-  // },
-
   dropdownPlaceholder: {
     color: "#333",
     fontFamily: "PlusR",

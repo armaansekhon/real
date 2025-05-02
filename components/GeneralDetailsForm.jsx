@@ -90,22 +90,17 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
       
     ],
     [
+      { key: "salary", placeholder: "Salary" },
+    
+      
+      
+    ],
+    [
      
       { key: "motherTongue", placeholder: "Mother Tongue" },
       { key: "dob", placeholder: "DOB" },
     ],
-    [
-      { key: "salary", placeholder: "Salary" },
-      { key: "joiningDate", placeholder: "Joining Date" },
-      
-      
-    ],
 
-    // [
-    //   { key: "category", placeholder: "Category" },
-    //   // { key: "senior", placeholder: "Report To" },
-
-    // ],
 
     [
       { key: "bloodGroup", placeholder: "Blood Group" },
@@ -256,22 +251,22 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
     </Text>
     <Ionicons name="calendar-outline" size={18} color="#777" />
   </TouchableOpacity>
-) : item.key === "joiningDate" ? (
-  <TouchableOpacity
-    onPress={() => setShowDatePicker("joiningDate")}
-    style={styles.input}
-  >
-    <Text
-      style={{
-        color: data.joiningDate ? "#000" : "#333",
-        fontFamily: "PlusR",
-        fontSize: 13,
-      }}
-    >
-      {data.joiningDate || "Select Date"}
-    </Text>
-    <Ionicons name="calendar-outline" size={18} color="#777" />
-  </TouchableOpacity>
+// ) : item.key === "joiningDate" ? (
+  // <TouchableOpacity
+  //   onPress={() => setShowDatePicker("joiningDate")}
+  //   style={styles.input}
+  // >
+  //   <Text
+  //     style={{
+  //       color: data.joiningDate ? "#000" : "#333",
+  //       fontFamily: "PlusR",
+  //       fontSize: 13,
+  //     }}
+  //   >
+  //     {data.joiningDate || "Select Date"}
+  //   </Text>
+  //   <Ionicons name="calendar-outline" size={18} color="#777" />
+  // </TouchableOpacity>
 ) : (
   <TextInput
     style={styles.input}
@@ -326,17 +321,35 @@ export default function GeneralDetailsForm({ initialData, onNext, onBack }) {
   
       {/* <Text>Back</Text> */}
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => {
+    {/* <TouchableOpacity onPress={() => {
   if (validateForm()) {
     onNext(data);
   }
-}}>
+}}> */}
+      <TouchableOpacity onPress={async () => {
+  if (validateForm()) {
+    try {
+      const response = await onNext(data); // assuming onNext returns a response object
+      if (
+        response?.status === "warning" &&
+        response?.message?.toLowerCase().includes("contact number already exists")
+      ) {
+        alert("This mobile number already exists. Please use a different one.");
+      }
+    } catch (error) {
+      console.error("Submission failed:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  }
+}}
+>
+  
     <Ionicons
               name="chevron-forward-circle-sharp"
               size={55}
               color="black"
             />
-      {/* <Text>Next</Text> */}
+      
     </TouchableOpacity>
   </View>
 </SafeAreaView>

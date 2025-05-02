@@ -14,7 +14,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { getAllJuniorRequestedLeaves } from "../../../services/api";
 import { useUser } from '../../../context/UserContext';
-import LeaveRequest from "../../../components/LeaveRequest";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -39,7 +38,11 @@ const ManageLeaves = () => {
 
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLeaveId, setSelectedLeaveId] = useState(null);
   const router = useRouter();
+
+
+
 
   const{user}=useUser();
 
@@ -55,13 +58,11 @@ const ManageLeaves = () => {
       const mappedData = (data || []).map(item => ({
         id: item.id,
         date: item["Leave Requested Date"],
-        initiatedBy: item["Initiated By"],
-        // leaveType: item["Leave Type"],
+        initiatedBy: item["Initiated By"], 
         fromDate: item["From"],
         toDate: item["To"],
         status: item["Status"],
         leaveAt: item["Leave Currently At"],
-        // reason: item["Reason"],
       }));
       console.log("API Response:", data);
       setLeaves(mappedData || []);
@@ -72,7 +73,12 @@ const ManageLeaves = () => {
   }, []);
 
   const renderItem = ({ item, index }) => (
-    <View style={styles.card}>
+    <TouchableOpacity 
+    style={styles.card}
+    onPress={() => router.push({ pathname: "/(drawer)/Leaves/LeaveDetails", params: { leaveId: item.id } })}
+
+    >
+    {/* <TouchableOpacity style={styles.card}> */}
       <View style={styles.cardRow}>
         <Text style={styles.serial}>#{index + 1}</Text>
         <Text style={styles.date}>{item.date}</Text>
@@ -97,18 +103,20 @@ const ManageLeaves = () => {
       >
         {item.status}
       </Text>
-      <TouchableOpacity
+      
+      {/* <TouchableOpacity
+  
         style={styles.manageButton}
-        onPress={() => {
-          
-          console.log(`Manage Leave ID: ${item.id}`);
-        }}
+        // onPress={() => router.push('/(drawer)/Leaves/LeaveDetails')}
       >
         <Ionicons name="settings-outline" size={20} color="#5aaf57" />
         <Text style={styles.manageText}>Manage</Text>
-      </TouchableOpacity>
-    </View>
-  );
+      </TouchableOpacity> */}
+
+    
+    </TouchableOpacity>
+
+);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -116,7 +124,7 @@ const ManageLeaves = () => {
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Manage</Text>
           <Text style={styles.headerSubTitle}>Leaves</Text>
-          <Text style={styles.headerDesc}>View all the pending leaves here!</Text>
+          <Text style={styles.headerDesc}>View all the pending leaves here!</Text>  
         </View>
         <LottieView
           source={require("../../../assets/svg/EMP.json")}
@@ -173,8 +181,8 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   lottie: {
-    width: 80,
-    height: 50,
+    width: 90,
+    height: 70,
     transform: [{ scale: 2 }],
     bottom: 15,
     top: -45,
@@ -186,7 +194,7 @@ const styles = StyleSheet.create({
     height: 200,
     padding: 15,
     marginBottom: 15,
-    elevation: 3,
+    elevation: 5,
     shadowColor: "#32cd32",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -229,25 +237,25 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     textTransform: "capitalize",
   },
-  manageButton: {
-    marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-end",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    backgroundColor: "#e6f4ea",
-    top: -40,
+  // manageButton: {
+  //   marginTop: 10,
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   alignSelf: "flex-end",
+  //   paddingHorizontal: 10,
+  //   paddingVertical: 5,
+  //   borderRadius: 8,
+  //   backgroundColor: "#e6f4ea",
+  //   top: -40,
    
-    },
-  manageText: {
-    marginLeft: 6,
-    color: "#5aaf57",
-    fontFamily: "PlusR",
+  //   },
+  // manageText: {
+  //   marginLeft: 6,
+  //   color: "#5aaf57",
+  //   fontFamily: "PlusR",
 
-    fontSize: 14,
-  },
+  //   fontSize: 14,
+  // },
 });
 
 export default ManageLeaves;

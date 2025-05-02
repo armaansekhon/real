@@ -45,6 +45,7 @@ export const addNewEmployee = async (payload) => {
       department,
       mobile,
       category,
+      country,
       addressLine2,
       addressLine1,
       stateId,
@@ -66,12 +67,15 @@ export const addNewEmployee = async (payload) => {
     // 2. Append the entire payload as a JSON string under "data"
     formData.append("data", JSON.stringify(restPayload));
 
+ 
+
     // 3. If you want to send image later, you'd do:
     // formData.append("image", {
     //   uri: image.uri,
     //   name: image.name || 'profile.jpg',
     //   type: image.type || 'image/jpeg',
     // });
+
 
     const response = await fetch(`${API_BASE_URL}/employee/addNewEmployee`, {
       method: "POST",
@@ -239,3 +243,115 @@ export const getAllJuniorRequestedLeaves = async (employeeId) => {
 
 
 
+/* Get leave details by ID */
+export const getLeaveById = async (leaveId) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/getLeaveById/${leaveId}`, {
+      method: "GET",
+      headers: {
+        secret_key: secretKey,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch leave details");
+    }
+
+    const data = await response.json();
+    console.log("API Response for leaveId:", leaveId, data);
+
+    // If the response is an array, find the specific leave
+    if (Array.isArray(data)) {
+      return data.find((item) => String(item.id) === String(leaveId)) || null;
+    }
+
+    return data; // Return the data directly if it's not an array
+  } catch (error) {
+    console.error("Error fetching leave details:", error.message);
+    return null;
+  }
+};
+
+
+
+/* Get leave app authority */
+export const getLeaveApprovalAuthority = async (employeeId) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(
+      `${API_BASE_URL}/employee/getLeaveApprovalAuthority/employeeId/${employeeId}`,
+      {
+        method: "GET",
+        headers: {
+          secret_key: secretKey,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!employeeId) {
+      console.error("employeeId is undefined");
+      return;
+    }
+    
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch leave approval authority");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching leave approval authority:", error);
+    return null;
+  }
+};
+
+
+
+/* Submit Leave Action */
+export const submitLeaveAction = async ({ leaveId, leaveStatus, remarks, updatedBy, updateDate }) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/action-on-leave`, {
+      method: "POST",
+      headers: {
+        secret_key: secretKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        leaveId,
+        leaveStatus,
+        remarks,
+        updatedBy,
+        updateDate,
+      }),
+    });
+
+    const contentType = response.headers.get("content-type");
+
+    let data;
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      throw new Error(`Unexpected response: ${text}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(data.message || "Leave action failed.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in submitLeaveAction:", error);
+    throw error;
+  }
+};
