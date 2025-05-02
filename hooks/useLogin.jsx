@@ -7,7 +7,7 @@ import { useUser } from '../context/UserContext';
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
-  const { setUser, setUserType ,setimg,setdate} = useUser(); 
+  const { setUser, setUserType ,setimg,setdate,setbranch} = useUser(); 
 
   const login = async (usercode, password) => {
     setLoading(true);
@@ -29,6 +29,9 @@ const useLogin = () => {
         setUserType(data.user.userCategoryCode);
         setimg(data.employeePic)
         setdate(data.currentDay)
+        setbranch(data.branch)
+
+        
    
         await SecureStore.setItemAsync('userType', data.user.userCategoryCode);
         await SecureStore.setItemAsync('userid', JSON.stringify(data.user.id));
