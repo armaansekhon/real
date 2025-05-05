@@ -317,36 +317,38 @@ const Followup = () => {
 
     try {
       const payload = {
-        leadId: parsedLeadData.id,
+        realEstateCustomerLead: { id: parsedLeadData.id },
         followUpDate: moment(followUpDate).format("YYYY-MM-DD"),
-        followUpStatus:{id:followUpStatusValue} ,
-        followUpVia: {id:followUpViaValue},
+        followUpStatus: { id: followUpStatusValue },
+        followUpVia: { id: followUpViaValue },
         nextFollowUpDate: moment(nextFollowUpDate).format("YYYY-MM-DD"),
         remarks: form.remarks,
-        appointmentDetails: gotAppointment
-          ? {
-              appointmentDate: moment(appointmentDate).format("YYYY-MM-DD"),
-              remarks: form.appointmentRemarks,
-              addressDetails: {
-             
-                address1: form.addressLine1,
-                address2: form.addressLine2,
-                city: form.city,
-                district: {
-                  id: districtValue,
-                  state: {
-                    id: stateValue,
-                    country: {
-                      id: countryValue,
+        appointment: gotAppointment
+          ? [
+              {
+                appointementDate: moment(appointmentDate).format("YYYY-MM-DD"),
+                remarks: form.appointmentRemarks,
+                addressDetails: {
+                  address1: form.addressLine1,
+                  address2: form.addressLine2,
+                  city: form.city,
+                  district: {
+                    id: districtValue,
+                    state: {
+                      id: stateValue,
+                      country: {
+                        id: countryValue,
+                      },
                     },
                   },
                 },
               },
-            }
-          : null,
-          entryBy: { id: user.id },
+            ]
+          : [], // Empty array instead of null to match List in backend
+        entryBy: { id: user.id },
         // branch: { id: branch.id },
       };
+      
 
       console.log("Data Sending .......",payload)
 

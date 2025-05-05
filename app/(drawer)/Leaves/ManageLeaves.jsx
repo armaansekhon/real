@@ -18,9 +18,11 @@ import { useUser } from '../../../context/UserContext';
 const screenHeight = Dimensions.get("window").height;
 
 
-
 const getStatusColor = (status = "") => {
-  switch (status.toLowerCase()) {
+  // Convert status to string and handle null/undefined
+  const safeStatus = status ? String(status).toLowerCase() : "";
+  
+  switch (safeStatus) {
     case "approved":
       return "#4CAF50";
     case "send to higher authority":

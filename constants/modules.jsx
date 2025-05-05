@@ -96,6 +96,12 @@ export const defaultModules   = [
         title: "Appointments",
        
       },
+      {
+        name: "AddCustomer",
+        path: "/(drawer)/CRM/AddCustomer",
+        title: "Add Customer",
+       
+      },
 
       ]
 
@@ -135,35 +141,7 @@ export const defaultModules   = [
           },
         ],
       },
-    {
-      name:"CRM",
-      path: "/(drawer)/CRM",
-      title: "CRM",
-
-      icon: CRM,
-     children: [
-      {
-        name: "AddLeads",
-        path: "/(drawer)/CRM/AddLeads",
-        title: "Add Leads",
-        alwaysVisible: true
-      },
-      {
-        name: "ManageLeads",
-        path: "/(drawer)/CRM/ManageLeads",
-        title: "Manage Leads",
-       
-      },
-      {
-        name: "Appointments",
-        path: "/(drawer)/CRM/Appointments",
-        title: "Appointments",
-       
-      },
-
-      ]
-
-    },
+   
 
 
 
