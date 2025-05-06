@@ -67,9 +67,7 @@ const MovementRequest = () => {
   const [refreshing, setRefreshing] = useState(false);
 
 
-//   const formatTime = (date) => {
-//     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-//   };
+
 const formatTime = (date) => {
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -92,28 +90,6 @@ const formatTime = (date) => {
     fetchReasons();
   }, []);
 
-//   const handleSubmit = async () => {
-//     try {
-//       const payload = {
-//         mRequestedDate: data.date,            
-//         initiatedBy: data.initiatedBy,          
-//         fromTime: data.fromTime + ".0000000",  
-//         toTime: data.toTime + ".0000000",       
-//         movementReasonId: data.reason,       
-//         description: data.description,
-//       };
-  
-//       console.log("Submitting Movement Request:", payload);
-  
-//       const res = await submitMovementRequest(payload);
-  
-//       alert(res.message || "Movement request submitted!");
-//       // resetForm(); // optional
-//     } catch (err) {
-//       console.error("Error submitting movement request:", err);
-//       alert("Submission failed: " + err.message);
-//     }
-//   };
   
 
 
@@ -159,8 +135,6 @@ const handleSubmit = async () => {
         initiatedBy: Number(data.initiatedBy),
         fromTime: formatTime(new Date(data.fromTime)), // Example: "08:00"
         toTime: formatTime(new Date(data.toTime)),    
-        // fromTime: data.fromTime + ".0000000",
-        // toTime: data.toTime + ".0000000",
         movementReasonId: Number(data.reason),
         description: data.description,
       };
@@ -193,19 +167,6 @@ const handleSubmit = async () => {
     [{ key: "description", placeholder: "Description" }],
   ];
 
-
-
-//   // Date picker and time picker logic
-//   const handleDateChange = (date) => {
-//     setData({ ...data, date: date.toISOString().split("T")[0] });
-//   };
-
-//   const handleTimeChange = (timeType, selectedDate) => {
-//     if (selectedDate) {
-//       const time = formatTime(selectedDate);
-//       setData((prev) => ({ ...prev, [timeType]: time }));
-//     }
-//   };
 
 
   return (
@@ -344,10 +305,7 @@ const handleSubmit = async () => {
       if (selectedDate) {
         setData({ ...data, fromTime: selectedDate.toISOString() });
       }
-    //   if (selectedDate) {
-    //     const time = selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    //     setData({ ...data, fromTime: time });
-    //   }
+
     }}
   />
 )}
@@ -362,10 +320,6 @@ const handleSubmit = async () => {
       if (selectedDate) {
         setData({ ...data, toTime: selectedDate.toISOString() });
       }
-    //   if (selectedDate) {
-    //     const time = selectedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    //     setData({ ...data, toTime: time });
-    //   }
     }}
   />
 )}

@@ -475,6 +475,89 @@ export const getAllJuniorRequestedMovements = async (employeeId) => {
 };
 
 
+/* Get movement details by ID */
+export const getMovementById = async (mId) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/getMovementRequestById/${mId}`, {
+      method: "GET",
+      headers: {
+        secret_key: secretKey,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch movement details");
+    }
+
+    const data = await response.json();
+    console.log("API Response for mId:", mId, data);
+
+
+    // const cleanKeys = (obj) =>
+    //   Object.fromEntries(Object.entries(obj).map(([k, v]) => [k.trim(), v]));
+
+    // if (Array.isArray(data)) {
+    //   const found = data.find((item) => String(item.mId) === String(mId));
+    //   return found ? cleanKeys(found) : null;
+    // }
+
+    // return cleanKeys(data);
+    if (Array.isArray(data)) {
+      return data.find((item) => String(item.mId) === String(mId)) || null;
+    }
+
+    return data; 
+  } catch (error) {
+    console.error("Error fetching movement details:", error.message);
+    return null;
+  }
+};
+
+
+/* Submit Movement Action */
+export const submitMovementAction = async ({ movementRequestId, status, remarks, updatedBy, updateDate }) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/movement-requests-action`, {
+      method: "POST",
+      headers: {
+        secret_key: secretKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        movementRequestId,
+        status,
+        remarks,
+        updatedBy,
+        updateDate,
+      }),
+    });
+
+    const contentType = response.headers.get("content-type");
+
+    let data;
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      throw new Error(`Unexpected response: ${text}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(data.message || "Movement action failed.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in submitMovementAction:", error);
+    throw error;
+  }
+};
 
 
  {/*get all Active Or Inactive Employees*/}

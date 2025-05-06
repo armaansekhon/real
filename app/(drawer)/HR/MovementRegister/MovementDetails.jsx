@@ -14,14 +14,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useLocalSearchParams } from "expo-router";
-import { getLeaveById } from "../../../../services/api";
+import { getMovementById} from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "expo-router";
 
 import { Dropdown } from "react-native-element-dropdown" 
 import {getLeaveApprovalAuthority} from  "../../../../services/api";
 import { useUser } from '../../../../context/UserContext';
-import { submitLeaveAction } from "../../../../services/api";
+import { submitMovementAction } from "../../../../services/api";
 
 const CustomDropdown = ({ value, setValue, data, placeholder, loading }) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -178,20 +178,26 @@ const MovementDetails = () => {
 
 
   const handleSubmit = async () => {
+    if (!data.status || !data.date || !data.remarks) {
+      alert("Please fill all fields.");
+      return;
+    }
     try {
       const payload = {
-        mId: Number(mId),
-        movementStatus: data.status,
+        movementRequestId: Number(mId), // instead of mId
+        status: data.status,            // instead of movementStatus
         remarks: data.remarks,
         updatedBy: user?.id,
         updateDate: data.date,
       };
-  
+      console.log("Payload being sent:", payload);
+
       const res = await submitMovementAction(payload);
       alert(res.message || "Movement action successful!");
       resetForm();
     } catch (err) {
       alert("Submission failed: " + err.message);
+      console.error("Error during movement submission:", err);
     }
   };
 
@@ -249,16 +255,15 @@ const MovementDetails = () => {
 
 
  
-        {/* <Text style={styles.heading}>Leave Details</Text> */}
-        <Detail label="Leave Type" value={leaveDetails["Leave Type"]}/>
-        <Detail label="Status" value={leaveDetails["Status"]} />
-        <Detail label="Requested On" value={leaveDetails["Leave Requested Date"]} />
-        <Detail label="From Date" value={leaveDetails["From"]} />
-        <Detail label="To Date" value={leaveDetails["To"]} />
-        <Detail label="Initiated By" value={leaveDetails["Initiated By"]} />
-        <Detail label="Leave Currently At" value={leaveDetails["Leave Currently At"]} />
-        <Detail label="Reason" value={leaveDetails["Reason"]} />
-      
+<Detail label="Status" value={movementDetails["Status"]} />
+<Detail label="Requested On" value={movementDetails["Movement Requested Date"]} />
+<Detail label="From Time" value={movementDetails["fromTime"]} />
+<Detail label="To Time" value={movementDetails["toTime"]} />
+<Detail label="Initiated By" value={movementDetails["Initiated By"]} />
+<Detail label="Currently At" value={movementDetails["Currently At"]} />
+<Detail label="Reason" value={movementDetails["Movement Reason "]?.trim()} />
+<Detail label="Description" value={movementDetails["description"] || "N/A"} />
+
 
 
       {groupedFields.map((row, rowIndex) => (

@@ -13,7 +13,7 @@ import {
 import LottieView from "lottie-react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { getAllJuniorRequestedMovements, } from "../../../../services/api";
+import { getAllJuniorRequestedMovements, getMovementById } from "../../../../services/api";
 import { useUser } from '../../../../context/UserContext';
 import { useNavigation } from 'expo-router';
 
@@ -40,7 +40,7 @@ const ManageMovement = () => {
 
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedLeaveId, setSelectedLeaveId] = useState(null);
+  const [selectedMovementId, setSelectedMovementId] = useState(null);
   const router = useRouter();
   const navigation = useNavigation();
 
