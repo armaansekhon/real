@@ -44,64 +44,75 @@ export const defaultModules   = [
            
           ],
         },
+        {
+          name: "E-Status",
+          path: "/(drawer)/HR/E-Status",
+          title: "Employee Status",
+          children: [
+            {
+              name: "ExistingEmployees",
+              path: "/(drawer)/HR/E-Status/ExistingEmployees",
+              title: "Update Status",
+            },
+       
+          ],
+        },
+        {
+          name:"Leaves",
+          path: "/(drawer)/HR/Leaves",
+          title: "Leaves",
+    
+          
+         children: [
+          {
+            name: "ApplyLeave",
+            path: "/(drawer)/HR/Leaves/ApplyLeave",
+            title: "Apply Leave",
+            alwaysVisible: true
+          },
+          {
+            name: "ManageLeaves",
+            path: "/(drawer)/HR/Leaves/ManageLeaves",
+            title: "Manage Leave",
+           
+          },
+    
+          ]
+    
+        },
+        {
+          name:"MovementRegister",
+          path: "/(drawer)/HR/MovementRegister",
+          title: "Movement Register",
+    
+          
+         children: [
+          {
+            name: "MovementRequest",
+            path: "/(drawer)/HR/MovementRegister/MovementRequest",
+            title: "Movement Request",
+            alwaysVisible: true
+          },
+    
+          {
+            name: "ManageMovement",
+            path: "/(drawer)/HR/MovementRegister/ManageMovement",
+            title: "Manage Movement",
+            alwaysVisible: true
+          },
+          ]
+    
+        },
+
       ],
     },
 
-    {
-      name:"Leaves",
-      path: "/(drawer)/Leaves",
-      title: "Leaves",
-
-      icon: Brief,
-     children: [
-      {
-        name: "ApplyLeave",
-        path: "/(drawer)/Leaves/ApplyLeave",
-        title: "Apply Leave",
-        alwaysVisible: true
-      },
-      {
-        name: "ManageLeaves",
-        path: "/(drawer)/Leaves/ManageLeaves",
-        title: "Manage Leave",
-       
-      },
-
-      ]
-
-    },
-
-    {
-      name:"CRM",
-      path: "/(drawer)/CRM",
-      title: "CRM",
-
-      icon: CRM,
-     children: [
-      {
-        name: "AddLeads",
-        path: "/(drawer)/CRM/AddLeads",
-        title: "Add Leads",
-        alwaysVisible: true
-      },
-      {
-        name: "ManageLeads",
-        path: "/(drawer)/CRM/ManageLeads",
-        title: "Manage Leads",
-       
-      },
-      {
-        name: "Appointments",
-        path: "/(drawer)/CRM/Appointments",
-        title: "Appointments",
-       
-      },
-
-      ]
-
-    },
+  
 
 
+    
+
+  
 
 
 

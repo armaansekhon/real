@@ -8,19 +8,19 @@ import {
   FlatList,
   TouchableOpacity,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import LottieView from "lottie-react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { getAllJuniorRequestedLeaves } from "../../../services/api";
-import { useUser } from '../../../context/UserContext';
+import { getAllJuniorRequestedLeaves, getLeaveById } from "../../../../services/api";
+import { useUser } from '../../../../context/UserContext';
+import { useNavigation } from 'expo-router';
 
 const screenHeight = Dimensions.get("window").height;
 
-
-
-const getStatusColor = (status = "") => {
-  switch (status.toLowerCase()) {
+const getStatusColor = (status) => {
+  switch (status?.toLowerCase?.()) {
     case "approved":
       return "#4CAF50";
     case "send to higher authority":
@@ -34,17 +34,41 @@ const getStatusColor = (status = "") => {
   }
 };
 
+
+// const getStatusColor = (status = "") => {
+//   switch (status.toLowerCase()) {
+//     case "approved":
+//       return "#4CAF50";
+//     case "send to higher authority":
+//       return "#FF9800";
+//     case "initiated":
+//       return "#2196F3";
+//     case "rejected request":
+//       return "#F44336";
+//     default:
+//       return "#757575";
+//   }
+// };
+
 const ManageLeaves = () => {
 
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLeaveId, setSelectedLeaveId] = useState(null);
   const router = useRouter();
+  const navigation = useNavigation();
 
-
-
+  const [refreshing, setRefreshing] = useState(false);
 
   const{user}=useUser();
+
+  
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchInitialData();
+    resetForm();
+    setRefreshing(false);
+  };
 
 
   useEffect(() => {
@@ -75,7 +99,7 @@ const ManageLeaves = () => {
   const renderItem = ({ item, index }) => (
     <TouchableOpacity 
     style={styles.card}
-    onPress={() => router.push({ pathname: "/(drawer)/Leaves/LeaveDetails", params: { leaveId: item.id } })}
+    onPress={() => router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } })}
 
     >
     {/* <TouchableOpacity style={styles.card}> */}
@@ -104,14 +128,7 @@ const ManageLeaves = () => {
         {item.status}
       </Text>
       
-      {/* <TouchableOpacity
-  
-        style={styles.manageButton}
-        // onPress={() => router.push('/(drawer)/Leaves/LeaveDetails')}
-      >
-        <Ionicons name="settings-outline" size={20} color="#5aaf57" />
-        <Text style={styles.manageText}>Manage</Text>
-      </TouchableOpacity> */}
+
 
     
     </TouchableOpacity>
@@ -120,14 +137,20 @@ const ManageLeaves = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+               <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                         <Ionicons name="menu" size={26} color="#000" />
+                       </TouchableOpacity>
+         
+               </View>
       <View style={styles.headerRow}>
+              
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Manage</Text>
           <Text style={styles.headerSubTitle}>Leaves</Text>
           <Text style={styles.headerDesc}>View all the pending leaves here!</Text>  
         </View>
         <LottieView
-          source={require("../../../assets/svg/EMP.json")}
+          source={require("../../../../assets/svg/EMP.json")}
           autoPlay
           loop
           style={styles.lottie}
@@ -141,6 +164,9 @@ const ManageLeaves = () => {
         contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
+              refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                  }
       />
     </SafeAreaView>
   );
@@ -237,25 +263,10 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     textTransform: "capitalize",
   },
-  // manageButton: {
-  //   marginTop: 10,
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   alignSelf: "flex-end",
-  //   paddingHorizontal: 10,
-  //   paddingVertical: 5,
-  //   borderRadius: 8,
-  //   backgroundColor: "#e6f4ea",
-  //   top: -40,
-   
-  //   },
-  // manageText: {
-  //   marginLeft: 6,
-  //   color: "#5aaf57",
-  //   fontFamily: "PlusR",
-
-  //   fontSize: 14,
-  // },
+  header: {
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+  },
 });
 
 export default ManageLeaves;

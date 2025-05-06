@@ -17,8 +17,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from 'expo-router';
 import moment from 'moment';
-import { useUser } from '../../../context/UserContext';
-import MyLeaves from '../../../components/MyLeaves';
+import { useUser } from '../../../../context/UserContext';
+import MyLeaves from '../../../../components/MyLeaves';
 
 const ApplyLeave = () => {
   const navigation = useNavigation();

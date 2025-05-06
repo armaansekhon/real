@@ -9,17 +9,19 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useLocalSearchParams } from "expo-router";
-import { getLeaveById } from "../../../services/api";
+import { getLeaveById } from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useNavigation } from "expo-router";
 
-import { Dropdown } from "react-native-element-dropdown";
-import {getLeaveApprovalAuthority} from  "../../../services/api";
-import { useUser } from '../../../context/UserContext';
-import { submitLeaveAction } from "../../../services/api";
+import { Dropdown } from "react-native-element-dropdown" 
+import {getLeaveApprovalAuthority} from  "../../../../services/api";
+import { useUser } from '../../../../context/UserContext';
+import { submitLeaveAction } from "../../../../services/api";
 
 const CustomDropdown = ({ value, setValue, data, placeholder, loading }) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -53,10 +55,13 @@ const LeaveDetails = () => {
   const { leaveId } = useLocalSearchParams(); // from router.push({ pathname: ..., params: { leaveId } })
   const [leaveDetails, setLeaveDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [statusOptions, setStatusOptions] = useState([]);
   const [statusLoading, setStatusLoading] = useState(true);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const [data, setData] = useState({
     status: null,
@@ -64,6 +69,13 @@ const LeaveDetails = () => {
     remarks: null,
  
   });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchInitialData();
+    resetForm();
+    setRefreshing(false);
+  };
 
 
  
@@ -111,7 +123,7 @@ const LeaveDetails = () => {
     const fetchStatusOptions = async () => {
       try {
         setStatusLoading(true);
-        console.log("Fetching approval authority for employeeId:", user.employeeId);
+        console.log("Fetching approval authority for employeeId:", user.id);
   
         const response = await getLeaveApprovalAuthority(user.id);
         console.log("Approval authority response:", response);
@@ -154,6 +166,15 @@ const LeaveDetails = () => {
     setData((prev) => ({ ...prev, [field]: val }));
   };
 
+  const resetForm = () => {
+    setData({
+      status: null,
+      date: null,
+      remarks: null,
+    });
+  };
+  
+
 
 
   const handleSubmit = async () => {
@@ -168,6 +189,7 @@ const LeaveDetails = () => {
   
       const res = await submitLeaveAction(payload);
       alert(res.message || "Leave action successful!");
+      resetForm();
     } catch (err) {
       alert("Submission failed: " + err.message);
     }
@@ -178,8 +200,7 @@ const LeaveDetails = () => {
     { label: "Approved", value: "approved" },
     { label: "Rejected", value: "rejected" },
     { label: "Pending", value: "pending" },
-    { label: "Pending", value: "pending" },
-    { label: "Pending", value: "pending" },
+
   ];
   
   const dates = [
@@ -198,6 +219,12 @@ const LeaveDetails = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                <Ionicons name="menu" size={26} color="#000" />
+              </TouchableOpacity>
+
+      </View>
+   
                 <View style={styles.headerRow}>
                 <View style={styles.headerTextContainer}> 
                   <Text style={styles.headerTitle}>Leave</Text>
@@ -205,13 +232,19 @@ const LeaveDetails = () => {
                   {/* <Text style={styles.headerDesc}>View all the pending leaves here!</Text>   */}
                 </View>
                 <LottieView
-                  source={require("../../../assets/svg/EMP.json")}
+                  source={require("../../../../assets/svg/EMP.json")}
                   autoPlay
                   loop
                   style={styles.lottie}
                 />
               </View>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+          contentContainerStyle={styles.content}
+         keyboardShouldPersistTaps="handled"
+            refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+  >
 
 
 
@@ -455,6 +488,12 @@ const styles = StyleSheet.create({
   submitButton: {
     alignItems: "center",
     marginTop: 20,
+  },
+
+
+  header: {
+    paddingHorizontal: 16,
+    paddingBottom: 10,
   },
   
 });

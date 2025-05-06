@@ -355,3 +355,151 @@ export const submitLeaveAction = async ({ leaveId, leaveStatus, remarks, updated
     throw error;
   }
 };
+
+
+
+
+/* get movement reasons */
+
+export const getMovementReasons = async () => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/movementReasons`, {
+      method: "GET",
+      headers: {
+        secret_key: secretKey,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch movement reasons");
+    }
+
+    const data = await response.json();
+
+    // Transform data to { label, value } format for dropdown
+    return data.map((item) => ({
+      label: item.mReason,
+      value: item.id,
+    }));
+  } catch (error) {
+    console.error("Error fetching movement reasons:", error);
+    return [];
+  }
+};
+
+
+
+/* Submit Movement Request */
+export const submitMovementRequest = async ({
+  mRequestedDate,
+  initiatedBy,
+  fromTime,
+  toTime,
+  movementReasonId,
+  description,
+}) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/save-movement-request`, {
+      method: "POST",
+      headers: {
+        secret_key: secretKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mRequestedDate,
+        initiatedBy,
+        fromTime,
+        toTime,
+        movementReasonId,
+        description,
+      }),
+    });
+
+    const contentType = response.headers.get("content-type");
+
+    let data;
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      throw new Error(`Unexpected response: ${text}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(data.message || "Movement request failed.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in submitMovementRequest:", error);
+    throw error;
+  }
+};
+
+{/*get all junior requested movements */}
+
+
+export const getAllJuniorRequestedMovements = async (employeeId) => {
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(
+      `${API_BASE_URL}/employee/getAllJuniorRequestedMovements/employeeId/${employeeId}`,
+      {
+        method: "GET",
+        headers: {
+          secret_key: secretKey,
+          "Content-Type": "application/json",
+          // Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch junior requested movements");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching junior requested movements:", error);
+    return [];
+  }
+};
+
+
+
+
+ {/*get all Active Or Inactive Employees*/}
+
+ export const getAllActiveOrInactiveEmployees = async () => {  
+  try {
+    const secretKey = await SecureStore.getItemAsync("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/employee/getAllActiveOrInactiveEmployees`, {
+      method: "GET",
+      headers: {
+        secret_key: secretKey,
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Failed to fetch employees");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    return [];
+  }
+};
