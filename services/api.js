@@ -586,3 +586,33 @@ export const submitMovementAction = async ({ movementRequestId, status, remarks,
     return [];
   }
 };
+
+ {/*get my movements*/}
+
+// export const getMyMovements = async (employeeId) => {
+//   try {
+//     const secretKey = await SecureStore.getItemAsync("auth_token");
+
+//     const response = await fetch(
+//       `${API_BASE_URL}/employee/my-movements/employeeId/${employeeId}`,
+//       {
+//         method: "GET",
+//         headers: {
+//           secret_key: secretKey,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+
+//     if (!response.ok) {
+//       const errorText = await response.text();
+//       throw new Error(errorText || "Failed to fetch movements");
+//     }
+
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error("Error fetching my movements:", error);
+//     return [];
+//   }
+// };

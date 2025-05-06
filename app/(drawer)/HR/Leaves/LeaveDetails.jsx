@@ -219,8 +219,8 @@ const LeaveDetails = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                <Ionicons name="menu" size={26} color="#000" />
+      <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="chevron-back" size={28} color="#000" />
               </TouchableOpacity>
 
       </View>
