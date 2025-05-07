@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   RefreshControl,
+  Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
@@ -17,7 +18,8 @@ import { useLocalSearchParams } from "expo-router";
 import { getMovementById} from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "expo-router";
-
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 import { Dropdown } from "react-native-element-dropdown" 
 import {getLeaveApprovalAuthority} from  "../../../../services/api";
 import { useUser } from '../../../../context/UserContext';
@@ -60,7 +62,9 @@ const MovementDetails = () => {
 
   const [statusOptions, setStatusOptions] = useState([]);
   const [statusLoading, setStatusLoading] = useState(true);
-
+ const [historyModalVisible, setHistoryModalVisible] = useState(false);
+  const [movementHistory, setMovementHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   const [data, setData] = useState({
@@ -144,6 +148,29 @@ const MovementDetails = () => {
     fetchStatusOptions();
   }, [user?.id]);
   
+
+
+  const fetchMovementHistory = async (mId) => {
+    try {
+      setHistoryLoading(true);
+      const secretKey = await SecureStore.getItemAsync('auth_token');
+      const response = await axios.get(
+        `http://192.168.6.210:8686/pipl/api/v1/employee/getMovementHistories/movementId/${mId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            secret_key: secretKey,
+          },
+        }
+      );
+      setMovementHistory(response.data);
+      setHistoryModalVisible(true);
+    } catch (error) {
+      console.error('Error fetching movement history:', error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
   
 
   if (loading) {
@@ -235,7 +262,7 @@ const MovementDetails = () => {
                 <View style={styles.headerTextContainer}> 
                   <Text style={styles.headerTitle}>Movement</Text>
                   <Text style={styles.headerSubTitle}>Details</Text>
-                  {/* <Text style={styles.headerDesc}>View all the pending leaves here!</Text>   */}
+                
                 </View>
                 <LottieView
                   source={require("../../../../assets/svg/EMP.json")}
@@ -243,7 +270,62 @@ const MovementDetails = () => {
                   loop
                   style={styles.lottie}
                 />
+
+                 <TouchableOpacity
+                        style={styles.historyButton}
+                        onPress={() => fetchMovementHistory(mId)}
+                      >
+                        <Text style={styles.historyButtonText}>History</Text>
+                      </TouchableOpacity>
               </View>
+
+
+
+               {/* Movement History Modal */}
+                    <Modal
+                visible={historyModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setHistoryModalVisible(false)}
+              >
+                <View style={styles.modalOverlay}>
+                  <View style={styles.updatedModalContent}>
+                    <View style={styles.modalHeader}>
+                      <Text style={styles.modalTitle}>Movement History</Text>
+                      <TouchableOpacity onPress={() => setHistoryModalVisible(false)}>
+                        <Ionicons name="close" size={24} color="black" />
+                      </TouchableOpacity>
+                    </View>
+              
+                    {historyLoading ? (
+                      <ActivityIndicator size="large" color="#007bff" />
+                    ) : (
+                      <ScrollView style={{ marginTop: 10 }}>
+                        {movementHistory.length === 0 ? (
+                          <Text style={{ textAlign: 'center', marginTop: 20 }}>No history found.</Text>
+                        ) : (
+                          <View style={styles.timelineContainer}>
+                            {movementHistory.map((historyItem, index) => (
+                              <View key={index} style={styles.timelineItem}>
+                                {/* Vertical Line */}
+                                {index !== 0 && <View style={styles.timelineLine} />}
+                                
+                                {/* Card */}
+                                <View style={styles.historyCard}>
+                                  <Text style={styles.historyLabel}>Updated On: <Text style={styles.historyValue}>{historyItem['Updated On ']}</Text></Text>
+                                  <Text style={styles.historyLabel}>Movement Status: <Text style={styles.historyValue}>{historyItem['Movement Status ']}</Text></Text>
+                                  <Text style={styles.historyLabel}>Updated By: <Text style={styles.historyValue}>{historyItem['Updated By ']}</Text></Text>
+                                  <Text style={styles.historyLabel}>Remarks: <Text style={styles.historyValue}>{historyItem['Remarks ']}</Text></Text>
+                                </View>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </ScrollView>
+                    )}
+                  </View>
+                </View>
+              </Modal>
       <ScrollView 
           contentContainerStyle={styles.content}
          keyboardShouldPersistTaps="handled"
@@ -405,11 +487,12 @@ const styles = StyleSheet.create({
   },
   headerTextContainer: {
     flex: 1,
+    paddingBottom: 10,
   },
   headerTitle: {
     fontSize: 37,
     fontFamily: "PlusSB",
-    marginTop: -89,
+    marginTop: -70,
   },
   headerSubTitle: {
     fontSize: 32,
@@ -417,12 +500,13 @@ const styles = StyleSheet.create({
     color: "#5aaf57",
     marginTop: -7,
   },
-  lottie: {
-    width: 90,
+  lottie: {    
+    width: 70,
     height: 70,
     transform: [{ scale: 2 }],
     bottom: 15,
-    top: -25,
+    top: -60,
+    right: -15,
     marginRight: 20,
   },
 
@@ -499,6 +583,108 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingBottom: 10,
+  },
+
+  historyButton: {
+    flex: 1,
+    position: 'absolute',
+    top: -1,
+    // bottom: 20,
+    right: 16,
+    borderColor: '#5aaf57',
+    borderWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 8,
+   
+  },
+  historyButtonText: {
+    color: '#5aaf57',
+    fontSize: 14,
+    fontFamily: "PlusSB",
+  },
+
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: "PlusSB",
+  },
+  updatedModalContent: {
+    width: '95%',
+    maxHeight: '85%',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+  },
+
+
+  historyItem: {
+    marginBottom: 15,
+  },
+  historyLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#5aaf57',
+    fontFamily: "PlusSB",
+  },
+  historyValue: {
+    fontSize: 14,
+    color: '#111',
+    fontFamily: "PlusR",
+  },
+  historyDivider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 10,
+  },
+  historyCard: {
+    width: '90%',
+    backgroundColor: '#f7f7f7',
+    padding: 15,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#5aaf57',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+  timelineContainer: {
+    marginTop: 10,
+    paddingVertical: 10,
+  },
+  
+  timelineItem: {
+    alignItems: 'center',
+    marginBottom: 30,
+    position: 'relative',
+  },
+  
+  timelineLine: {
+    position: 'absolute',
+    top: -30,
+    height: 30,
+    width: 2,
+    backgroundColor: '#5aaf57',
+    zIndex: -1,
   },
   
 });

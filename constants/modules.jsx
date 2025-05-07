@@ -74,7 +74,7 @@ export const defaultModules   = [
             name: "ManageLeaves",
             path: "/(drawer)/HR/Leaves/ManageLeaves",
             title: "Manage Leave",
-           
+            alwaysVisible: true
           },
     
           ]

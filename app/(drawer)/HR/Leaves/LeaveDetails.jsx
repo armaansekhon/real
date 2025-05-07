@@ -10,10 +10,13 @@ import {
   TextInput,
   TouchableOpacity,
   RefreshControl,
+  Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useLocalSearchParams } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 import { getLeaveById } from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "expo-router";
@@ -62,7 +65,9 @@ const LeaveDetails = () => {
   const [statusLoading, setStatusLoading] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
-
+  const [historyModalVisible, setHistoryModalVisible] = useState(false);
+   const [historyLoading, setHistoryLoading] = useState(false);
+     const [leaveHistory, setLeaveHistory] = useState([]);
   const [data, setData] = useState({
     status: null,
     date: null,
@@ -144,6 +149,29 @@ const LeaveDetails = () => {
     fetchStatusOptions();
   }, [user?.id]);
   
+
+
+  const fetchLeaveHistory = async (leaveId) => {
+    try {
+      setHistoryLoading(true);
+      const secretKey = await SecureStore.getItemAsync('auth_token');
+      const response = await axios.get(
+        `http://192.168.6.210:8686/pipl/api/v1/employee/getMyLeaveHistories/id/${leaveId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            secret_key: secretKey,
+          },
+        }
+      );
+      setLeaveHistory(response.data);
+      setHistoryModalVisible(true);
+    } catch (error) {
+      console.error('Error fetching leave history:', error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
   
 
   if (loading) {
@@ -229,7 +257,7 @@ const LeaveDetails = () => {
                 <View style={styles.headerTextContainer}> 
                   <Text style={styles.headerTitle}>Leave</Text>
                   <Text style={styles.headerSubTitle}>Details</Text>
-                  {/* <Text style={styles.headerDesc}>View all the pending leaves here!</Text>   */}
+                
                 </View>
                 <LottieView
                   source={require("../../../../assets/svg/EMP.json")}
@@ -237,6 +265,16 @@ const LeaveDetails = () => {
                   loop
                   style={styles.lottie}
                 />
+
+                
+      <TouchableOpacity
+        style={styles.historyButton}
+        onPress={() => fetchLeaveHistory(leaveId)}
+      >
+        <Text style={styles.historyButtonText}>History</Text>
+      </TouchableOpacity>
+
+
               </View>
       <ScrollView 
           contentContainerStyle={styles.content}
@@ -330,6 +368,56 @@ const LeaveDetails = () => {
       >
         <Ionicons name="checkmark-done-circle-sharp" size={55} color="black" />
       </TouchableOpacity>
+
+
+
+
+
+      {/* Leave History Modal */}
+            <Modal
+        visible={historyModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setHistoryModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.updatedModalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Leave History</Text>
+              <TouchableOpacity onPress={() => setHistoryModalVisible(false)}>
+                <Ionicons name="close" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+      
+            {historyLoading ? (
+              <ActivityIndicator size="large" color="#007bff" />
+            ) : (
+              <ScrollView style={{ marginTop: 10 }}>
+                {leaveHistory.length === 0 ? (
+                  <Text style={{ textAlign: 'center', marginTop: 20 }}>No history found.</Text>
+                ) : (
+                  <View style={styles.timelineContainer}>
+                    {leaveHistory.map((historyItem, index) => (
+                      <View key={index} style={styles.timelineItem}>
+                        {/* Vertical Line */}
+                        {index !== 0 && <View style={styles.timelineLine} />}
+                        
+                        {/* Card */}
+                        <View style={styles.historyCard}>
+                          <Text style={styles.historyLabel}>Updated On: <Text style={styles.historyValue}>{historyItem['Updated On ']}</Text></Text>
+                          <Text style={styles.historyLabel}>Leave Status: <Text style={styles.historyValue}>{historyItem['Leave Status ']}</Text></Text>
+                          <Text style={styles.historyLabel}>Updated By: <Text style={styles.historyValue}>{historyItem['Updated By ']}</Text></Text>
+                          <Text style={styles.historyLabel}>Remarks: <Text style={styles.historyValue}>{historyItem['Remarks ']}</Text></Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -397,14 +485,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: Platform.OS === "ios" ? 60 : 70,
     marginBottom: 5,
+
   },
   headerTextContainer: {
     flex: 1,
+    paddingBottom: 10,
+    
   },
   headerTitle: {
     fontSize: 40,
     fontFamily: "PlusSB",
-    marginTop: -89,
+marginTop: -70,
   },
   headerSubTitle: {
     fontSize: 32,
@@ -413,11 +504,13 @@ const styles = StyleSheet.create({
     marginTop: -7,
   },
   lottie: {
-    width: 90,
+    // width: 90,
+    width: 70,
     height: 70,
     transform: [{ scale: 2 }],
     bottom: 15,
-    top: -25,
+    top: -60,
+    right: -15,
     marginRight: 20,
   },
 
@@ -444,11 +537,6 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
 
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.05,
-    // shadowRadius: 2,
-    // elevation: 2,
   },
 
   dropdown: {
@@ -494,8 +582,111 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingBottom: 10,
+    // paddingTop: 40,
   },
   
+
+  historyButton: {
+    flex: 1,
+    position: 'absolute',
+    top: -1,
+    // bottom: 20,
+    right: 16,
+    borderColor: '#5aaf57',
+    borderWidth: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 8,
+   
+  },
+  historyButtonText: {
+    color: '#5aaf57',
+    fontSize: 14,
+    fontFamily: "PlusSB",
+  },
+
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: "PlusSB",
+  },
+  updatedModalContent: {
+    width: '95%',
+    maxHeight: '85%',
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+  },
+
+
+  historyItem: {
+    marginBottom: 15,
+  },
+  historyLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#5aaf57',
+    fontFamily: "PlusSB",
+  },
+  historyValue: {
+    fontSize: 14,
+    color: '#111',
+    fontFamily: "PlusR",
+  },
+  historyDivider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 10,
+  },
+  historyCard: {
+    width: '90%',
+    backgroundColor: '#f7f7f7',
+    padding: 15,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#5aaf57',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+  timelineContainer: {
+    marginTop: 10,
+    paddingVertical: 10,
+  },
+  
+  timelineItem: {
+    alignItems: 'center',
+    marginBottom: 30,
+    position: 'relative',
+  },
+  
+  timelineLine: {
+    position: 'absolute',
+    top: -30,
+    height: 30,
+    width: 2,
+    backgroundColor: '#5aaf57',
+    zIndex: -1,
+  },
 });
 
 export default LeaveDetails;

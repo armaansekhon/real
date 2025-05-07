@@ -99,10 +99,21 @@ const ManageLeaves = () => {
   const renderItem = ({ item, index }) => (
     <TouchableOpacity 
     style={styles.card}
-    onPress={() => router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } })}
+    // onPress={() => router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } })}
 
-    >
-    {/* <TouchableOpacity style={styles.card}> */}
+    // >
+
+onPress={async () => {
+      if (item.status.toLowerCase() === "approved") {
+        alert("This leave is already approved.");
+        return;
+      }
+
+      // Proceed to LeaveDetails screen for other statuses
+      router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } });
+    }}
+  >
+
       <View style={styles.cardRow}>
         <Text style={styles.serial}>#{index + 1}</Text>
         <Text style={styles.date}>{item.date}</Text>
