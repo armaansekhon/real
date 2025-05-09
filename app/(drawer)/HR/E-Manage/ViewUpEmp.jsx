@@ -19,7 +19,6 @@ import { Feather, AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Dimensions } from "react-native";
 import { useNavigation } from 'expo-router';
-
 import { getAllEmployees, getAllEmployeesbyId } from "../../../../services/api";
 
 const screenHeight = Dimensions.get("window").height;
@@ -28,16 +27,13 @@ const ViewUpEmp = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [employeeModalVisible, setEmployeeModalVisible] = useState(false);
-
   const [employees, setEmployees] = useState([]);
-  // const [employeeDetails, setEmployeeDetails] = useState([]);
-
   const Router = useRouter();
   const navigation = useNavigation();
+
   useEffect(() => {
     const fetchEmployees = async () => {
       const data = await getAllEmployees();
-
       const employeesWithPhotos = data.map((emp) => ({
         id: emp.id.toString(),
         usercode: emp.usercode,
@@ -52,59 +48,16 @@ const ViewUpEmp = () => {
         employeeType: emp.employeeType?.employeeType || "N/A",
         employeeId: emp.employeeType?.id || "N/A",
         pincode: emp.employeeAddress?.id || "N/A",
-        pic:
-          emp.employeePic || "https://randomuser.me/api/portraits/lego/1.jpg",
-        // photo:
-        //   emp.gender === "male"
-        //     ? "https://randomuser.me/api/portraits/men/1.jpg"
-        //     : emp.gender === "female"
-        //     ? "https://randomuser.me/api/portraits/women/1.jpg"
-        //     : "https://randomuser.me/api/portraits/lego/1.jpg",
+        pic: emp.employeePic || "https://randomuser.me/api/portraits/lego/1.jpg",
       }));
       setEmployees(employeesWithPhotos);
     };
     fetchEmployees();
   }, []);
 
-  //for emp with id
-  // useEffect(() => {
-  //   const fetchEmployeeDetails = async () => {
-  //     const data = await getAllEmployeesbyId();
-
-  //     const employeesWithDetails = data.map((emp) => ({
-  //       id: emp.id?.toString() || "N/A",
-  //       name: emp.name || "N/A",
-  //       email: emp.email || "N/A",
-  //       phone: emp.contact || "N/A",
-  //       gender: emp.gender || "N/A",
-  //       age: emp.age || "N/A", // Only include if available in your API
-  //       category: emp.category || "N/A",
-  //       department: emp.department || "N/A",
-  //       designation: emp.designation || "N/A",
-  //       employeeType: emp.employeeType || "N/A",
-  //       employeeId: emp.employeeTypeId || "N/A", // Assuming there's a separate ID (if not, omit this)
-  //       address: emp.employeeAddress?.[0]?.address1 || "N/A",
-  //       pincode: emp.employeeAddress?.[0]?.pincode || "N/A",
-  //       spouseName: emp.employeeSpouses?.[0]?.name || "N/A",
-  //       childName: emp.employeeChilds?.[0]?.name || "N/A",
-  //       education: emp.employeeEducations?.[0]?.classsName || "N/A",
-  //       experience: emp.employeeExperiences?.[0]?.position || "N/A",
-  //       pic: emp.employeePic
-  //         ? `data:${emp.employeeDocuments?.[0]?.documentType};base64,${emp.employeePic}`
-  //         : item.pic,
-  //     }));
-
-  //     setEmployeeDetails(employeesWithDetails);
-  //   };
-
-  //   fetchEmployeeDetails();
-  // }, []);
-
-  // Fetch detailed employee info for modal
   const onSelectEmployeeDetails = async (item) => {
     try {
-      const emp = await getAllEmployeesbyId(item.id); // Make sure this endpoint accepts ID
-
+      const emp = await getAllEmployeesbyId(item.id);
       const detailedEmployee = {
         ...item,
         email: emp.email || item.email || "N/A",
@@ -127,7 +80,6 @@ const ViewUpEmp = () => {
             ? `data:${emp.employeeDocuments?.[0]?.documentType};base64,${emp.employeePic}`
             : item.pic,
       };
-
       setSelectedEmployee(detailedEmployee);
       setEmployeeModalVisible(true);
     } catch (error) {
@@ -144,9 +96,12 @@ const ViewUpEmp = () => {
     setEmployeeModalVisible(true);
   };
 
-  const onSelectEmployee = (item) => {
-    setSelectedEmployee(item);
-    setEmployeeModalVisible(true);
+  const navigateToEdit = (id) => {
+    console.log("Navigating to Edit Employee");
+    Router.push({
+      pathname: "/(drawer)/HR/E-Manage/AddEmp",
+      params: { id, isEdit: true },
+    });
   };
 
   const renderEmployee = ({ item }) => (
@@ -154,35 +109,20 @@ const ViewUpEmp = () => {
       style={styles.card}
       onPress={() => handleEmployeePress(item)}
     >
-      {/* <Image source={{ uri:item.pic }} style={styles.avatar} /> */}
       <Image
-        source={{ uri: `data:image/jpeg;base64, ${item.pic}` }}
+        source={{ uri: `data:image/jpeg;base64,${item.pic}` }}
         style={styles.avatar}
       />
       <View style={styles.cardText}>
         <Text style={styles.empName}>{item.name}</Text>
         <Text style={styles.empDept}>{item.department}</Text>
         <TouchableOpacity style={styles.iconContainer}>
-          {/* <Ionicons
-            style={styles.icon}
-            name="pencil-outline"
-            size={25}
-            color="black"
-            onPress={() => {
-              console.log("Navigating to Login");
-              Router.push("/(drawer)/HR/E-Manage/AddEmp");
-            }}
-
-          /> */}
-
           <Feather
             name="search"
             size={20}
             color="#5aaf57"
             style={styles.searchIcon}
           />
-
-          {/* <Text style={styles.updateBtnText}>Update Details</Text> */}
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -190,11 +130,11 @@ const ViewUpEmp = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-            <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                      <Ionicons name="menu" size={26} color="#000" />
-                    </TouchableOpacity>
-      
-            </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={26} color="#000" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>View</Text>
@@ -203,7 +143,6 @@ const ViewUpEmp = () => {
             Search for the employee in the Search Bar!
           </Text>
         </View>
-
         <LottieView
           source={require("../../../../assets/svg/EMP.json")}
           autoPlay
@@ -211,8 +150,6 @@ const ViewUpEmp = () => {
           style={styles.lottie}
         />
       </View>
-
-      {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Feather
           name="search"
@@ -236,16 +173,11 @@ const ViewUpEmp = () => {
           </TouchableOpacity>
         )}
       </View>
-
-      {/* <ViewUpEmpList onSelectedEmployee={setSelectedEmployee} /> */}
-
-      {/* Employee List */}
       <FlatList
         data={employees.filter((e) => {
-          const lowerCaseSearchQuery = searchQuery?.toLowerCase() || ""; // Ensure searchQuery is a string
-          const lowerCaseName = e.name?.toLowerCase() || ""; // Ensure name is a string
-          const lowerCaseDepartment = e.department?.toLowerCase() || ""; // Ensure department is a string
-
+          const lowerCaseSearchQuery = searchQuery?.toLowerCase() || "";
+          const lowerCaseName = e.name?.toLowerCase() || "";
+          const lowerCaseDepartment = e.department?.toLowerCase() || "";
           return (
             lowerCaseName.includes(lowerCaseSearchQuery) ||
             lowerCaseDepartment.includes(lowerCaseSearchQuery)
@@ -257,130 +189,34 @@ const ViewUpEmp = () => {
           <TouchableOpacity
             style={styles.item}
             onPress={() => onSelectEmployeeDetails(item)}
-
-            // onPress={() => Router.push({ pathname: "/(drawer)/HR/E-Manage/ViewEmp", params: { id: item.id } })}
           >
             <Text style={styles.index}>{index + 1}</Text>
-
-            {/* <Text style={styles.id}>{item.usercode}</Text> */}
-
             <View style={styles.imageWrapper}>
-              {/* <Image source={{ uri: `data:image/jpeg;base64, ${item.pic}` }} style={styles.avatar} /> */}
               <Image
                 source={
                   item.pic
-                    ? { uri: `data:image/jpeg;base64, ${item.pic}` }
+                    ? { uri: `data:image/jpeg;base64,${item.pic}` }
                     : { uri: "https://randomuser.me/api/portraits/lego/1.jpg" }
                 }
                 style={styles.avatar}
               />
             </View>
-
             <View style={styles.nameDeptWrapper}>
               <Text style={styles.name}>{item.name}</Text>
               <Text style={styles.department} numberOfLines={1}>
                 {item.department}
               </Text>
             </View>
-
             <Feather
               name="edit"
               size={20}
               color="#5aaf57"
               style={styles.icon}
-              onPress={() => {
-                console.log("Navigating to Login");
-                Router.push({
-                  pathname: "/(drawer)/HR/E-Manage/AddEmp",
-                  // params: { id: item.id }
-                  params: { id: item.id, isEdit: true },
-                });
-              }}
+              onPress={() => navigateToEdit(item.id)}
             />
           </TouchableOpacity>
         )}
       />
-
-      {/* Employee Details Modal */}
-
-      {/* <Modal
-        visible={employeeModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setEmployeeModalVisible(false)}
-      >
-        <TouchableWithoutFeedback
-          onPress={() => setEmployeeModalVisible(false)}
-        >
-          <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View
-                style={[styles.modalContainer, { height: screenHeight * 0.7 }]}
-              >
-                <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  keyboardDismissMode="on-drag"
-                  contentContainerStyle={{
-                    alignItems: "center",
-                    paddingBottom: 20,
-                  }}
-                  nestedScrollEnabled
-                  showsVerticalScrollIndicator={true}
-                >
-                  <Image
-                    source={{
-                      uri: `data:image/jpeg;base64, ${selectedEmployee?.pic}`,
-                    }}
-                    style={styles.modalAvatar}
-                  />
-                  <Text style={styles.modalName}>{selectedEmployee?.name}</Text>
-                  <Text style={styles.modalInfo}>
-                    Usercode: {selectedEmployee?.usercode}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Department: {selectedEmployee?.department}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Designation: {selectedEmployee?.designation}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Employee Type: {selectedEmployee?.employeeType}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Email: {selectedEmployee?.email}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Phone: {selectedEmployee?.phone}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Gender: {selectedEmployee?.gender}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Category: {selectedEmployee?.category}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Age: {selectedEmployee?.age}
-                  </Text>
-                  <Text style={styles.modalInfo}>Spouse: {selectedEmployee?.spouseName}</Text>
-                  <Text style={styles.modalInfo}>Child: {selectedEmployee?.childName}</Text>
-                  <Text style={styles.modalInfo}>Education: {selectedEmployee?.education}</Text>
-                  <Text style={styles.modalInfo}>Experience: {selectedEmployee?.experience}</Text>
-                  <Text style={styles.modalInfo}>Address: {selectedEmployee?.address}</Text>
-                  <Text style={styles.modalInfo}>Pincode: {selectedEmployee?.pincode}</Text>
-
-                  <TouchableOpacity
-                    style={styles.closeBtn}
-                    onPress={() => setEmployeeModalVisible(false)}
-                  >
-                    <Text style={styles.closeBtnText}>Close</Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal> */}
-
       <Modal
         visible={employeeModalVisible}
         transparent={true}
@@ -393,7 +229,6 @@ const ViewUpEmp = () => {
           <View style={styles.modalBackground}>
             <TouchableWithoutFeedback onPress={() => {}}>
               <View style={[styles.modalContainer]}>
-                {/* Static Top Content */}
                 <View style={styles.headerSection}>
                   <Image
                     source={{
@@ -406,22 +241,11 @@ const ViewUpEmp = () => {
                     Usercode: {selectedEmployee?.usercode}
                   </Text>
                 </View>
-
-                {/* Scrollable Middle Section */}
                 <FlatList
                   data={[
-                    {
-                      label: "Department",
-                      value: selectedEmployee?.department,
-                    },
-                    {
-                      label: "Designation",
-                      value: selectedEmployee?.designation,
-                    },
-                    {
-                      label: "Employee Type",
-                      value: selectedEmployee?.employeeType,
-                    },
+                    { label: "Department", value: selectedEmployee?.department },
+                    { label: "Designation", value: selectedEmployee?.designation },
+                    { label: "Employee Type", value: selectedEmployee?.employeeType },
                     { label: "Email", value: selectedEmployee?.email },
                     { label: "Phone", value: selectedEmployee?.phone },
                     { label: "Gender", value: selectedEmployee?.gender },
@@ -430,10 +254,7 @@ const ViewUpEmp = () => {
                     { label: "Spouse", value: selectedEmployee?.spouseName },
                     { label: "Child", value: selectedEmployee?.childName },
                     { label: "Education", value: selectedEmployee?.education },
-                    {
-                      label: "Experience",
-                      value: selectedEmployee?.experience,
-                    },
+                    { label: "Experience", value: selectedEmployee?.experience },
                     { label: "Address", value: selectedEmployee?.address },
                     { label: "Pincode", value: selectedEmployee?.pincode },
                   ]}
@@ -450,8 +271,6 @@ const ViewUpEmp = () => {
                   )}
                   style={styles.flatListContainer}
                 />
-
-                {/* Static Bottom Content */}
                 <TouchableOpacity
                   style={styles.closeBtn}
                   onPress={() => setEmployeeModalVisible(false)}
@@ -481,24 +300,20 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === "ios" ? 60 : 70,
     marginBottom: 20,
   },
-
   headerTextContainer: {
     flex: 1,
   },
-
   headerTitle: {
     fontSize: 35,
     fontFamily: "PlusSB",
     marginTop: -89,
   },
-
   headerSubTitle: {
     fontSize: 30,
     fontFamily: "PlusSB",
     color: "#5aaf57",
     marginTop: -5,
   },
-
   headerDesc: {
     fontSize: 12,
     fontFamily: "PlusR",
@@ -539,7 +354,6 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: 5,
   },
-
   iconContainer: {
     width: 45,
     alignItems: "center",
@@ -550,9 +364,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: -10,
   },
-
-  //new
-
   list: {
     paddingHorizontal: 16,
     paddingBottom: 20,
@@ -569,19 +380,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-
-  id: {
-    width: 5,
-    fontSize: 13,
-    color: "#888",
-    textAlign: "center",
-    flex: 1,
-  },
   index: {
     fontSize: 13,
     color: "#888",
     textAlign: "center",
-    // flex: 1,
   },
   imageWrapper: {
     flex: 1,
@@ -609,9 +411,6 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     marginRight: 30,
   },
-
-  //new modal styles
-
   modalBackground: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -620,7 +419,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: "85%",
-    height: "70%", // fixed modal height
+    height: "70%",
     backgroundColor: "white",
     borderRadius: 30,
     padding: 16,
@@ -689,7 +488,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 10,
   },
-  
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+    elevation: 3,
+    shadowColor: "#32cd32",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  cardText: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  empName: {
+    fontSize: 16,
+    fontFamily: "PlusSB",
+    color: "#333",
+  },
+  empDept: {
+    fontSize: 14,
+    fontFamily: "PlusR",
+    color: "#5aaf57",
+    marginTop: 4,
+  },
 });
 
 export default ViewUpEmp;

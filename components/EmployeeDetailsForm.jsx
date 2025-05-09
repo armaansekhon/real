@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   placeholder: {
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 42,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 14,
     fontSize: 14,
@@ -572,11 +572,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "PlusSB",
     marginBottom: 4,
-    color: "#444",
+    color: "#5aaf57",
   },
   dropdown: {
     height: 42,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 14,
     borderColor: "#ccc",

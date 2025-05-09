@@ -364,7 +364,7 @@ const ExistingEmployees = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? 25 : 0,
+    paddingTop: Platform.OS === "android" ? 25 : 30,
     backgroundColor: "#fff",
   },
   topBar: {
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginTop: Platform.OS === "ios" ? 60 : 70,
+    marginTop: Platform.OS === "ios" ? 90 : 70,
     marginBottom: 20,
   },
 

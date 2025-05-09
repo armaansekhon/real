@@ -7,7 +7,7 @@ export const defaultModules   = [
     {
       name: "Home",
       path: "/(drawer)/(tabs)/Home",
-      title: "Tabs",
+      title: "Home",
     //   icon: "home-outline",
       icon: Property,
       alwaysVisible: true
@@ -45,7 +45,6 @@ export const defaultModules   = [
           ],
         },
         {
-<<<<<<< Updated upstream
           name: "E-Status",
           path: "/(drawer)/HR/E-Status",
           title: "Employee Status",
@@ -105,54 +104,10 @@ export const defaultModules   = [
     
         },
 
-=======
-          name: "E-Salary",
-          path: "/(drawer)/HR/E-Salary",
-          title: "Employee Salary",
-          children: [
-            {
-              name: "MonthlySalary",
-              path: "/(drawer)/HR/E-Salary/MonthlySalary",
-              title: "Monthly Salary",
-            },
-            {
-              name: "ViewSalary",
-              path: "/(drawer)/HR/E-Salary/ViewSalary",
-              title: "View Salary",
-            },
-            
-            
-           
-          ],
-        },
->>>>>>> Stashed changes
       ],
     },
 
-<<<<<<< HEAD
-    {
-      name:"Leaves",
-      path: "/(drawer)/Leaves",
-      title: "Leaves",
-
-      icon: Brief,
-     children: [
-      {
-        name: "ApplyLeave",
-        path: "/(drawer)/Leaves/ApplyLeave",
-        title: "Apply Leave",
-        alwaysVisible: true
-      },
-      {
-        name: "ManageLeaves",
-        path: "/(drawer)/Leaves/ManageLeaves",
-        title: "Manage Leave",
-       
-      },
-
-      ]
-
-    },
+   
 
     {
       name:"CRM",
@@ -195,9 +150,6 @@ export const defaultModules   = [
       ]
 
     },
-=======
-  
->>>>>>> 3757caf79ade441777f790bca674f25f651e7bd8
 
 
     

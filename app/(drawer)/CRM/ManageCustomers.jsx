@@ -7,28 +7,34 @@ import { useNavigation } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
+import LottieView from 'lottie-react-native';
 
 const ManageCustomers = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [customers, setCustomers] = useState([]);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const Router = useRouter();
 
   // Fetch Customers
   const fetchCustomers = async () => {
     try {
+      setLoading(true);
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.get('http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/realEstateCustomers', {
-        headers: {  'Content-Type': 'application/json',
-          'secret_key':secretKey
-         },
+        headers: {
+          'Content-Type': 'application/json',
+          'secret_key': secretKey
+        },
       });
       setCustomers(response.data);
       setFilteredCustomers(response.data);
     } catch (error) {
       console.error('Error fetching customers:', error);
       alert('Failed to fetch customers. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,15 +147,26 @@ const ManageCustomers = () => {
         <Ionicons name="search" size={24} color="#5aaf57" style={styles.searchIcon} />
       </View>
 
-      {/* Customer List */}
-      <FlatList
-        data={filteredCustomers}
-        renderItem={renderCustomerCard}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<Text style={styles.emptyText}>No customers found.</Text>}
-      />
+      {/* Loading Animation or Customer List */}
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <LottieView
+            source={require('../../../assets/svg/loader2.json')}
+            autoPlay
+            loop
+            style={styles.loader}
+          />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredCustomers}
+          renderItem={renderCustomerCard}
+          keyExtractor={item => item.id.toString()}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<Text style={styles.emptyText}>No customers found.</Text>}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -246,7 +263,18 @@ const styles = StyleSheet.create({
   addDocsIcon: {
     position: 'absolute',
     top: 0,
-    right: 50, // Positioned to the left of the update icon
+    right: 50,
     padding: 5,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loader: {
+    width: 100,
+    height: 100,
+    transform:[{scale:2.8}],
+    bottom:30,
   },
 });

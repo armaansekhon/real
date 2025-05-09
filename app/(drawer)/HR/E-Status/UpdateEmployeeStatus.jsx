@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Image,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import {
   Appbar,
@@ -29,12 +30,10 @@ import { RadioButton } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useUser } from '../../../../context/UserContext';
 import Toast from 'react-native-root-toast';
-
 import { Ionicons } from "@expo/vector-icons";
-const UpdateEmployeeStatus = () => {
-  
-  const API_BASE_URL = 'http://192.168.6.210:8686/pipl/api/v1';
 
+const UpdateEmployeeStatus = () => {
+  const API_BASE_URL = 'http://192.168.6.210:8686/pipl/api/v1';
   const [data, setData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisiblePic, setModalVisiblePic] = useState(false);
@@ -45,17 +44,15 @@ const UpdateEmployeeStatus = () => {
   const [status, setStatus] = useState('');
   const [reason, setReason] = useState('');
   const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false); 
-  const  {user}=useUser();
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const { user } = useUser();
 
-  const inserteDate =date;
-  const reasonOfTermination=reason;
-  const activityStatus=status;
-
+  const inserteDate = date;
+  const reasonOfTermination = reason;
+  const activityStatus = status;
 
   useEffect(() => {
-
-    console.log("logged in ",user.id);
+    console.log("logged in ", user.id);
     if (id) {
       fetchEmployeeData(id);
     }
@@ -88,13 +85,13 @@ const UpdateEmployeeStatus = () => {
       setLoading(false);
     }
   };
-  // insertedById
+
   const handleSubmit = async () => {
     if (!status || !reason || !date) {
       alert("Please fill in all required fields.");
       return;
     }
-  
+
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await fetch(`${API_BASE_URL}/employee/updateEmployeeStatus`, {
@@ -106,17 +103,17 @@ const UpdateEmployeeStatus = () => {
         body: JSON.stringify({
           employeeId: id,
           activityStatus,
-          insertedById:user.id,
+          insertedById: user.id,
           reasonOfTermination,
-          inserteDate: date.toISOString().split('T')[0], // Format: yyyy-mm-dd
+          inserteDate: date.toISOString().split('T')[0],
         }),
-      }); 
-  
+      });
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Failed to update status');
       }
-  
+
       alert('Status updated successfully!');
       navigation.goBack();
     } catch (error) {
@@ -124,7 +121,6 @@ const UpdateEmployeeStatus = () => {
       alert('Something went wrong. Please try again.');
     }
   };
-  
 
   if (loading) {
     return (
@@ -145,95 +141,86 @@ const UpdateEmployeeStatus = () => {
   const { employeeDetails, employeeStatusList } = data;
 
   return (
-    <PaperProvider contentContainerStyle= {{backgroundColor: "#fff"}}>
-      {/* <Appbar.Header> */}
-              {/* Header */}
-              <View style={styles.header}>
-                {/* <TouchableOpacity onPress={() => goBack()} style={styles.backButton}>
-                  <Ionicons name="chevron-back" size={28} color="#000" />
-                </TouchableOpacity> */}
-
-                 <Appbar.BackAction onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Employee <Text style={{ color: "#5aaf57" }}>Status</Text></Text>
+    <View style={{backgroundColor:"#fff" , flex:1,}}
+  >
+         <PaperProvider contentContainerStyle={{ backgroundColor: "#fff" }}>
+      <View style={styles.header}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Text style={styles.headerTitle}>Employee <Text style={{ color: "#5aaf57" }}>Status</Text></Text>
+      </View>
+      <ScrollView contentContainerStyle={[styles.container, { paddingBottom: 100 }]}>
+        <Card style={styles.card}>
+          <Card.Content>
+            <View style={styles.profileContainer}>
+              {employeeDetails?.profilePic ? (
+                <TouchableOpacity onPress={() => setModalVisiblePic(true)}>
+                  <Avatar.Image
+                    size={80}
+                    source={{
+                      uri: `data:image/*;base64,${employeeDetails.profilePic}`,
+                    }}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <Avatar.Icon size={80} icon="account" />
+              )}
+              <View style={styles.textContainer}>
+                <Text variant="titleLarge" style={styles.name}>
+                  {employeeDetails?.name || 'N/A'}
+                </Text>
+                <Text variant="bodyMedium" style={styles.designation}>
+                  {employeeDetails?.designation || 'N/A'}
+                </Text>
+                <Text variant="bodySmall" style={styles.department}>
+                  {employeeDetails?.department || 'Department not specified'}
+                </Text>
               </View>
-       
-        {/* <Appbar.Content title="Employee Status" /> */}
-      {/* </Appbar.Header> */}
-      <ScrollView contentContainerStyle={styles.container}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <View style={styles.profileContainer}>
-            {employeeDetails?.profilePic ? (
-             <TouchableOpacity onPress={() => setModalVisiblePic(true)}>
-             <Avatar.Image
-               size={80}
-               source={{
-                 uri: `data:image/*;base64,${employeeDetails.profilePic}`,
-               }}
-             />
-           </TouchableOpacity>
-         ) : (
-           <Avatar.Icon size={80} icon="account" />
-         )}
-            <View style={styles.textContainer}>
-              <Text variant="titleLarge" style={styles.name}>
-                {employeeDetails?.name || 'N/A'}
-              </Text>
-              <Text variant="bodyMedium" style={styles.designation}>
-                {employeeDetails?.designation || 'N/A'}
-              </Text>
-              <Text variant="bodySmall" style={styles.department}>
-                {employeeDetails?.department || 'Department not specified'}
-              </Text>
             </View>
-          </View>
 
-          <View style={styles.detailsContainer}>
-            <View style={styles.detailRow}>
-              <Text style={styles.label}>Employee ID:</Text>
-              <Text style={styles.value}>{employeeDetails?.usercode || 'N/A'}</Text>
+            <View style={styles.detailsContainer}>
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Employee ID:</Text>
+                <Text style={styles.value}>{employeeDetails?.usercode || 'N/A'}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Email:</Text>
+                <Text style={styles.value}>{employeeDetails?.email || 'N/A'}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Phone:</Text>
+                <Text style={styles.value}>{employeeDetails?.contact || 'N/A'}</Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Joining Date:</Text>
+                <Text style={styles.value}>
+                  {employeeDetails?.joiningDate
+                    ? (() => {
+                        const [year, month, day] = employeeDetails?.joiningDate.split('-');
+                        return `${day}-${month}-${year}`;
+                      })()
+                    : 'N/A'}
+                </Text>
+              </View>
+              <View style={styles.detailRow}>
+                <Text style={styles.label}>Current Status:</Text>
+                <Text style={styles.value}>{employeeDetails?.currentStatus || 'N/A'}</Text>
+              </View>
             </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.label}>Email:</Text>
-              <Text style={styles.value}>{employeeDetails?.email || 'N/A'}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.label}>Phone:</Text>
-              <Text style={styles.value}>{employeeDetails?.contact || 'N/A'}</Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.label}>Joining Date:</Text>
-              <Text style={styles.value}>
-              {employeeDetails?.joiningDate
-                ? (() => {
-                    const [year, month, day] = employeeDetails?.joiningDate.split('-');
-                    return `${day}-${month}-${year}`;
-                  })()
-                : 'N/A'}
-              </Text>
-            </View>
-            <View style={styles.detailRow}>
-              <Text style={styles.label}>Current Status:</Text>
-              <Text style={styles.value}>{employeeDetails?.currentStatus || 'N/A'}</Text>
-            </View>
-          </View>
 
-          {/* ✅ Moved button inside the Card */}
-          <Button
-            mode="contained"
-            style={[styles.historyButton, { marginTop: 16 }]}
-            onPress={() => setModalVisible(true)}
-          >
-            View Status History
-          </Button>
-        </Card.Content>
-      </Card>
+            <Button
+              mode="contained"
+              style={[styles.historyButton, { marginTop: 16 }]}
+              onPress={() => setModalVisible(true)}
+            >
+              View Status History
+            </Button>
+          </Card.Content>
+        </Card>
 
-      {employeeDetails?.currentStatus !== 'Terminate' ? (
-      <View style={styles.row}> 
-          <Text style={styles.label}>Activity Status<Text style={styles.red}> *</Text></Text>
-          <View style={styles.radioGroup}>
-              {/* Suspend: show if currentStatus is 'Active' or 'DeActivate' */}
+        {employeeDetails?.currentStatus !== 'Terminate' ? (
+          <View style={styles.row}>
+            <Text style={styles.label}>Activity Status<Text style={styles.red}> *</Text></Text>
+            <View style={styles.radioGroup}>
               {(employeeDetails?.currentStatus === 'Active' || employeeDetails?.currentStatus === 'DeActivate') && (
                 <View style={styles.radioOption}>
                   <RadioButton
@@ -244,8 +231,6 @@ const UpdateEmployeeStatus = () => {
                   <Text>Suspend</Text>
                 </View>
               )}
-
-              {/* Terminate: show if currentStatus is 'Suspend', 'Active', or 'DeActivate' */}
               {(employeeDetails?.currentStatus === 'Suspend' ||
                 employeeDetails?.currentStatus === 'Active' ||
                 employeeDetails?.currentStatus === 'DeActivate') && (
@@ -254,7 +239,6 @@ const UpdateEmployeeStatus = () => {
                     value="Terminate"
                     status={status === 'Terminate' ? 'checked' : 'unchecked'}
                     onPress={() => {
-                      // Optional confirmTerminate() logic
                       Alert.alert('Confirmation', 'Are you sure you want to terminate?', [
                         { text: 'Cancel' },
                         { text: 'OK', onPress: () => setStatus('Terminate') },
@@ -264,8 +248,6 @@ const UpdateEmployeeStatus = () => {
                   <Text>Terminate</Text>
                 </View>
               )}
-
-              {/* DeActivate: show only if currentStatus is 'Active' */}
               {employeeDetails?.currentStatus === 'Active' && (
                 <View style={styles.radioOption}>
                   <RadioButton
@@ -276,8 +258,6 @@ const UpdateEmployeeStatus = () => {
                   <Text>DeActivate</Text>
                 </View>
               )}
-
-              {/* Activate: show if currentStatus is 'Suspend' or 'DeActivate' */}
               {(employeeDetails?.currentStatus === 'Suspend' ||
                 employeeDetails?.currentStatus === 'DeActivate') && (
                 <View style={styles.radioOption}>
@@ -291,88 +271,86 @@ const UpdateEmployeeStatus = () => {
               )}
             </View>
 
-          <View style={styles.dateContainer}>
-            <Text style={styles.label}>Date of Action<Text style={styles.red}> *</Text></Text>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInput}>
-              <Text>{date.toLocaleDateString()}</Text>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={date}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setShowDatePicker(Platform.OS === 'ios');
-                  if (selectedDate) setDate(selectedDate);
-                }}
-              />
-            )}
-          </View>
+            <View style={styles.dateContainer}>
+              <Text style={styles.label}>Date of Action<Text style={styles.red}> *</Text></Text>
+              <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInput}>
+                <Text>{date.toLocaleDateString()}</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    setShowDatePicker(Platform.OS === 'ios');
+                    if (selectedDate) setDate(selectedDate);
+                  }}
+                />
+              )}
+            </View>
 
-          <Text style={styles.label}>Reason<Text style={styles.red}> *</Text></Text>
-          <TextInput
-            value={reason}
-            onChangeText={setReason}
-            placeholder="Enter reason"
-            multiline
-            numberOfLines={9}
-            style={styles.reasonInput}
-          />
-          <Button
-          mode="contained"
-          style={styles.submitButton}
-          onPress={handleSubmit}
-        >
-          Submit
-        </Button>
-      </View>
-      ) : (
-        <View style={styles.terminatedBox}>
-          <Text style={styles.terminatedText}>
-            You can't perform any action after termination.
-          </Text>
-          <Text style={styles.terminatedSubText}>
-            Please contact HR for further assistance.
-          </Text>
-        </View>
-      )}
-
-
-        {/* Zoomed-in Modal */}
-      <Modal
-        visible={modalVisiblePic}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        {employeeDetails?.profilePic ? (
-        <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisiblePic(false)}>
-          <View style={styles.imageWrapper}>
-            <Image
-              source={{
-                uri: `data:image/*;base64,${employeeDetails?.profilePic}`,
-              }}
-              style={styles.zoomedImage}
+            <Text style={styles.label}>Reason<Text style={styles.red}> *</Text></Text>
+            <TextInput
+              value={reason}
+              onChangeText={setReason}
+              placeholder="Enter reason"
+              multiline
+              numberOfLines={9}
+              style={styles.reasonInput}
             />
+            <Button
+              mode="contained"
+              style={styles.submitButton}
+              onPress={handleSubmit}
+            >
+              Submit
+            </Button>
           </View>
-        </TouchableOpacity>
         ) : (
-          <TouchableOpacity
-            onPress={() => {
-              Toast.show('No Image', {
-                duration: 5000,
-                position: Toast.positions.BOTTOM,
-                shadow: true,
-                animation: true,
-                hideOnPress: true,
-                delay: 0,
-              });
-            }}
-          >
-            <Avatar.Icon size={80} icon="account" />
-          </TouchableOpacity>
+          <View style={styles.terminatedBox}>
+            <Text style={styles.terminatedText}>
+              You can't perform any action after termination.
+            </Text>
+            <Text style={styles.terminatedSubText}>
+              Please contact HR for further assistance.
+            </Text>
+          </View>
         )}
-      </Modal>
+
+        <Modal
+          visible={modalVisiblePic}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setModalVisiblePic(false)}
+        >
+          {employeeDetails?.profilePic ? (
+            <TouchableOpacity style={styles.modalBackground} onPress={() => setModalVisiblePic(false)}>
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={{
+                    uri: `data:image/*;base64,${employeeDetails?.profilePic}`,
+                  }}
+                  style={styles.zoomedImage}
+                />
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                Toast.show('No Image', {
+                  duration: 5000,
+                  position: Toast.positions.BOTTOM,
+                  shadow: true,
+                  animation: true,
+                  hideOnPress: true,
+                  delay: 0,
+                });
+              }}
+            >
+              <Avatar.Icon size={80} icon="account" />
+            </TouchableOpacity>
+          )}
+        </Modal>
 
         <Portal>
           <Modal
@@ -385,28 +363,28 @@ const UpdateEmployeeStatus = () => {
               <View style={styles.modalContainer}>
                 <Text style={styles.modalTitle}>Status History</Text>
                 <ScrollView style={{ maxHeight: 300 }}>
-                <DataTable>
-                  <DataTable.Header>
-                    <DataTable.Title>Date</DataTable.Title>
-                    <DataTable.Title>Inserted By</DataTable.Title>
-                    <DataTable.Title>Status</DataTable.Title>
-                  </DataTable.Header>
-                  {employeeStatusList?.map((item, index) => (
-                    <DataTable.Row key={index}>
-                      <DataTable.Cell>
-                      {item.Date
-                        ? (() => {
-                            const [year, month, day] = item.Date.split('-');
-                            return `${day}-${month}-${year}`;
-                          })()
-                        : 'N/A'}
-                    </DataTable.Cell>
-                      <DataTable.Cell>{item.InsertedBy}</DataTable.Cell>
-                      <DataTable.Cell>{item.ActivityStatus}</DataTable.Cell>
-                    </DataTable.Row>
-                  ))}
-                </DataTable>
-              </ScrollView>
+                  <DataTable>
+                    <DataTable.Header>
+                      <DataTable.Title>Date</DataTable.Title>
+                      <DataTable.Title>Inserted By</DataTable.Title>
+                      <DataTable.Title>Status</DataTable.Title>
+                    </DataTable.Header>
+                    {employeeStatusList?.map((item, index) => (
+                      <DataTable.Row key={index}>
+                        <DataTable.Cell>
+                          {item.Date
+                            ? (() => {
+                                const [year, month, day] = item.Date.split('-');
+                                return `${day}-${month}-${year}`;
+                              })()
+                            : 'N/A'}
+                        </DataTable.Cell>
+                        <DataTable.Cell>{item.InsertedBy}</DataTable.Cell>
+                        <DataTable.Cell>{item.ActivityStatus}</DataTable.Cell>
+                      </DataTable.Row>
+                    ))}
+                  </DataTable>
+                </ScrollView>
 
                 <Button
                   mode="text"
@@ -421,8 +399,11 @@ const UpdateEmployeeStatus = () => {
         </Portal>
       </ScrollView>
     </PaperProvider>
+    </View>
+ 
   );
 };
+
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
@@ -453,12 +434,10 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 10,
     alignSelf: 'center',
-  },  
+  },
   container: {
-    // marginTop: 30,
     padding: 16,
     backgroundColor: '#fff',
-    
   },
   loadingContainer: {
     flex: 1,
@@ -466,7 +445,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    marginBottom: 16,
+    marginBottom: 10,
     borderRadius: 12,
     elevation: 1,
     backgroundColor: '#fff',
@@ -474,7 +453,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
-    shadowRadius: 4,    
+    shadowRadius: 4,
   },
   profileContainer: {
     flexDirection: 'row',
@@ -506,22 +485,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 6,
   },
-
   value: {
     color: '#666',
   },
   historyButton: {
     color: '#f44336',
-    borderRadius:5,
-    backgroundColor:'#5aaf57',
+    borderRadius: 5,
+    backgroundColor: '#5aaf57',
   },
   submitButton: {
     color: '#333',
-    borderRadius:5,
-    backgroundColor:'black',
+    borderRadius: 5,
+    backgroundColor: 'black',
     marginTop: 20,
   },
-
   red: {
     color: 'red',
   },
@@ -581,11 +558,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 3,
     marginBottom: 16,
-    elevation: 3,
   },
   terminatedBox: {
     padding: 16,
-    backgroundColor: '#ffe6e6',
+    backgroundColor: '#fff',
     borderColor: '#ff4d4d',
     borderWidth: 1,
     borderRadius: 10,
@@ -621,20 +597,13 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 125,
   },
-
-
   header: {
-    // position: "absolute",
     width: "100%",
-    // height: "10%",
-
     paddingHorizontal: 22,
-    paddingTop: 10,
-    // paddingBottom: 20,
-    // marginBottom: 30,
+    paddingTop: Platform.OS == "android" ? 20 : 60,
+    marginBottom: 30,
     backgroundColor: '#fff',
   },
 });
-  
 
 export default UpdateEmployeeStatus;

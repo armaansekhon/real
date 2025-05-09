@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -35,6 +35,13 @@ const CustomDrawer = ({ navigation }) => {
   const { user } = useUser();
   const { logout, loading } = useLogin();
 
+  // Set initial active tab when component mounts
+  useEffect(() => {
+    if (modules.length > 0) {
+      setClickedItem(modules[0].name); // Set first module as active initially
+    }
+  }, [modules]);
+
   const toggleExpand = (moduleName) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedItems((prev) => ({
@@ -46,6 +53,7 @@ const CustomDrawer = ({ navigation }) => {
   const handleItemClick = (module) => {
     setClickedItem(module.name);
     router.push(module.path);
+    navigation.closeDrawer(); // Close the drawer after navigation
   };
 
   const handleLogout = () => {
@@ -83,9 +91,9 @@ const CustomDrawer = ({ navigation }) => {
               onPress={() => toggleExpand(module.name)}
             >
               {module.icon ? (
-                <module.icon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+                <module.icon width={24} height={24} fill={isClicked ? "#4CAF50" : "#000"} />
               ) : (
-                <FolderIcon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+                <FolderIcon width={24} height={24} fill={isClicked ? "#4CAF50" : "#000"} />
               )}
               <Text
                 style={[
@@ -122,9 +130,9 @@ const CustomDrawer = ({ navigation }) => {
           onPress={() => handleItemClick(module)}
         >
           {module.icon ? (
-            <module.icon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+            <module.icon width={24} height={24} fill={isClicked ? "#4CAF50" : "#000"} />
           ) : (
-            <FolderIcon width={24} height={24} fill={isClicked ? "#5aaf57" : "#000"} />
+            <FolderIcon width={24} height={24} fill={isClicked ? "#4CAF50" : "#000"} />
           )}
           <Text
             style={[
@@ -141,7 +149,7 @@ const CustomDrawer = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.drawerContainer}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
           <LottieView
             source={require('../assets/svg/reales2.json')}
@@ -179,7 +187,6 @@ const CustomDrawer = ({ navigation }) => {
 const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
-    backgroundColor: "#f0fff0",
     paddingVertical: 20,
     paddingHorizontal: 15,
   },
@@ -192,7 +199,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: Platform.OS === "ios" ? 75 : 30,
     paddingBottom: 20,
-    backgroundColor: "#f8f9fa",
     top: 0,
     left: 0,
     right: 0,
@@ -216,7 +222,7 @@ const styles = StyleSheet.create({
     fontFamily: "PlusR",
   },
   adminText: {
-    color: "#5aaf57",
+    color: "#4CAF50",
     fontFamily: "PlusL",
   },
   designation: {
@@ -228,13 +234,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    marginLeft:10,
     marginBottom: 10,
     backgroundColor: "transparent",
   },
   clickedDrawerItem: {
-    backgroundColor: "white",
+    backgroundColor: "rgba(76, 175, 80, 0.15)", // More natural green with reduced opacity
+    width: "95%", // Slightly reduced width for active tab
   },
   drawerItemText: {
     marginLeft: 10,
@@ -243,7 +251,7 @@ const styles = StyleSheet.create({
     fontFamily: "PlusR",
   },
   clickedDrawerItemText: {
-    color: "#5aaf57",
+    color: "#4CAF50",
     fontFamily: "PlusSB",
   },
   nestedItems: {
@@ -262,8 +270,7 @@ const styles = StyleSheet.create({
     marginBottom: Platform.OS === "ios" ? 50 : 10,
   },
   loginButtonText: {
-    color: "#444",
-    fontSize: 16,
+    fontSize: 20,
     paddingLeft: 10,
     fontFamily: "PlusSB",
   },
