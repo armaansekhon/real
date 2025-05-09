@@ -40,7 +40,7 @@ const ManageLeads = () => {
       setLoading(true);
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const res = await fetch(
-        'http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/getAllCustomerLeads',
+        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/getAllCustomerLeads',
         {
           method: 'GET',
           headers: {
@@ -61,13 +61,13 @@ const ManageLeads = () => {
 
   const deleteLead = async (leadId) => {
     try {
-      // const secretKey = await SecureStore.getItemAsync('auth_token');
+      const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.delete(
-        `http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/realestateCustomerLeadDelete?id=${leadId}`,
+        `http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/realestateCustomerLeadDelete?id=${leadId}`,
         {
           headers: {
             'Content-Type': 'application/json',
-            // 'secret_key': secretKey,
+            'secret_key': secretKey,
           },
         }
       );

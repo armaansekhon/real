@@ -45,7 +45,7 @@ const UpdateLead = () => {
 
   const [leadDate, setLeadDate] = useState(new Date());
   const [showLeadDatePicker, setShowLeadDatePicker] = useState(false);
-  const [dob, setDob] = useState(null); // Changed to null initially
+  const [dob, setDob] = useState(null);
   const [showDobPicker, setShowDobPicker] = useState(false);
 
   const [leadSourceOpen, setLeadSourceOpen] = useState(false);
@@ -53,7 +53,7 @@ const UpdateLead = () => {
   const [leadSourceItems, setLeadSourceItems] = useState([
     { label: 'Referral', value: 'referral' },
     { label: 'Online', value: 'online' },
-    { label: 'Walk In', value: 'walkin' }, // Changed to match received data
+    { label: 'Walk In', value: 'walkin' },
   ]);
 
   const [genderOpen, setGenderOpen] = useState(false);
@@ -78,6 +78,11 @@ const UpdateLead = () => {
     addressLine2: '',
   });
 
+  const [errors, setErrors] = useState({});
+
+  // Store parsed lead data to use in fetch functions
+  const [parsedLeadData, setParsedLeadData] = useState(null);
+
   // Prefill form with leadData
   useEffect(() => {
     if (!leadData) {
@@ -87,10 +92,11 @@ const UpdateLead = () => {
       return;
     }
 
-    let parsedLeadData;
+    let parsedData;
     try {
-      parsedLeadData = JSON.parse(leadData);
-      console.log('Parsed leadData:', parsedLeadData);
+      parsedData = JSON.parse(leadData);
+      console.log('Parsed leadData:', parsedData);
+      setParsedLeadData(parsedData);
     } catch (e) {
       console.error('Error parsing leadData:', e);
       Alert.alert('Error', 'Failed to parse lead data. Please try again.');
@@ -99,57 +105,56 @@ const UpdateLead = () => {
     }
 
     setForm({
-      firstName: parsedLeadData.name?.split(' ')[0] || '',
-      middleName: parsedLeadData.middleName || '',
-      lastName: parsedLeadData.lastName || parsedLeadData.name?.split(' ').slice(1).join(' ') || '',
-      mobileNo: parsedLeadData.mobileNo || '',
-      emailID: parsedLeadData.emailID || '',
-      fatherName: parsedLeadData.fatherName || '',
-      motherName: parsedLeadData.motherName || '',
-      city: parsedLeadData.city || '',
-      addressLine1: parsedLeadData.address1 || '',
-      addressLine2: parsedLeadData.address2 || '',
+      firstName: parsedData.name?.split(' ')[0] || '',
+      middleName: parsedData.middleName || '',
+      lastName: parsedData.lastName || parsedData.name?.split(' ').slice(1).join(' ') || '',
+      mobileNo: parsedData.mobileNo || '',
+      emailID: parsedData.emailID || '',
+      fatherName: parsedData.fatherName || '',
+      motherName: parsedData.motherName || '',
+      city: parsedData.city || '',
+      addressLine1: parsedData.address1 || '',
+      addressLine2: parsedData.address2 || '',
     });
 
-    setCountryValue(parsedLeadData.countryId || null);
-    setStateValue(parsedLeadData.stateId || null);
-    setDistrictValue(parsedLeadData.districtId || null);
+    setCountryValue(parsedData.countryId || null);
+    setStateValue(parsedData.stateId || null);
 
     const leadSourceMatch = leadSourceItems.find(item => 
-      item.label.toLowerCase() === parsedLeadData.leadFrom?.toLowerCase()
+      item.label.toLowerCase() === parsedData.leadFrom?.toLowerCase()
     );
-    setLeadSourceValue(leadSourceMatch ? leadSourceMatch.value : parsedLeadData.leadFrom || null);
+    setLeadSourceValue(leadSourceMatch ? leadSourceMatch.value : parsedData.leadFrom || null);
 
     const genderMatch = genderItems.find(item => 
-      item.value.toLowerCase() === parsedLeadData.gender?.toLowerCase()
+      item.value.toLowerCase() === parsedData.gender?.toLowerCase()
     );
-    setGenderValue(genderMatch ? genderMatch.value : parsedLeadData.gender || null);
+    setGenderValue(genderMatch ? genderMatch.value : parsedData.gender || null);
 
-    if (parsedLeadData.leadGenerationDate) {
-      const leadGenDate = new Date(parsedLeadData.leadGenerationDate);
+    if (parsedData.leadGenerationDate) {
+      const leadGenDate = new Date(parsedData.leadGenerationDate);
       if (!isNaN(leadGenDate.getTime())) {
         setLeadDate(leadGenDate);
       }
     }
 
-    if (parsedLeadData.dob) {
-      const dobDate = new Date(parsedLeadData.dob);
+    if (parsedData.dob) {
+      const dobDate = new Date(parsedData.dob);
       if (!isNaN(dobDate.getTime())) {
         setDob(dobDate);
       }
     }
 
-    if (parsedLeadData.profile) {
-      setImage(`data:image/jpeg;base64,${parsedLeadData.profile}`);
+    if (parsedData.profile) {
+      setImage(`data:image/jpeg;base64,${parsedData.profile}`);
     }
 
     setAddressNeeded(
-      !!parsedLeadData.city || 
-      !!parsedLeadData.address1 || 
-      !!parsedLeadData.address2 || 
-      !!parsedLeadData.country || 
-      !!parsedLeadData.state || 
-      !!parsedLeadData.district
+      !!parsedData.city || 
+      !!parsedData.address1 || 
+      !!parsedData.address2 || 
+      !!parsedData.country || 
+      !!parsedData.state || 
+      !!parsedData.district
     );
   }, [leadData, leadSourceItems, genderItems]);
 
@@ -173,10 +178,11 @@ const UpdateLead = () => {
         }));
         setCountryItems(formattedCountries);
 
-        const leadRes = await fetch('http://192.168.6.210:8000/pipl/api/v1/leadFromCustomer/getAllLeadFromData', {
+        const leadRes = await fetch('http://192.168.6.210:8686/pipl/api/v1/leadFromCustomer/getAllLeadFromData', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'secret_key': secretKey,
           },
         });
         const leadData = await leadRes.json();
@@ -214,14 +220,18 @@ const UpdateLead = () => {
         }));
 
         setStateItems(formatted);
-        setStateValue(null);
+        if (parsedLeadData && parsedLeadData.countryId === countryValue) {
+          setStateValue(parsedLeadData.stateId || null);
+        } else {
+          setStateValue(null);
+        }
       } catch (err) {
         console.error('Error fetching states:', err);
       }
     };
 
     fetchStates();
-  }, [countryValue]);
+  }, [countryValue, parsedLeadData]);
 
   useEffect(() => {
     const fetchDistricts = async () => {
@@ -244,14 +254,19 @@ const UpdateLead = () => {
         }));
 
         setDistrictItems(formatted);
-        setDistrictValue(null);
+        if (parsedLeadData && parsedLeadData.stateId === stateValue) {
+          console.log("Setting districtValue to:", parsedLeadData.districtId);
+          setDistrictValue(parsedLeadData.districtId || null);
+        } else {
+          setDistrictValue(null);
+        }
       } catch (err) {
         console.error('Error fetching districts:', err);
       }
     };
 
     fetchDistricts();
-  }, [stateValue]);
+  }, [stateValue, parsedLeadData]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -275,11 +290,58 @@ const UpdateLead = () => {
 
   const handleChange = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: '' }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!leadDate || isNaN(leadDate.getTime())) {
+      newErrors.leadDate = 'Lead Date is required';
+    }
+
+    if (!form.firstName.trim()) {
+      newErrors.firstName = 'First Name is required';
+    }
+
+    if (!genderValue) {
+      newErrors.gender = 'Gender is required';
+    }
+
+    if (!form.mobileNo.trim() && !form.emailID.trim()) {
+      newErrors.contactInfo = 'At least one of Mobile or Email is required';
+    } else {
+      if (form.mobileNo && !form.mobileNo.match(/^\d{10}$/)) {
+        newErrors.mobileNo = 'Mobile number must be 10 digits';
+      }
+      if (form.emailID && !form.emailID.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        newErrors.emailID = 'Enter a valid email address';
+      }
+    }
+
+    if (addressNeeded) {
+      if (!countryValue) {
+        newErrors.country = 'Country is required';
+      }
+      if (!stateValue) {
+        newErrors.state = 'State is required';
+      }
+      if (!districtValue) {
+        newErrors.district = 'District is required';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleUpdate = async () => {
     if (!leadData) {
       Alert.alert('Error', 'Lead data is missing.');
+      return;
+    }
+
+    if (!validateForm()) {
       return;
     }
 
@@ -323,12 +385,12 @@ const UpdateLead = () => {
 
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.post(
-        'http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/addRealestateCustomerLead',
+        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/addRealestateCustomerLead',
         payload,
         {
           headers: {
             'Content-Type': 'application/json',
-            // 'secret_key': token if needed
+            'secret_key': secretKey
           }
         }
       );
@@ -373,10 +435,17 @@ const UpdateLead = () => {
             )}
           </TouchableOpacity>
 
-          <Text style={styles.label}>Lead Date</Text>
-          <TouchableOpacity style={styles.input} onPress={() => setShowLeadDatePicker(true)}>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>Lead Date</Text>
+            <Text style={styles.required}>*</Text>
+          </View>
+          <TouchableOpacity 
+            style={[styles.input, errors.leadDate && styles.inputError]} 
+            onPress={() => setShowLeadDatePicker(true)}
+          >
             <Text>{moment(leadDate).format('MM/DD/YYYY')}</Text>
           </TouchableOpacity>
+          {errors.leadDate && <Text style={styles.errorText}>{errors.leadDate}</Text>}
           <Modal visible={showLeadDatePicker} transparent animationType="slide">
             <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: '#00000088' }}>
               <View style={{ backgroundColor: 'white', padding: 16, borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
@@ -386,7 +455,10 @@ const UpdateLead = () => {
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                   onChange={(event, selectedDate) => {
                     setShowLeadDatePicker(false);
-                    if (selectedDate) setLeadDate(selectedDate);
+                    if (selectedDate) {
+                      setLeadDate(selectedDate);
+                      setErrors(prev => ({ ...prev, leadDate: '' }));
+                    }
                   }}
                 />
               </View>
@@ -405,16 +477,21 @@ const UpdateLead = () => {
               placeholder="Select Lead Source"
               listMode="SCROLLVIEW"
               zIndex={800}
+              style={[styles.dropdown]}
+              dropDownContainerStyle={styles.dropDownContainer}
             />
           </View>
 
-          <Text style={styles.label}>First & Middle Name</Text>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>First & Middle Name</Text>
+            <Text style={styles.required}>*</Text>
+          </View>
           <View style={styles.row}>
             <TextInput
               placeholder="First Name"
               value={form.firstName}
               onChangeText={text => handleChange('firstName', text)}
-              style={styles.input}
+              style={[styles.input, errors.firstName && styles.inputError]}
             />
             <TextInput
               placeholder="Middle Name"
@@ -423,6 +500,7 @@ const UpdateLead = () => {
               style={styles.input}
             />
           </View>
+          {errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
 
           <Text style={styles.label}>Last Name</Text>
           <TextInput
@@ -432,38 +510,56 @@ const UpdateLead = () => {
             style={styles.input}
           />
 
-          <Text style={styles.label}>Gender</Text>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>Gender</Text>
+            <Text style={styles.required}>*</Text>
+          </View>
           <View style={{ zIndex: 900, marginTop: 4 }}>
             <DropDownPicker
               open={genderOpen}
               value={genderValue}
               items={genderItems}
               setOpen={setGenderOpen}
-              setValue={setGenderValue}
+              setValue={(callback) => {
+                const value = callback();
+                setGenderValue(value);
+                setErrors(prev => ({ ...prev, gender: '' }));
+              }}
               setItems={setGenderItems}
               placeholder="Select Gender"
               placeholderStyle={styles.dropplace}
               listMode="SCROLLVIEW"
+              style={[styles.dropdown, errors.gender && styles.inputError]}
+              dropDownContainerStyle={styles.dropDownContainer}
             />
           </View>
+          {errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
 
-          <Text style={styles.label}>Contact Info</Text>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>Contact Info</Text>
+            <Text style={styles.required}>*</Text>
+          </View>
           <View style={styles.row}>
             <TextInput
               placeholder="Mobile"
               value={form.mobileNo}
               onChangeText={text => handleChange('mobileNo', text)}
-              style={styles.input}
+              style={[styles.input, errors.mobileNo && styles.inputError]}
               keyboardType="phone-pad"
             />
             <TextInput
               placeholder="Email"
               value={form.emailID}
               onChangeText={text => handleChange('emailID', text)}
-              style={styles.input}
+              style={[styles.input, errors.emailID && styles.inputError]}
               keyboardType="email-address"
             />
           </View>
+          {(errors.contactInfo || errors.mobileNo || errors.emailID) && (
+            <Text style={styles.errorText}>
+              {errors.contactInfo || errors.mobileNo || errors.emailID}
+            </Text>
+          )}
 
           <Text style={styles.label}>Father's Name</Text>
           <TextInput
@@ -519,50 +615,80 @@ const UpdateLead = () => {
 
           {addressNeeded && (
             <>
-              <Text style={styles.label}>Country</Text>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>Country</Text>
+                <Text style={styles.required}>*</Text>
+              </View>
               <View style={{ zIndex: 800, marginTop: 4 }}>
                 <DropDownPicker
                   open={countryOpen}
                   value={countryValue}
                   items={countryItems}
                   setOpen={setCountryOpen}
-                  setValue={setCountryValue}
+                  setValue={(callback) => {
+                    const value = callback();
+                    setCountryValue(value);
+                    setErrors(prev => ({ ...prev, country: '' }));
+                  }}
                   setItems={setCountryItems}
                   placeholder="Select Country"
                   listMode="SCROLLVIEW"
                   zIndex={800}
+                  style={[styles.dropdown, errors.country && styles.inputError]}
+                  dropDownContainerStyle={styles.dropDownContainer}
                 />
               </View>
+              {errors.country && <Text style={styles.errorText}>{errors.country}</Text>}
 
-              <Text style={styles.label}>State</Text>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>State</Text>
+                <Text style={styles.required}>*</Text>
+              </View>
               <View style={{ zIndex: 700, marginTop: 4 }}>
                 <DropDownPicker
                   open={stateOpen}
                   value={stateValue}
                   items={stateItems}
                   setOpen={setStateOpen}
-                  setValue={setStateValue}
+                  setValue={(callback) => {
+                    const value = callback();
+                    setStateValue(value);
+                    setErrors(prev => ({ ...prev, state: '' }));
+                  }}
                   setItems={setStateItems}
                   placeholder="Select State"
                   listMode="SCROLLVIEW"
                   zIndex={700}
+                  style={[styles.dropdown, errors.state && styles.inputError]}
+                  dropDownContainerStyle={styles.dropDownContainer}
                 />
               </View>
+              {errors.state && <Text style={styles.errorText}>{errors.state}</Text>}
 
-              <Text style={styles.label}>District</Text>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>District</Text>
+                <Text style={styles.required}>*</Text>
+              </View>
               <View style={{ zIndex: 600, marginTop: 4 }}>
                 <DropDownPicker
                   open={districtOpen}
                   value={districtValue}
                   items={districtItems}
                   setOpen={setDistrictOpen}
-                  setValue={setDistrictValue}
+                  setValue={(callback) => {
+                    const value = callback();
+                    setDistrictValue(value);
+                    setErrors(prev => ({ ...prev, district: '' }));
+                  }}
                   setItems={setDistrictItems}
                   placeholder="Select District"
                   listMode="SCROLLVIEW"
                   zIndex={700}
+                  style={[styles.dropdown, errors.district && styles.inputError]}
+                  dropDownContainerStyle={styles.dropDownContainer}
                 />
               </View>
+              {errors.district && <Text style={styles.errorText}>{errors.district}</Text>}
 
               <Text style={styles.label}>City</Text>
               <TextInput
@@ -607,6 +733,16 @@ const styles = {
     backgroundColor: '#fff',
     flex: 1,
   },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+  },
+  inputError: {
+    borderColor: 'red',
+  },
   radioBtn: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -634,6 +770,10 @@ const styles = {
     marginTop: 20,
     marginBottom: 40,
   },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   label: {
     fontSize: 14,
     marginBottom: 4,
@@ -642,10 +782,27 @@ const styles = {
     fontFamily: 'PlusSB',
     marginLeft: 8,
   },
+  required: {
+    color: 'red',
+    fontSize: 14,
+    marginLeft: 4,
+  },
   dropplace: {
     color: '#777',
     fontSize: 14,
     fontFamily: 'PlusR',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginLeft: 8,
+    marginTop: 4,
+  },
+  dropDownContainer: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#fff',
   },
 };
 

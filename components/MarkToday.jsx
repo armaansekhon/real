@@ -7,14 +7,10 @@ import {
   StyleSheet,
   Modal,
   Platform,
-  ScrollView,
   TextInput,
-  SafeAreaView,
-  TouchableWithoutFeedback,
   Keyboard,
- 
   InteractionManager,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
@@ -24,55 +20,58 @@ import useEmployeeList from '../hooks/useEmployeeList';
 import useSaveAttendance from '../hooks/useSaveAttendence';
 import { Alert } from 'react-native';
 
-
-
-
 const MarkToday = ({ onBack }) => {
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [attendanceData, setAttendanceData] = useState({});
-  const [Search, setSearch] = useState('');
+  const [search, setSearch] = useState('');
   const { employees, loading: empLoading } = useEmployeeList();
-  const [filteredEmployees, SetFilteredEmployees] = useState([]);
-  
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
   const { notations, loading } = useAttendanceNotations();
   const saveAttendance = useSaveAttendance();
-  
 
   useEffect(() => {
-    if (Search.trim() === '') {
-      SetFilteredEmployees(employees);
-    } else {
-      const lowerQuery = Search.toLowerCase();
-      const filtered = employees.filter((emp) =>
-        emp.name.toLowerCase().includes(lowerQuery)
-      );
-      SetFilteredEmployees(filtered);
+    setFilteredEmployees(employees || []);
+  }, [employees]);
+
+  const handleSearch = (query) => {
+    setSearch(query);
+    if (!employees) {
+      setFilteredEmployees([]);
+      return;
     }
-  }, [Search, employees]);
+
+    if (query.trim() === '') {
+      setFilteredEmployees(employees);
+    } else {
+      const lowerQuery = query.toLowerCase();
+      const filtered = employees.filter((emp) => {
+        if (!emp || !emp.name) {
+          return false;
+        }
+        return emp.name.toLowerCase().includes(lowerQuery);
+      });
+      setFilteredEmployees(filtered);
+    }
+  };
+
   useEffect(() => {
-    if (!loading && employees.length && notations.length) {
+    if (!loading && employees?.length && notations?.length) {
       const mappedAttendance = {};
-  
       employees.forEach((emp) => {
+        if (!emp || !emp.attendance) {
+          return;
+        }
         const matchedNotation = notations.find(
-          (note) => note.color.toLowerCase() === emp.attendance.toLowerCase()
+          (note) => note?.color?.toLowerCase() === emp.attendance?.toLowerCase()
         );
-  
         if (matchedNotation) {
           mappedAttendance[emp.id] = matchedNotation.description;
         }
       });
-  
       setAttendanceData(mappedAttendance);
     }
   }, [employees, notations, loading]);
-
-  // useEffect(() => {
-  //   const formatted = moment(date).format('YYYY-MM-DD');
-  //   const prev = previousAttendance[formatted];
-  //   setAttendanceData(prev || {});
-  // }, [date]);
 
   const handleStatusSelect = (empId, status) => {
     setAttendanceData((prev) => ({
@@ -83,69 +82,65 @@ const MarkToday = ({ onBack }) => {
 
   const handleSubmit = async () => {
     try {
-      // Step 1: Build an array of all attendance records
-      const attendanceList = Object.entries(attendanceData).map(([empId, statusDesc]) => {
-        const matchedNotation = notations.find(
-          (note) => note.description.toLowerCase() === statusDesc.toLowerCase()
-        );
-  
-        if (!matchedNotation) {
-          console.warn(`No matching notation for status: ${statusDesc}`);
-          return null; // filter out later
-        }
-  
-        return {
-          employeeId: empId,
-          colorCode: matchedNotation.color,
-        };
-      }).filter(Boolean); // Remove any nulls
-  
-      // Step 2: Send all at once
+      const attendanceList = Object.entries(attendanceData)
+        .map(([empId, statusDesc]) => {
+          const matchedNotation = notations.find(
+            (note) => note?.description?.toLowerCase() === statusDesc?.toLowerCase()
+          );
+          if (!matchedNotation) {
+            console.warn(`No matching notation for status: ${statusDesc}`);
+            return null;
+          }
+          return {
+            employeeId: empId,
+            colorCode: matchedNotation.color,
+          };
+        })
+        .filter(Boolean);
+
       await saveAttendance(attendanceList);
-  
-      // Alert.alert('Success', 'Attendance saved successfully!');
       InteractionManager.runAfterInteractions(() => {
         Alert.alert('Success', 'Attendance saved successfully!');
       });
-      
     } catch (error) {
       console.error('Failed to save all attendance:', error);
+      Alert.alert('Error', 'Failed to save attendance. Please try again.');
     }
   };
-  
+
   const renderLegend = () => (
     <View style={styles.legendRow}>
-      {notations.map((item) => (
-        <View key={item.id} style={styles.legendItem}>
-          <View style={[styles.legendBox, { backgroundColor: item.color }]} />
-          <Text style={styles.legendText}>{item.description}</Text>
+      {notations?.map((item) => (
+        <View key={item?.id} style={styles.legendItem}>
+          <View style={[styles.legendBox, { backgroundColor: item?.color }]} />
+          <Text style={styles.legendText}>{item?.description}</Text>
         </View>
       ))}
     </View>
   );
 
   const renderEmployeeRow = ({ item }) => {
-    const currentStatus = attendanceData[item.id];
-
+    const currentStatus = attendanceData[item?.id];
     return (
       <View style={styles.tableRow}>
         <View style={{ flex: 3 }}>
-          <Text style={styles.nameText}>{item.name}</Text>
+          <Text style={styles.nameText}>{item?.name || 'Unknown'}</Text>
         </View>
-        <View style={styles.statusGroup}>
-          {notations.map((statusItem) => (
+        <View style={styles.statusGroup} pointerEvents="box-none">
+          {notations?.map((statusItem) => (
             <TouchableOpacity
-              key={statusItem.description}
+              key={statusItem?.description}
               style={[
                 styles.statusCircle,
                 {
-                  backgroundColor: statusItem.color,
-                  opacity: currentStatus === statusItem.description ? 1 : 0.4,
+                  backgroundColor: statusItem?.color,
+                  opacity: currentStatus === statusItem?.description ? 1 : 0.4,
                 },
               ]}
-              onPress={() => handleStatusSelect(item.id, statusItem.description)}
+              activeOpacity={0.7}
+              onPress={() => handleStatusSelect(item?.id, statusItem?.description)}
             >
-              {currentStatus === statusItem.description && (
+              {currentStatus === statusItem?.description && (
                 <Ionicons name="checkmark" size={26} color="#fff" />
               )}
             </TouchableOpacity>
@@ -154,11 +149,12 @@ const MarkToday = ({ onBack }) => {
       </View>
     );
   };
-  
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <View style={styles.container}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <Ionicons style={styles.backText} name="chevron-back" size={24} color="black" />
@@ -167,21 +163,22 @@ const MarkToday = ({ onBack }) => {
         <Text style={styles.header}>
           Mark <Text style={styles.highlight}>Attendance</Text>
         </Text>
-        <Text style={{ color: "#444",marginBottom:20, fontFamily: "PlusR" }}>Mark  Todays Attendance</Text>
+        <Text style={{ color: '#444', marginBottom: 20, fontFamily: 'PlusR' }}>
+          Mark Today's Attendance
+        </Text>
 
-        {/* <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.dateBtn}>
-          <Text style={styles.dateText}>{moment(date).format('MMMM D, YYYY')}</Text>
-        </TouchableOpacity> */}
-
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#888" style={{ marginRight: 8 }} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by name"
-            value={Search}
-            onChangeText={setSearch}
-          />
-        </View>
+        <TouchableOpacity onPress={Keyboard.dismiss} activeOpacity={1}>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#888" style={{ marginRight: 8 }} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search by name"
+              value={search}
+              onChangeText={handleSearch}
+              autoCapitalize="none"
+            />
+          </View>
+        </TouchableOpacity>
 
         <Modal visible={showPicker} transparent animationType="fade">
           <View style={styles.modalOverlay}>
@@ -208,22 +205,23 @@ const MarkToday = ({ onBack }) => {
           showsVerticalScrollIndicator={false}
           style={styles.list}
           data={filteredEmployees}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item?.id?.toString() || Math.random().toString()}
           renderItem={renderEmployeeRow}
           initialNumToRender={10}
-          contentContainerStyle={{ paddingBottom: 100 }}
-            keyboardShouldPersistTaps="handled"
-            windowSize={5}
-  maxToRenderPerBatch={10}
-  removeClippedSubviews={true}
+          contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          scrollEnabled={true}
+          onStartShouldSetResponder={() => true}
+          windowSize={5}
+          maxToRenderPerBatch={10}
+          removeClippedSubviews={true}
         />
 
         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
           <Text style={styles.submitText}>Save Attendance</Text>
         </TouchableOpacity>
       </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -231,8 +229,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 18, backgroundColor: '#fff' },
   backButton: { marginBottom: 10 },
   backText: { color: '#000', fontSize: 26, fontWeight: '1200' },
-  header: { fontSize: 32, color: '#111', marginBottom: 10 , fontFamily:"PlusSB" },
-  highlight: { fontFamily:"PlusSB",color: '#5aaf57' },
+  header: { fontSize: 32, color: '#111', marginBottom: 10, fontFamily: 'PlusSB' },
+  highlight: { fontFamily: 'PlusSB', color: '#5aaf57' },
   dateBtn: {
     paddingVertical: 15,
     paddingHorizontal: 20,
@@ -241,7 +239,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 12,
   },
-  dateText: { fontSize: 18, fontFamily: "PlusSB", color: '#111' },
+  dateText: { fontSize: 18, fontFamily: 'PlusSB', color: '#111' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.3)',
@@ -265,6 +263,7 @@ const styles = StyleSheet.create({
   doneText: { color: '#fff', fontWeight: '600' },
   list: {
     marginTop: 40,
+    flex: 1,
   },
   legendRow: {
     flexDirection: 'row',
@@ -285,18 +284,19 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginRight: 8,
   },
-  legendText: { fontSize: 15, fontFamily: "PlusR", color: '#222' },
+  legendText: { fontSize: 15, fontFamily: 'PlusR', color: '#222' },
   tableRow: {
     flexDirection: 'row',
     paddingVertical: 12,
     borderBottomWidth: 0.5,
     borderColor: '#eee',
     alignItems: 'center',
+    width: '100%',
   },
   nameText: {
     fontSize: 17,
     color: '#222',
-    fontFamily: "PlusR",
+    fontFamily: 'PlusR',
   },
   statusGroup: {
     flex: 4,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#111',
-    fontFamily: "PlusR"
+    fontFamily: 'PlusR',
   },
   submitBtn: {
     position: 'absolute',
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   submitText: {
     color: '#000',
     fontSize: 19,
-    fontFamily: "PlusR"
+    fontFamily: 'PlusR',
   },
 });
 

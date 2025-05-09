@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import LottieView from 'lottie-react-native';
 import moment from 'moment';
@@ -8,7 +8,6 @@ import useFetchAttendance from '../hooks/useFetchAttendance';
 import * as SecureStore from 'expo-secure-store';
 
 const { width, height } = Dimensions.get('window');
-
 
 const AttendanceCard = () => {
   const [clock, setClock] = useState('');
@@ -22,13 +21,11 @@ const AttendanceCard = () => {
   const { postAttendance } = usePostAttendance();
   const { attendance, loading, error, refetch } = useFetchAttendance();
 
-
   const loadDate = async () => {
     try {
       const currentDayDate = await SecureStore.getItemAsync('currentDayDate');
       const formattedDate = moment(currentDayDate).format('dddd, MMMM DD, YYYY');
       setDate(formattedDate);
-
     } catch (e) {
       console.error('Date formatting error:', e);
     }
@@ -38,30 +35,33 @@ const AttendanceCard = () => {
     loadDate();
     const interval = setInterval(() => {
       setClock(moment().format('hh:mm A'));
-      // setDate(formattedDate);
     }, 1000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     if (attendance) {
-      if (attendance.checkIn) {
-        setClickInTime(attendance.checkIn);
+      setClickInTime(attendance.checkIn || null);
+      setClickOutTime(attendance.checkOut || null);
+      setHoursWorked(attendance.workedHoursAndMins || '');
+      const hasCheckIn = !!attendance.checkIn;
+      const hasCheckOut = !!attendance.checkOut;
+
+      if (hasCheckOut) {
+        // Checked out: grey and disabled (frame 60)
+        setClickedIn(false);
+        animationRef.current?.play(30, 60);
+      } else if (hasCheckIn) {
+        // Checked in: blue (frame 30)
         setClickedIn(true);
         animationRef.current?.play(0, 30);
-      }
-      if (attendance.checkOut) {
-        setClickOutTime(attendance.checkOut);
+      } else {
+        // No attendance: grey (frame 0)
         setClickedIn(false);
-        animationRef.current?.play(60, 0);
+        animationRef.current?.reset();
       }
-      if (attendance.workedHoursAndMins) {
-        setHoursWorked(attendance.workedHoursAndMins);
-      }
-      animationRef.current?.play(10, 0);
     }
   }, [attendance]);
-  
 
   const handleClick = async () => {
     if (clickedIn) {
@@ -88,19 +88,44 @@ const AttendanceCard = () => {
       console.log('Permission to access location was denied');
       return;
     }
-  
+
     const location = await Location.getCurrentPositionAsync({});
     const { latitude, longitude } = location.coords;
-  
+
+    if (!clickedIn) {
+      // Clicking in: play grey to blue
+      animationRef.current?.play(0, 30);
+      setClickedIn(true);
+    } else {
+      // Clicking out: play blue to grey
+      animationRef.current?.play(30, 60);
+      setClickedIn(false);
+    }
+
     await postAttendance({ latitude, longitude });
-  
-    // Don't manually set clickIn/out or hoursWorked here!
-    // Let refetch do its job after backend returns latest status
-    await refetch(); 
+    await refetch();
   };
-  
 
   const isButtonDisabled = !!clickOutTime;
+
+  if (loading) {
+    return (
+      <View style={styles.card}>
+        <ActivityIndicator size="large" color="#5aaf57" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.card}>
+        <Text style={styles.errorText}>Error loading attendance: {error}</Text>
+        <TouchableOpacity onPress={refetch} style={styles.retryButton}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.card}>
@@ -167,6 +192,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
     marginTop: 10,
+    justifyContent: 'center',
   },
   clock: {
     fontSize: 26,
@@ -214,6 +240,24 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusSB',
     color: '#222',
     marginTop: 4,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#FF0000',
+    fontFamily: 'PlusR',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  retryButton: {
+    backgroundColor: '#5aaf57',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'PlusSB',
   },
 });
 

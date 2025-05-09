@@ -45,6 +45,7 @@ export const defaultModules   = [
           ],
         },
         {
+<<<<<<< Updated upstream
           name: "E-Status",
           path: "/(drawer)/HR/E-Status",
           title: "Employee Status",
@@ -104,6 +105,27 @@ export const defaultModules   = [
     
         },
 
+=======
+          name: "E-Salary",
+          path: "/(drawer)/HR/E-Salary",
+          title: "Employee Salary",
+          children: [
+            {
+              name: "MonthlySalary",
+              path: "/(drawer)/HR/E-Salary/MonthlySalary",
+              title: "Monthly Salary",
+            },
+            {
+              name: "ViewSalary",
+              path: "/(drawer)/HR/E-Salary/ViewSalary",
+              title: "View Salary",
+            },
+            
+            
+           
+          ],
+        },
+>>>>>>> Stashed changes
       ],
     },
 
@@ -161,6 +183,12 @@ export const defaultModules   = [
         name: "AddCustomer",
         path: "/(drawer)/CRM/AddCustomer",
         title: "Add Customer",
+       
+      },
+      {
+        name: "ManageCustomers",
+        path: "/(drawer)/CRM/ManageCustomers",
+        title: "Manage Customers",
        
       },
 

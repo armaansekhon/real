@@ -21,7 +21,7 @@ const AddCustomer = () => {
     fatherName: '',
     emailId: '',
     motherName: '',
-    phoneNumber: '',
+   
     gender: '',
     aadharNumber: '',
     panNo:'',
@@ -152,7 +152,7 @@ const AddCustomer = () => {
       fatherName: '',
       emailId: '',
       motherName: '',
-      phoneNumber: '',
+  
       gender: '',
       aadharNumber: '',
       panNo:'',
@@ -213,12 +213,12 @@ const AddCustomer = () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const payload = {
-        fullName: form.fullName,
-        mobileNumber: form.mobileNumber,
-        fatherName: form.fatherName,
-        emailId: form.emailId,
-        motherName: form.motherName || null,
-        phoneNumber: form.phoneNumber || null,
+        name: form.fullName,
+        contact: form.mobileNumber,
+        father_Name: form.fatherName,
+        email_Id: form.emailId,
+        mother_Name: form.motherName || null,
+    
         gender: form.gender,
         panNo:form.panNo,
         aaddharNo: form.aadharNumber || null,
@@ -244,11 +244,12 @@ const AddCustomer = () => {
         },
         dp: image || null,
       };
+      console.log("payload:",payload);
 
-      await axios.post('http://192.168.6.210:8000/pipl/api/v1/customer/add', payload, {
+      await axios.post('http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/addRealEstateCustomer', payload, {
         headers: {
           'Content-Type': 'application/json',
-        //   'secret_key': secretKey,
+          'secret_key': secretKey,
         },
       });
 
@@ -257,7 +258,10 @@ const AddCustomer = () => {
       navigation.goBack();
     } catch (error) {
       console.error('Error adding customer:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to add customer. Please try again.';
+      errorMessage = error.response.data?.message ||
+                   error.response.data?.error ||
+                   JSON.stringify(error.response.data) || 
+                   errorMessage || "failed to add the customer";
       Alert.alert('Error', errorMessage);
     }
   };
@@ -362,11 +366,11 @@ const AddCustomer = () => {
 
             {/* Phone Number */}
             <View style={[styles.inputContainer, styles.halfWidth]}>
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label}>Pan Number</Text>
               <TextInput
                 style={styles.input}
-                value={form.phoneNumber}
-                onChangeText={text => setForm({ ...form, phoneNumber: text })}
+                value={form.panNo}
+                onChangeText={text => setForm({ ...form, panNo: text })}
                 placeholder="Enter Phone Number"
                 keyboardType="numeric"
               />
@@ -416,6 +420,7 @@ const AddCustomer = () => {
               <Text style={styles.label}>Gender *</Text>
               <Dropdown
                 style={styles.dropdown}
+                placeholderStyle={{color:"#bbb"}}
                 data={genderOptions}
                 labelField="label"
                 valueField="value"
@@ -431,6 +436,7 @@ const AddCustomer = () => {
               <Text style={styles.label}>Marital Status</Text>
               <Dropdown
                 style={styles.dropdown}
+                placeholderStyle={{color:"#bbb"}}
                 data={maritalStatusOptions}
                 labelField="label"
                 valueField="value"
@@ -468,16 +474,7 @@ const AddCustomer = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={[styles.inputContainer, styles.fullWidth]}>
-              <Text style={styles.label}>Pan Number</Text>
-              <TextInput
-                style={styles.input}
-                value={form.panNo}
-                onChangeText={text => setForm({ ...form, panNo: text })}
-                placeholder="Enter Pan Number"
-                keyboardType="numeric"
-              />
-            </View>
+         
 
           {/* Date Picker Modal */}
           <Modal
@@ -517,6 +514,7 @@ const AddCustomer = () => {
                 <Text style={styles.label}>Country *</Text>
                 <Dropdown
                   style={styles.dropdown}
+                  placeholderStyle={{color:"#bbb"}}
                   data={countries}
                   labelField="label"
                   valueField="value"
@@ -540,6 +538,7 @@ const AddCustomer = () => {
                 <Text style={styles.label}>State *</Text>
                 <Dropdown
                   style={styles.dropdown}
+                  placeholderStyle={{color:"#bbb"}}
                   data={states}
                   labelField="label"
                   valueField="value"
@@ -565,6 +564,7 @@ const AddCustomer = () => {
                 <Text style={styles.label}>District *</Text>
                 <Dropdown
                   style={styles.dropdown}
+                  placeholderStyle={{color:"#bbb"}}
                   data={districts}
                   labelField="label"
                   valueField="value"
@@ -670,6 +670,7 @@ const AddCustomer = () => {
                 <Text style={styles.label}>Country *</Text>
                 <Dropdown
                   style={styles.dropdown}
+                  placeholderStyle={{color:"#bbb"}}
                   data={countries}
                   labelField="label"
                   valueField="value"
@@ -694,6 +695,7 @@ const AddCustomer = () => {
                 <Text style={styles.label}>State *</Text>
                 <Dropdown
                   style={styles.dropdown}
+                  placeholderStyle={{color:"#bbb"}}
                   data={correspondingStates}
                   labelField="label"
                   valueField="value"
@@ -720,6 +722,7 @@ const AddCustomer = () => {
                 <Text style={styles.label}>District *</Text>
                 <Dropdown
                   style={styles.dropdown}
+                  placeholderStyle={{color:"#bbb"}}
                   data={correspondingDistricts}
                   labelField="label"
                   valueField="value"

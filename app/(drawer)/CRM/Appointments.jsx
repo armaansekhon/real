@@ -21,7 +21,7 @@ const Appointments = () => {
       setLoading(true);
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.get(
-        `http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/realestateCustomerLeadApointments/${user.id}`,
+        `http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/realestateCustomerLeadApointments/${user.id}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const Appointments = () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
       await axios.post(
-        'http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/updateFollowUpRemarks',
+        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/updateFollowUpRemarks',
         {
           followUpId,
           remarks: remark,
