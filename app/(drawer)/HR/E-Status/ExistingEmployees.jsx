@@ -16,15 +16,14 @@ import {
 } from "react-native";
 import LottieView from "lottie-react-native";
 import { Feather, AntDesign, Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { Dimensions } from "react-native";
-import { useNavigation } from 'expo-router';
 
-import { getAllEmployees, getAllEmployeesbyId } from "../../../../services/api";
+import { getAllActiveOrInactiveEmployees, getAllEmployees, getAllEmployeesbyId } from "../../../../services/api";
 
 const screenHeight = Dimensions.get("window").height;
 
-const ViewUpEmp = () => {
+const ExistingEmployees = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [employeeModalVisible, setEmployeeModalVisible] = useState(false);
@@ -33,10 +32,10 @@ const ViewUpEmp = () => {
   // const [employeeDetails, setEmployeeDetails] = useState([]);
 
   const Router = useRouter();
-  const navigation = useNavigation();
+
   useEffect(() => {
     const fetchEmployees = async () => {
-      const data = await getAllEmployees();
+      const data = await getAllActiveOrInactiveEmployees();
 
       const employeesWithPhotos = data.map((emp) => ({
         id: emp.id.toString(),
@@ -66,40 +65,6 @@ const ViewUpEmp = () => {
     fetchEmployees();
   }, []);
 
-  //for emp with id
-  // useEffect(() => {
-  //   const fetchEmployeeDetails = async () => {
-  //     const data = await getAllEmployeesbyId();
-
-  //     const employeesWithDetails = data.map((emp) => ({
-  //       id: emp.id?.toString() || "N/A",
-  //       name: emp.name || "N/A",
-  //       email: emp.email || "N/A",
-  //       phone: emp.contact || "N/A",
-  //       gender: emp.gender || "N/A",
-  //       age: emp.age || "N/A", // Only include if available in your API
-  //       category: emp.category || "N/A",
-  //       department: emp.department || "N/A",
-  //       designation: emp.designation || "N/A",
-  //       employeeType: emp.employeeType || "N/A",
-  //       employeeId: emp.employeeTypeId || "N/A", // Assuming there's a separate ID (if not, omit this)
-  //       address: emp.employeeAddress?.[0]?.address1 || "N/A",
-  //       pincode: emp.employeeAddress?.[0]?.pincode || "N/A",
-  //       spouseName: emp.employeeSpouses?.[0]?.name || "N/A",
-  //       childName: emp.employeeChilds?.[0]?.name || "N/A",
-  //       education: emp.employeeEducations?.[0]?.classsName || "N/A",
-  //       experience: emp.employeeExperiences?.[0]?.position || "N/A",
-  //       pic: emp.employeePic
-  //         ? `data:${emp.employeeDocuments?.[0]?.documentType};base64,${emp.employeePic}`
-  //         : item.pic,
-  //     }));
-
-  //     setEmployeeDetails(employeesWithDetails);
-  //   };
-
-  //   fetchEmployeeDetails();
-  // }, []);
-
   // Fetch detailed employee info for modal
   const onSelectEmployeeDetails = async (item) => {
     try {
@@ -109,6 +74,7 @@ const ViewUpEmp = () => {
         ...item,
         email: emp.email || item.email || "N/A",
         phone: emp.contact || item.phone || "N/A",
+        activityStatus: emp.activityStatus || item.activityStatus || "N/A",
         gender: emp.gender || item.gender || "N/A",
         age: emp.age || "N/A",
         category: emp.category || item.category || "N/A",
@@ -187,17 +153,21 @@ const ViewUpEmp = () => {
       </View>
     </TouchableOpacity>
   );
+  const Navigation = useNavigation();
 
   return (
-    <SafeAreaView style={styles.container}>
-            <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                      <Ionicons name="menu" size={26} color="#000" />
-                    </TouchableOpacity>
-      
-            </View>
+    <>
+   <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => Navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color="#333" />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>View</Text>
+          <Text style={styles.headerTitle}>Existing</Text>
           <Text style={styles.headerSubTitle}>Employees</Text>
           <Text style={styles.headerDesc}>
             Search for the employee in the Search Bar!
@@ -282,16 +252,15 @@ const ViewUpEmp = () => {
                 {item.department}
               </Text>
             </View>
-
+           
             <Feather
               name="edit"
               size={20}
               color="#5aaf57"
               style={styles.icon}
               onPress={() => {
-                console.log("Navigating to Login");
                 Router.push({
-                  pathname: "/(drawer)/HR/E-Manage/AddEmp",
+                  pathname: "/(drawer)/HR/E-Status/UpdateEmployeeStatus",
                   // params: { id: item.id }
                   params: { id: item.id, isEdit: true },
                 });
@@ -300,86 +269,6 @@ const ViewUpEmp = () => {
           </TouchableOpacity>
         )}
       />
-
-      {/* Employee Details Modal */}
-
-      {/* <Modal
-        visible={employeeModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setEmployeeModalVisible(false)}
-      >
-        <TouchableWithoutFeedback
-          onPress={() => setEmployeeModalVisible(false)}
-        >
-          <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View
-                style={[styles.modalContainer, { height: screenHeight * 0.7 }]}
-              >
-                <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  keyboardDismissMode="on-drag"
-                  contentContainerStyle={{
-                    alignItems: "center",
-                    paddingBottom: 20,
-                  }}
-                  nestedScrollEnabled
-                  showsVerticalScrollIndicator={true}
-                >
-                  <Image
-                    source={{
-                      uri: `data:image/jpeg;base64, ${selectedEmployee?.pic}`,
-                    }}
-                    style={styles.modalAvatar}
-                  />
-                  <Text style={styles.modalName}>{selectedEmployee?.name}</Text>
-                  <Text style={styles.modalInfo}>
-                    Usercode: {selectedEmployee?.usercode}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Department: {selectedEmployee?.department}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Designation: {selectedEmployee?.designation}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Employee Type: {selectedEmployee?.employeeType}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Email: {selectedEmployee?.email}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Phone: {selectedEmployee?.phone}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Gender: {selectedEmployee?.gender}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Category: {selectedEmployee?.category}
-                  </Text>
-                  <Text style={styles.modalInfo}>
-                    Age: {selectedEmployee?.age}
-                  </Text>
-                  <Text style={styles.modalInfo}>Spouse: {selectedEmployee?.spouseName}</Text>
-                  <Text style={styles.modalInfo}>Child: {selectedEmployee?.childName}</Text>
-                  <Text style={styles.modalInfo}>Education: {selectedEmployee?.education}</Text>
-                  <Text style={styles.modalInfo}>Experience: {selectedEmployee?.experience}</Text>
-                  <Text style={styles.modalInfo}>Address: {selectedEmployee?.address}</Text>
-                  <Text style={styles.modalInfo}>Pincode: {selectedEmployee?.pincode}</Text>
-
-                  <TouchableOpacity
-                    style={styles.closeBtn}
-                    onPress={() => setEmployeeModalVisible(false)}
-                  >
-                    <Text style={styles.closeBtnText}>Close</Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal> */}
 
       <Modal
         visible={employeeModalVisible}
@@ -417,6 +306,10 @@ const ViewUpEmp = () => {
                     {
                       label: "Designation",
                       value: selectedEmployee?.designation,
+                    },
+                    {
+                      label: "Employee Status",
+                      value: selectedEmployee?.activityStatus,
                     },
                     {
                       label: "Employee Type",
@@ -464,6 +357,7 @@ const ViewUpEmp = () => {
         </TouchableWithoutFeedback>
       </Modal>
     </SafeAreaView>
+    </>
   );
 };
 
@@ -472,6 +366,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Platform.OS === "android" ? 25 : 0,
     backgroundColor: "#fff",
+  },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: "#fff",
+    // elevation: 4,
+    zIndex: 10,
   },
   headerRow: {
     flexDirection: "row",
@@ -685,11 +589,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "PlusR",
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingBottom: 10,
-  },
-  
 });
 
-export default ViewUpEmp;
+export default ExistingEmployees;

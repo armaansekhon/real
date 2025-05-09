@@ -9,17 +9,19 @@ import {
   Platform,
   TextInput,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useLocalSearchParams } from "expo-router";
-import { getLeaveById } from "../../../services/api";
+import { getMovementById} from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useNavigation } from "expo-router";
 
-import { Dropdown } from "react-native-element-dropdown";
-import {getLeaveApprovalAuthority} from  "../../../services/api";
-import { useUser } from '../../../context/UserContext';
-import { submitLeaveAction } from "../../../services/api";
+import { Dropdown } from "react-native-element-dropdown" 
+import {getLeaveApprovalAuthority} from  "../../../../services/api";
+import { useUser } from '../../../../context/UserContext';
+import { submitMovementAction } from "../../../../services/api";
 
 const CustomDropdown = ({ value, setValue, data, placeholder, loading }) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -48,15 +50,18 @@ const CustomDropdown = ({ value, setValue, data, placeholder, loading }) => {
 
 
 
-const LeaveDetails = () => {
+const MovementDetails = () => {
   const{user, date}=useUser();
-  const { leaveId } = useLocalSearchParams(); // from router.push({ pathname: ..., params: { leaveId } })
-  const [leaveDetails, setLeaveDetails] = useState(null);
+  const { mId } = useLocalSearchParams(); // from router.push({ pathname: ..., params: { mId } })
+  const [movementDetails, setMovementDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [statusOptions, setStatusOptions] = useState([]);
   const [statusLoading, setStatusLoading] = useState(true);
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const [data, setData] = useState({
     status: null,
@@ -64,6 +69,13 @@ const LeaveDetails = () => {
     remarks: null,
  
   });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchInitialData();
+    resetForm();
+    setRefreshing(false);
+  };
 
 
  
@@ -88,17 +100,17 @@ const LeaveDetails = () => {
   
 
   useEffect(() => {
-    const fetchLeaveDetails = async () => {
-      if (!leaveId) return;
+    const fetchMovementDetails = async () => {
+      if (!mId) return;
       setLoading(true);
-      const data = await getLeaveById(leaveId);
-      setLeaveDetails(data);
+      const data = await getMovementById(mId);
+      setMovementDetails(data);
       setLoading(false);
     };
 
-    fetchLeaveDetails();
+    fetchMovementDetails();
     
-  }, [leaveId]);
+  }, [mId]);
 
 
   useEffect(() => {
@@ -111,7 +123,7 @@ const LeaveDetails = () => {
     const fetchStatusOptions = async () => {
       try {
         setStatusLoading(true);
-        console.log("Fetching approval authority for employeeId:", user.employeeId);
+        console.log("Fetching approval authority for employeeId:", user.id);
   
         const response = await getLeaveApprovalAuthority(user.id);
         console.log("Approval authority response:", response);
@@ -142,10 +154,10 @@ const LeaveDetails = () => {
     );
   }
 
-  if (!leaveDetails) {
+  if (!movementDetails) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>Failed to load leave details.</Text>
+        <Text style={styles.errorText}>Failed to load movement details.</Text>
       </SafeAreaView>
     );
   }
@@ -154,22 +166,38 @@ const LeaveDetails = () => {
     setData((prev) => ({ ...prev, [field]: val }));
   };
 
+  const resetForm = () => {
+    setData({
+      status: null,
+      date: null,
+      remarks: null,
+    });
+  };
+  
+
 
 
   const handleSubmit = async () => {
+    if (!data.status || !data.date || !data.remarks) {
+      alert("Please fill all fields.");
+      return;
+    }
     try {
       const payload = {
-        leaveId: Number(leaveId),
-        leaveStatus: data.status,
+        movementRequestId: Number(mId), // instead of mId
+        status: data.status,            // instead of movementStatus
         remarks: data.remarks,
         updatedBy: user?.id,
         updateDate: data.date,
       };
-  
-      const res = await submitLeaveAction(payload);
-      alert(res.message || "Leave action successful!");
+      console.log("Payload being sent:", payload);
+
+      const res = await submitMovementAction(payload);
+      alert(res.message || "Movement action successful!");
+      resetForm();
     } catch (err) {
       alert("Submission failed: " + err.message);
+      console.error("Error during movement submission:", err);
     }
   };
 
@@ -178,8 +206,7 @@ const LeaveDetails = () => {
     { label: "Approved", value: "approved" },
     { label: "Rejected", value: "rejected" },
     { label: "Pending", value: "pending" },
-    { label: "Pending", value: "pending" },
-    { label: "Pending", value: "pending" },
+
   ];
   
   const dates = [
@@ -198,34 +225,45 @@ const LeaveDetails = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>       
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={28} color="#000" />
+        </TouchableOpacity>
+      </View>
+   
                 <View style={styles.headerRow}>
                 <View style={styles.headerTextContainer}> 
-                  <Text style={styles.headerTitle}>Leave</Text>
+                  <Text style={styles.headerTitle}>Movement</Text>
                   <Text style={styles.headerSubTitle}>Details</Text>
                   {/* <Text style={styles.headerDesc}>View all the pending leaves here!</Text>   */}
                 </View>
                 <LottieView
-                  source={require("../../../assets/svg/EMP.json")}
+                  source={require("../../../../assets/svg/EMP.json")}
                   autoPlay
                   loop
                   style={styles.lottie}
                 />
               </View>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+          contentContainerStyle={styles.content}
+         keyboardShouldPersistTaps="handled"
+            refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+  >
 
 
 
  
-        {/* <Text style={styles.heading}>Leave Details</Text> */}
-        <Detail label="Leave Type" value={leaveDetails["Leave Type"]}/>
-        <Detail label="Status" value={leaveDetails["Status"]} />
-        <Detail label="Requested On" value={leaveDetails["Leave Requested Date"]} />
-        <Detail label="From Date" value={leaveDetails["From"]} />
-        <Detail label="To Date" value={leaveDetails["To"]} />
-        <Detail label="Initiated By" value={leaveDetails["Initiated By"]} />
-        <Detail label="Leave Currently At" value={leaveDetails["Leave Currently At"]} />
-        <Detail label="Reason" value={leaveDetails["Reason"]} />
-      
+<Detail label="Status" value={movementDetails["Status"]} />
+<Detail label="Requested On" value={movementDetails["Movement Requested Date"]} />
+<Detail label="From Time" value={movementDetails["fromTime"]} />
+<Detail label="To Time" value={movementDetails["toTime"]} />
+<Detail label="Initiated By" value={movementDetails["Initiated By"]} />
+<Detail label="Currently At" value={movementDetails["Currently At"]} />
+<Detail label="Reason" value={movementDetails["Movement Reason "]?.trim()} />
+<Detail label="Description" value={movementDetails["description"] || "N/A"} />
+
 
 
       {groupedFields.map((row, rowIndex) => (
@@ -369,7 +407,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 40,
+    fontSize: 37,
     fontFamily: "PlusSB",
     marginTop: -89,
   },
@@ -456,7 +494,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
+
+
+  header: {
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+  },
   
 });
 
-export default LeaveDetails;
+export default MovementDetails;
