@@ -38,55 +38,62 @@ export default function AddEmployee({ navigation }) {
 
 
    // when editing, fetch existing and prefill
-   useEffect(() => {
-    if (isEdit) {
-      (async () => {
-        try {
-          const emp = await getAllEmployeesbyId(id);
-          // split emp into your three sections:
-          setFormData({
-            employeeDetails: {
-              department: emp.department,
-              designation: emp.designation,
-              employeeType: emp.employeeType,
-              name: emp.name,
-              usercode: emp.usercode,
-              joiningDate: emp.joiningDate,
-              fatherName: emp.fatherName,
-              motherName: emp.motherName,
-              profileImage: emp.employeePic
-                ? { uri: `data:image/jpeg;base64,${emp.employeePic}` }
-                : null,
-            },
-            generalDetails: {
-              contact: emp.contact,
-              email: emp.email,
-              mobile: emp.mobile,
-              dob: emp.dob,
-              joiningDate: emp.joiningDate,
-              gender: emp.gender,
-              salary: emp.salary,
-              nationality: emp.nationality,
-              senior: emp.senior,
-              category: emp.category,
-              bloodGroup: emp.bloodGroup,
-              maritalStatus: emp.maritalStatus,
-            },
-            addressDetails: {
-              address1: emp.employeeAddress?.[0]?.address1,
-              address2: emp.employeeAddress?.[0]?.address2,
-              city: emp.employeeAddress?.[0]?.city,
-              pincode: emp.employeeAddress?.[0]?.pincode,
-              // country: emp.employeeAddress?.[0]?.state?.[1]?.country,
-            },
-          });
-        } catch (e) {
-          console.error("Failed to load employee for edit:", e);
-        }
-      })();
-    }
-  }, [id, isEdit]);
-
+ useEffect(() => {
+  if (isEdit && id) {
+    (async () => {
+      try {
+        const emp = await getAllEmployeesbyId(id);
+        console.log("Fetched employee data:", emp); // Debug log
+        const formattedData = {
+          employeeDetails: {
+            department: emp.department?.id || emp.department,
+            designation: emp.designation?.id || emp.designation,
+            employeeType: emp.employeeType?.id || emp.employeeType,
+            name: emp.name || "",
+            usercode: emp.usercode || "",
+            joiningDate: emp.joiningDate || "",
+            fatherName: emp.fatherName || "",
+            motherName: emp.motherName || "",
+            profileImage: emp.employeePic
+              ? { uri: `data:image/jpeg;base64,${emp.employeePic}` }
+              : null,
+            employeePic: emp.employeePic || null, // Store base64 for API
+            pictureType: emp.employeeDocuments?.[0]?.documentType || "image/jpeg",
+          },
+          generalDetails: {
+            contact: emp.officialContact || emp.contact || "",
+            email: emp.officialEmail || emp.email || "",
+            mobile: emp.mobile || "",
+            dob: emp.dob || "",
+            gender: emp.gender || "",
+            salary: emp.salary?.toString() || "",
+            nationality: emp.nationality || "",
+            category: emp.category?.id || emp.category || "",
+            bloodGroup: emp.bloodGroup?.id || emp.bloodGroup || "",
+            maritalStatus: emp.maritalStatus || "",
+            officialEmail: emp.officialEmail || "",
+            officialMobile: emp.officialContact || "",
+            motherTongue: emp.motherTongue || "",
+          },
+          addressDetails: {
+            addressLine1: emp.employeeAddress?.[0]?.address1 || "",
+            addressLine2: emp.employeeAddress?.[0]?.address2 || "",
+            city: emp.employeeAddress?.[0]?.city || "",
+            pincode: emp.employeeAddress?.[0]?.pincode || "",
+            country: emp.employeeAddress?.[0]?.country?.id || "",
+            state: emp.employeeAddress?.[0]?.state?.id || "",
+            district: emp.employeeAddress?.[0]?.district?.id || "",
+          },
+        };
+        console.log("Formatted formData:", formattedData); // Debug log
+        setFormData(formattedData);
+      } catch (e) {
+        console.error("Failed to load employee for edit:", e);
+        Alert.alert("Error", "Failed to load employee data.");
+      }
+    })();
+  }
+}, [id, isEdit]);
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
