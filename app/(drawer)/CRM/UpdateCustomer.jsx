@@ -8,6 +8,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../../../services/api';
 
 const UpdateCustomer = () => {
   const navigation = useNavigation();
@@ -74,7 +75,7 @@ const UpdateCustomer = () => {
     try {
       console.log(id);
             const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get(`http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/realEstateCustomer/${id}`,
+      const response = await axios.get(`${API_BASE_URL}/realestateCustomer/realEstateCustomer/${id}`,
         {
           headers: { 'secret_key': secretKey },
         }
@@ -157,7 +158,7 @@ const UpdateCustomer = () => {
   const fetchCountries = async () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get('http://192.168.6.210:8686/pipl/api/v1/employee/countries', {
+      const response = await axios.get(`${API_BASE_URL}/employee/countries`, {
         headers: { 'secret_key': secretKey },
       });
       setCountries(response.data.map(item => ({ label: item.country, value: item.id })));
@@ -171,7 +172,7 @@ const UpdateCustomer = () => {
     if (!countryId) return;
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get(`http://192.168.6.210:8686/pipl/api/v1/employee/getStatesByCountryId/${countryId}`, {
+      const response = await axios.get(`${API_BASE_URL}/employee/getStatesByCountryId/${countryId}`, {
         headers: { 'secret_key': secretKey },
       });
       const stateOptions = response.data.map(item => ({ label: item.state, value: item.id }));
@@ -190,7 +191,7 @@ const UpdateCustomer = () => {
     if (!stateId) return;
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get(`http://192.168.6.210:8686/pipl/api/v1/employee/getDistrictByStateId/${stateId}`, {
+      const response = await axios.get(`${API_BASE_URL}/employee/getDistrictByStateId/${stateId}`, {
         headers: { 'secret_key': secretKey },
       });
       const districtOptions = response.data.map(item => ({ label: item.district, value: item.id }));
@@ -301,7 +302,7 @@ const UpdateCustomer = () => {
         dp: image || null,
       };
 
-      await axios.post('http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/addRealEstateCustomer', payload, {
+      await axios.post(`${API_BASE_URL}/realestateCustomer/addRealEstateCustomer`, payload, {
         headers: {
           'Content-Type': 'application/json',
           'secret_key':secretKey

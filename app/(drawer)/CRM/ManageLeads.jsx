@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { useUser } from '../../../context/UserContext';
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
+import { API_BASE_URL } from '../../../services/api';
 
 const statusColors = {
   'Not Started': '#888c4a',  // Gray
@@ -40,7 +41,7 @@ const ManageLeads = () => {
       setLoading(true);
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const res = await fetch(
-        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/getAllCustomerLeads',
+        `${API_BASE_URL}/realestateCustomerLead/getAllCustomerLeads`,
         {
           method: 'GET',
           headers: {
@@ -63,7 +64,7 @@ const ManageLeads = () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.delete(
-        `http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/realestateCustomerLeadDelete?id=${leadId}`,
+        `${API_BASE_URL}/realestateCustomerLead/realestateCustomerLeadDelete?id=${leadId}`,
         {
           headers: {
             'Content-Type': 'application/json',

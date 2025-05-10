@@ -18,12 +18,13 @@ import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-element-dropdown";
 import * as SecureStore from "expo-secure-store";
+import { API_BASE_URL } from "../services/api";
 
 import useDropdownData from "../hooks/useDropdownData";
 
 const { height } = Dimensions.get("window");
 
-const BASE_URL = "http://192.168.6.210:8686/pipl/api/v1/employee";
+const BASE_URL = `${API_BASE_URL}/employee`;
 
 const getSecretKey = async () => {
   const key = await SecureStore.getItemAsync("auth_token");

@@ -9,6 +9,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../../../services/api';
 
 const AddDocs = () => {
   const navigation = useNavigation();
@@ -31,7 +32,7 @@ const AddDocs = () => {
   const fetchDocumentNames = async () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get('http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/getLists', {
+      const response = await axios.get(`${API_BASE_URL}/realestateCustomer/getLists`, {
         headers: {
           'Content-Type': 'application/json',
           'secret_key': secretKey,
@@ -246,7 +247,7 @@ const AddDocs = () => {
       }
 
       const response = await axios.post(
-        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/addRealEstateCustomerDocuments',
+        `${API_BASE_URL}/realestateCustomer/addRealEstateCustomerDocuments`,
         formData,
         {
           headers: {

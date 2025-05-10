@@ -22,6 +22,7 @@ import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 import { useUser } from '../../../context/UserContext';
 import axios from 'axios';
+import { API_BASE_URL } from '../../../services/api';
 
 const AddLead = () => {
   const [image, setImage] = useState(null);
@@ -83,7 +84,7 @@ const AddLead = () => {
   const fetchInitialData = async () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const countryRes = await fetch('http://192.168.6.210:8686/pipl/api/v1/employee/countries', {
+      const countryRes = await fetch(`${API_BASE_URL}/employee/countries`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ const AddLead = () => {
       }));
       setCountryItems(formattedCountries);
 
-      const leadRes = await fetch('http://192.168.6.210:8686/pipl/api/v1/leadFromCustomer/getAllLeadFromData', {
+      const leadRes = await fetch(`${API_BASE_URL}/leadFromCustomer/getAllLeadFromData`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +125,7 @@ const AddLead = () => {
       if (!countryValue) return;
       try {
         const secretKey = await SecureStore.getItemAsync('auth_token');
-        const res = await fetch(`http://192.168.6.210:8686/pipl/api/v1/employee/getStatesByCountryId/${countryValue}`, {
+        const res = await fetch(`${API_BASE_URL}/employee/getStatesByCountryId/${countryValue}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -150,7 +151,7 @@ const AddLead = () => {
       if (!stateValue) return;
       try {
         const secretKey = await SecureStore.getItemAsync('auth_token');
-        const res = await fetch(`http://192.168.6.210:8686/pipl/api/v1/employee/getDistrictByStateId/${stateValue}`, {
+        const res = await fetch(`.168.6.210:8686/pipl/api/v1/employee/getDistrictByStateId/${stateValue}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -298,7 +299,7 @@ const AddLead = () => {
       };
 
       const response = await axios.post(
-        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/addRealestateCustomerLead',
+        `${API_BASE_URL}/realestateCustomerLead/addRealestateCustomerLead`,
         payload,
         {
           headers: {

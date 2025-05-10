@@ -31,9 +31,10 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useUser } from '../../../../context/UserContext';
 import Toast from 'react-native-root-toast';
 import { Ionicons } from "@expo/vector-icons";
+import {  API_BASE_URL } from '../../../../services/api';
 
 const UpdateEmployeeStatus = () => {
-  const API_BASE_URL = 'http://192.168.6.210:8686/pipl/api/v1';
+  
   const [data, setData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalVisiblePic, setModalVisiblePic] = useState(false);

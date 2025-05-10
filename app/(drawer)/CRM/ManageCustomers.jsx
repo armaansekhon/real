@@ -8,6 +8,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
 import LottieView from 'lottie-react-native';
+import { API_BASE_URL } from '../../../services/api';
+
 
 const ManageCustomers = () => {
   const navigation = useNavigation();
@@ -22,7 +24,7 @@ const ManageCustomers = () => {
     try {
       setLoading(true);
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get('http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/realEstateCustomers', {
+      const response = await axios.get(`${API_BASE_URL}/realestateCustomer/realEstateCustomers`, {
         headers: {
           'Content-Type': 'application/json',
           'secret_key': secretKey

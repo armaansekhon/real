@@ -6,6 +6,7 @@ import { useNavigation } from 'expo-router';
 import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../../../../services/api';
 
 const ViewSalary = () => {
   const navigation = useNavigation();
@@ -53,7 +54,7 @@ const ViewSalary = () => {
         throw new Error('Authentication token not found');
       }
 
-      const url = `http://192.168.6.210:8686/pipl/api/v1/employee/salaries/view?selectedYear=${year}&selectedMonth=${month}`;
+      const url = `${API_BASE_URL}/employee/salaries/view?selectedYear=${year}&selectedMonth=${month}`;
 
       const response = await axios.get(url, {
         headers: {

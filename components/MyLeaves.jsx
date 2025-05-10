@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../context/UserContext';
+import { API_BASE_URL } from '../services/api';
 
 const MyLeaves = ({ goBack }) => {
   const [leaves, setLeaves] = useState([]);
@@ -19,7 +20,7 @@ const MyLeaves = ({ goBack }) => {
       const userId = user.id;
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.get(
-        `http://192.168.6.210:8686/pipl/api/v1/employee/my-leave/employeeId/${userId}`,
+        `${API_BASE_URL}/employee/my-leave/employeeId/${userId}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -40,7 +41,7 @@ const MyLeaves = ({ goBack }) => {
       setHistoryLoading(true);
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.get(
-        `http://192.168.6.210:8686/pipl/api/v1/employee/getMyLeaveHistories/id/${leaveId}`,
+        `${API_BASE_URL}/employee/getMyLeaveHistories/id/${leaveId}`,
         {
           headers: {
             'Content-Type': 'application/json',

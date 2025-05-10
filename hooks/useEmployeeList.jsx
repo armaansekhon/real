@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 // import axios from 'axios';
+import { API_BASE_URL } from '../services/api';
 
 const useEmployeeList = () => {
   const [employees, setEmployees] = useState([]);
@@ -12,7 +13,7 @@ const useEmployeeList = () => {
       const secretKey = await SecureStore.getItemAsync('auth_token');
       console.log("key", secretKey);
   
-      const res = await fetch('http://192.168.6.210:8686/pipl/api/v1/employee/emp-attendance', {
+      const res = await fetch(`${API_BASE_URL}/employee/emp-attendance`, {
         headers: {
           secret_key: secretKey,
         },

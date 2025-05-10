@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
+import { API_BASE_URL } from "../services/api";
 
-const BASE_URL = "http://192.168.6.210:8686/pipl/api/v1/employee";
+const BASE_URL = `${API_BASE_URL}/employee`;
 
 const getSecretKey = async () => {
   const key = await SecureStore.getItemAsync("auth_token");

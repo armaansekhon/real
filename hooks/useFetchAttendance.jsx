@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../services/api';
 
-const API_URL = 'http://192.168.6.210:8686/pipl/api/v1/employee/today-attendance';
+const API_URL = `${API_BASE_URL}/employee/today-attendance`;
 
 const useFetchAttendance = () => {
   const [attendance, setAttendance] = useState(null);
