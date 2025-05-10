@@ -65,7 +65,7 @@ const AddLead = () => {
 
   const [addressNeeded, setAddressNeeded] = useState(false);
   const [form, setForm] = useState({
-    firstName: '',
+    firstName : '',
     middleName: '',
     lastName: '',
     mobileNo: '',
@@ -97,9 +97,12 @@ const AddLead = () => {
       }));
       setCountryItems(formattedCountries);
 
-      const leadRes = await fetch('http://192.168.6.210:8000/pipl/api/v1/leadFromCustomer/getAllLeadFromData', {
+      const leadRes = await fetch('http://192.168.6.210:8686/pipl/api/v1/leadFromCustomer/getAllLeadFromData', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'secret_key': secretKey,
+        },
       });
       const leadData = await leadRes.json();
       const formattedLeads = leadData.map(lead => ({
@@ -258,6 +261,7 @@ const AddLead = () => {
     }
 
     try {
+      const secretKey = await SecureStore.getItemAsync('auth_token');
       const leadGenerationDate = moment(leadDate).format('YYYY-MM-DD');
       const dateob = moment(dob).format('YYYY-MM-DD');
       const payload = {
@@ -294,18 +298,19 @@ const AddLead = () => {
       };
 
       const response = await axios.post(
-        'http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/addRealestateCustomerLead',
+        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/addRealestateCustomerLead',
         payload,
         {
           headers: {
             'Content-Type': 'application/json',
+            'secret_key': secretKey,
           }
         }
       );
 
       if (response.status === 200 || response.status === 201) {
         Alert.alert('Success', 'Lead added successfully!');
-        resetForm(); // Refresh the page by resetting all fields
+        resetForm();
       }
     } catch (error) {
       console.error('Error submitting lead:', error);
@@ -315,8 +320,8 @@ const AddLead = () => {
 
   const RequiredLabel = ({ text, isRequired }) => (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      {isRequired && <Text style={styles.requiredMark}>* </Text>}
       <Text style={styles.label}>{text}</Text>
+      {isRequired && <Text style={styles.requiredMark}>*</Text>}
     </View>
   );
 
@@ -392,6 +397,8 @@ const AddLead = () => {
               placeholder="Select Lead Source"
               listMode="SCROLLVIEW"
               zIndex={800}
+              style={[styles.input, { padding: 12 }]}
+              dropDownContainerStyle={styles.dropDownContainer}
             />
           </View>
 
@@ -435,6 +442,8 @@ const AddLead = () => {
               placeholder="Select Gender"
               placeholderStyle={styles.dropplace}
               listMode="SCROLLVIEW"
+              style={[styles.input, { padding: 12 }]}
+              dropDownContainerStyle={styles.dropDownContainer}
             />
           </View>
           {errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
@@ -529,6 +538,8 @@ const AddLead = () => {
                   placeholder="Select Country"
                   listMode="SCROLLVIEW"
                   zIndex={800}
+                  style={[styles.input, { padding: 12 }]}
+                  dropDownContainerStyle={styles.dropDownContainer}
                 />
               </View>
               {errors.country && <Text style={styles.errorText}>{errors.country}</Text>}
@@ -548,6 +559,8 @@ const AddLead = () => {
                   placeholder="Select State"
                   listMode="SCROLLVIEW"
                   zIndex={700}
+                  style={[styles.input, { padding: 12 }]}
+                  dropDownContainerStyle={styles.dropDownContainer}
                 />
               </View>
               {errors.state && <Text style={styles.errorText}>{errors.state}</Text>}
@@ -567,6 +580,8 @@ const AddLead = () => {
                   placeholder="Select District"
                   listMode="SCROLLVIEW"
                   zIndex={700}
+                  style={[styles.input, { padding: 12 }]}
+                  dropDownContainerStyle={styles.dropDownContainer}
                 />
               </View>
               {errors.district && <Text style={styles.errorText}>{errors.district}</Text>}
@@ -650,13 +665,12 @@ const styles = {
     marginTop: 13,
     color: '#5aaf57',
     fontFamily: 'PlusSB',
-    marginLeft: 8,
+    marginRight: 4,
   },
   requiredMark: {
     color: 'red',
     fontSize: 14,
     marginTop: 13,
-    marginLeft: 4,
   },
   errorText: {
     color: 'red',
@@ -668,6 +682,12 @@ const styles = {
     color: '#777',
     fontSize: 14,
     fontFamily: 'PlusR',
+  },
+  dropDownContainer: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#fff',
   },
 };
 

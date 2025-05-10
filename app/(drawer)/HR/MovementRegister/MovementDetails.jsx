@@ -15,13 +15,18 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 import { useLocalSearchParams } from "expo-router";
-import { getMovementById} from "../../../../services/api";
+import { getMovementById } from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "expo-router";
+<<<<<<< HEAD
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import { Dropdown } from "react-native-element-dropdown" 
 import {getLeaveApprovalAuthority} from  "../../../../services/api";
+=======
+import { Dropdown } from "react-native-element-dropdown";
+import { getLeaveApprovalAuthority } from "../../../../services/api";
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 import { useUser } from '../../../../context/UserContext';
 import { submitMovementAction } from "../../../../services/api";
 
@@ -49,49 +54,39 @@ const CustomDropdown = ({ value, setValue, data, placeholder, loading }) => {
   );
 };
 
-
-
-
 const MovementDetails = () => {
-  const{user, date}=useUser();
-  const { mId } = useLocalSearchParams(); // from router.push({ pathname: ..., params: { mId } })
+  const { user, date } = useUser();
+  const { mId } = useLocalSearchParams();
   const [movementDetails, setMovementDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [showDatePicker, setShowDatePicker] = useState(false);
-
   const [statusOptions, setStatusOptions] = useState([]);
   const [statusLoading, setStatusLoading] = useState(true);
+<<<<<<< HEAD
  const [historyModalVisible, setHistoryModalVisible] = useState(false);
   const [movementHistory, setMovementHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+=======
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   const [refreshing, setRefreshing] = useState(false);
 
   const [data, setData] = useState({
     status: null,
     date: null,
     remarks: null,
- 
   });
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchInitialData();
-    resetForm();
+    await fetchMovementDetails();
     setRefreshing(false);
   };
 
-
- 
-  console.log("User context:", user);
-  console.log("Employee ID:", user?.id);
-
   const groupedFields = [
-    [{ key: "status", placeholder: "Update Status" },],
+    [{ key: "status", placeholder: "Update Status" }],
     [{ key: "date", placeholder: "Update Date" }],
     [{ key: "remarks", placeholder: "Remarks" }],
-
-    
   ];
 
   useEffect(() => {
@@ -99,44 +94,37 @@ const MovementDetails = () => {
       setData((prev) => ({ ...prev, date }));
     }
   }, [date]);
-  
 
-  
+  const fetchMovementDetails = async () => {
+    if (!mId) return;
+    setLoading(true);
+    console.log("User context:", user);
+    console.log("Employee ID:", user?.id);
+    const data = await getMovementById(mId);
+    setMovementDetails(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchMovementDetails = async () => {
-      if (!mId) return;
-      setLoading(true);
-      const data = await getMovementById(mId);
-      setMovementDetails(data);
-      setLoading(false);
-    };
-
     fetchMovementDetails();
-    
   }, [mId]);
 
-
   useEffect(() => {
-
-   if (!user || !user.id) {
+    if (!user || !user.id) {
       console.warn("User or employeeId not available yet.");
-     return; // prevent running API call if user is not ready
+      return;
     }
-  
+
     const fetchStatusOptions = async () => {
       try {
         setStatusLoading(true);
         console.log("Fetching approval authority for employeeId:", user.id);
-  
         const response = await getLeaveApprovalAuthority(user.id);
         console.log("Approval authority response:", response);
-  
         const formatted = response.roles.map((role) => ({
           label: role.role,
           value: role.role,
         }));
-  
         setStatusOptions(formatted);
       } catch (error) {
         console.error("Error fetching status options:", error);
@@ -144,9 +132,10 @@ const MovementDetails = () => {
         setStatusLoading(false);
       }
     };
-  
+
     fetchStatusOptions();
   }, [user?.id]);
+<<<<<<< HEAD
   
 
 
@@ -172,6 +161,8 @@ const MovementDetails = () => {
     }
   };
   
+=======
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 
   if (loading) {
     return (
@@ -200,9 +191,6 @@ const MovementDetails = () => {
       remarks: null,
     });
   };
-  
-
-
 
   const handleSubmit = async () => {
     if (!data.status || !data.date || !data.remarks) {
@@ -211,14 +199,13 @@ const MovementDetails = () => {
     }
     try {
       const payload = {
-        movementRequestId: Number(mId), // instead of mId
-        status: data.status,            // instead of movementStatus
+        movementRequestId: Number(mId),
+        status: data.status,
         remarks: data.remarks,
         updatedBy: user?.id,
         updateDate: data.date,
       };
       console.log("Payload being sent:", payload);
-
       const res = await submitMovementAction(payload);
       alert(res.message || "Movement action successful!");
       resetForm();
@@ -228,35 +215,30 @@ const MovementDetails = () => {
     }
   };
 
-
   const statuses = [
     { label: "Approved", value: "approved" },
     { label: "Rejected", value: "rejected" },
     { label: "Pending", value: "pending" },
-
   ];
-  
+
   const dates = [
     { label: "Today", value: new Date().toISOString().split("T")[0] },
     { label: "Tomorrow", value: new Date(Date.now() + 86400000).toISOString().split("T")[0] },
   ];
-  
+
   const remarks = [
     { label: "Approved by Manager", value: "Approved by Manager" },
     { label: "Needs clarification", value: "Needs clarification" },
   ];
 
-
-
-  
-
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>       
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color="#000" />
         </TouchableOpacity>
       </View>
+<<<<<<< HEAD
    
                 <View style={styles.headerRow}>
                 <View style={styles.headerTextContainer}> 
@@ -333,85 +315,94 @@ const MovementDetails = () => {
                   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
   >
+=======
+      <View style={styles.headerRow}>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerTitle}>Movement</Text>
+          <Text style={styles.headerSubTitle}>Details</Text>
+        </View>
+        <LottieView
+          source={require("../../../../assets/svg/EMP.json")}
+          autoPlay
+          loop
+          style={styles.lottie}
+        />
+      </View>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingBottom: 100 }]}
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <Detail label="Status" value={movementDetails["Status"]} />
+        <Detail label="Requested On" value={movementDetails["Movement Requested Date"]} />
+        <Detail label="From Time" value={movementDetails["fromTime"]} />
+        <Detail label="To Time" value={movementDetails["toTime"]} />
+        <Detail label="Initiated By" value={movementDetails["Initiated By"]} />
+        <Detail label="Currently At" value={movementDetails["Currently At"]} />
+        <Detail label="Reason" value={movementDetails["Movement Reason "]?.trim()} />
+        <Detail label="Description" value={movementDetails["description"] || "N/A"} />
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 
-
-
- 
-<Detail label="Status" value={movementDetails["Status"]} />
-<Detail label="Requested On" value={movementDetails["Movement Requested Date"]} />
-<Detail label="From Time" value={movementDetails["fromTime"]} />
-<Detail label="To Time" value={movementDetails["toTime"]} />
-<Detail label="Initiated By" value={movementDetails["Initiated By"]} />
-<Detail label="Currently At" value={movementDetails["Currently At"]} />
-<Detail label="Reason" value={movementDetails["Movement Reason "]?.trim()} />
-<Detail label="Description" value={movementDetails["description"] || "N/A"} />
-
-
-
-      {groupedFields.map((row, rowIndex) => (
+        {groupedFields.map((row, rowIndex) => (
           <View
             key={rowIndex}
             style={[styles.rowContainer, { zIndex: 1000 - rowIndex * 10 }]}
           >
-
-{row.map((item, itemIndex) => (
+            {row.map((item, itemIndex) => (
               <View key={item.key} style={styles.inputWrapper}>
                 <Text style={styles.label}>
                   {item.placeholder}
-             
                 </Text>
-
-                {["status", ].includes(item.key) ? (
-  <CustomDropdown
-    value={data[item.key]}
-    setValue={(val) => handleValueChange(item.key, val)}
-    data={
-      item.key === "status"
-        ? statusOptions 
-        : []
-    }
-    placeholder={` ${item.placeholder}`}
-    loading={item.key === "status" && statusLoading}
-  />
-) : item.key === "date" ? (
-  <TouchableOpacity
-    onPress={() => setShowDatePicker(true)}
-    style={[styles.input, styles.dateInputContainer]}
-  >
-    <Text
-      style={[
-        styles.select,
-        { color: data.date ? "#333" : "#999", fontFamily: "PlusR" },
-      ]}
-    >
-      {data.date || "YYYY-MM-DD"}
-    </Text>
-    <View style={{ marginLeft: "auto" }}>
-    <Ionicons
-      name="calendar-outline"
-      size={18}
-      color="#777"
-     
-    />
-    </View>
-  </TouchableOpacity>
-) : (
-  <TextInput
-    style={styles.input}
-    placeholder={item.placeholder}
-    placeholderTextColor="#999"
-    value={data[item.key] || ""}
-    onChangeText={(text) => handleValueChange(item.key, text)}
-  />
-)}
-
-                
-                </View>
-                ))}
-                </View>
-              ))}
-        </ScrollView>
-        <TouchableOpacity
+                {["status"].includes(item.key) ? (
+                  <CustomDropdown
+                    value={data[item.key]}
+                    setValue={(val) => handleValueChange(item.key, val)}
+                    data={
+                      item.key === "status"
+                        ? statusOptions
+                        : []
+                    }
+                    placeholder={` ${item.placeholder}`}
+                    loading={item.key === "status" && statusLoading}
+                  />
+                ) : item.key === "date" ? (
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(true)}
+                    style={[styles.input, styles.dateInputContainer]}
+                  >
+                    <Text
+                      style={[
+                        styles.select,
+                        { color: data.date ? "#333" : "#999", fontFamily: "PlusR" },
+                      ]}
+                    >
+                      {data.date || "YYYY-MM-DD"}
+                    </Text>
+                    <View style={{ marginLeft: "auto" }}>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color="#777"
+                      />
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  <TextInput
+                    style={styles.input}
+                    placeholder={item.placeholder}
+                    placeholderTextColor="#999"
+                    value={data[item.key] || ""}
+                    onChangeText={(text) => handleValueChange(item.key, text)}
+                  />
+                )}
+              </View>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+      <TouchableOpacity
         style={styles.submitButton}
         onPress={handleSubmit}
       >
@@ -433,27 +424,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingTop: Platform.OS === "android" ? 10 : 0,
+   
   },
   content: {
     padding: 20,
-    marginTop: -20,
+   
+    
   },
-
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 3,
-    // paddingHorizontal: 4, 
+    marginBottom: 12,
   },
   label: {
     fontSize: 14,
     fontFamily: "PlusSB",
     color: "#555",
     maxWidth: "40%",
-    // flexShrink: 1,
-
-
   },
   value: {
     fontSize: 13,
@@ -461,11 +449,7 @@ const styles = StyleSheet.create({
     color: "#222",
     maxWidth: "55%",
     textAlign: "right",
-    // flexShrink: 1,
-    // numberOfLines: 1,
-    // ellipsizeMode: "tail",
   },
-  
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -476,23 +460,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "PlusR",
   },
-
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginTop: Platform.OS === "ios" ? 60 : 70,
+    marginTop: Platform.OS === "ios" ? 60 : 60,
     marginBottom: 5,
   },
   headerTextContainer: {
     flex: 1,
+<<<<<<< HEAD
     paddingBottom: 10,
+=======
+    bottom: 30,
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   },
   headerTitle: {
     fontSize: 37,
     fontFamily: "PlusSB",
+<<<<<<< HEAD
     marginTop: -70,
+=======
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   },
   headerSubTitle: {
     fontSize: 32,
@@ -509,14 +499,6 @@ const styles = StyleSheet.create({
     right: -15,
     marginRight: 20,
   },
-
-
-
-  // rowContainer: {
-  //   flexDirection: "row",
-  //   justifyContent: "space-between",
-  //   gap: 12,
-  // },
   inputWrapper: {
     flex: 1,
     marginBottom: 10,
@@ -532,14 +514,7 @@ const styles = StyleSheet.create({
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.05,
-    // shadowRadius: 2,
-    // elevation: 2,
   },
-
   dropdown: {
     height: 42,
     backgroundColor: "#f9f9f9",
@@ -550,40 +525,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "PlusR",
     justifyContent: "center",
-
   },
-
   dropdownPlaceholder: {
     color: "#999",
     fontFamily: "PlusR",
     fontSize: 14,
-  
-    
   },
-  
   dropdownText: {
     color: "#333",
     fontFamily: "PlusR",
     fontSize: 14,
-  
-    
   },
   dateInputContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-
   submitButton: {
     alignItems: "center",
     marginTop: 20,
   },
-
-
   header: {
     paddingHorizontal: 16,
     paddingBottom: 10,
   },
+<<<<<<< HEAD
 
   historyButton: {
     flex: 1,
@@ -687,6 +653,8 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   
+=======
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 });
 
 export default MovementDetails;

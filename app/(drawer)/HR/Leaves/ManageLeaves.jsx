@@ -19,8 +19,9 @@ import { useNavigation } from 'expo-router';
 
 const screenHeight = Dimensions.get("window").height;
 
-const getStatusColor = (status) => {
-  switch (status?.toLowerCase?.()) {
+const getStatusColor = (status = "") => {
+  const safeStatus = status ? String(status).toLowerCase() : "";
+  switch (safeStatus) {
     case "approved":
       return "#4CAF50";
     case "send to higher authority":
@@ -34,69 +35,46 @@ const getStatusColor = (status) => {
   }
 };
 
-
-// const getStatusColor = (status = "") => {
-//   switch (status.toLowerCase()) {
-//     case "approved":
-//       return "#4CAF50";
-//     case "send to higher authority":
-//       return "#FF9800";
-//     case "initiated":
-//       return "#2196F3";
-//     case "rejected request":
-//       return "#F44336";
-//     default:
-//       return "#757575";
-//   }
-// };
-
 const ManageLeaves = () => {
-
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLeaveId, setSelectedLeaveId] = useState(null);
   const router = useRouter();
   const navigation = useNavigation();
-
   const [refreshing, setRefreshing] = useState(false);
+  const { user } = useUser();
 
-  const{user}=useUser();
-
-  
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchInitialData();
-    resetForm();
+    await fetchLeaves();
     setRefreshing(false);
   };
 
+  const fetchLeaves = async () => {
+    setLoading(true);
+    const employeeId = user.id;
+    console.log("Fetched employeeId:", employeeId);
+    const data = await getAllJuniorRequestedLeaves(employeeId);
+    const mappedData = (data || []).map(item => ({
+      id: item.id,
+      date: item["Leave Requested Date"],
+      initiatedBy: item["Initiated By"],
+      fromDate: item["From"],
+      toDate: item["To"],
+      status: item["Status"],
+      leaveAt: item["Leave Currently At"],
+    }));
+    console.log("API Response:", data);
+    setLeaves(mappedData || []);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchLeaves = async () => {
-      setLoading(true);
-      const employeeId =user.id;
-      console.log("Fetched employeeId:", employeeId);
-      const data = await getAllJuniorRequestedLeaves(employeeId);
-
-
-      const mappedData = (data || []).map(item => ({
-        id: item.id,
-        date: item["Leave Requested Date"],
-        initiatedBy: item["Initiated By"], 
-        fromDate: item["From"],
-        toDate: item["To"],
-        status: item["Status"],
-        leaveAt: item["Leave Currently At"],
-      }));
-      console.log("API Response:", data);
-      setLeaves(mappedData || []);
-      setLoading(false);
-    };
-
     fetchLeaves();
   }, []);
 
   const renderItem = ({ item, index }) => (
+<<<<<<< HEAD
     <TouchableOpacity 
     style={styles.card}
     // onPress={() => router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } })}
@@ -114,6 +92,12 @@ onPress={async () => {
     }}
   >
 
+=======
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } })}
+    >
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
       <View style={styles.cardRow}>
         <Text style={styles.serial}>#{index + 1}</Text>
         <Text style={styles.date}>{item.date}</Text>
@@ -138,27 +122,21 @@ onPress={async () => {
       >
         {item.status}
       </Text>
-      
-
-
-    
     </TouchableOpacity>
-
-);
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-               <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                         <Ionicons name="menu" size={26} color="#000" />
-                       </TouchableOpacity>
-         
-               </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={26} color="#000" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.headerRow}>
-              
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Manage</Text>
           <Text style={styles.headerSubTitle}>Leaves</Text>
-          <Text style={styles.headerDesc}>View all the pending leaves here!</Text>  
+          <Text style={styles.headerDesc}>View all the pending leaves here!</Text>
         </View>
         <LottieView
           source={require("../../../../assets/svg/EMP.json")}
@@ -167,7 +145,6 @@ onPress={async () => {
           style={styles.lottie}
         />
       </View>
-
       <FlatList
         data={leaves}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
@@ -175,9 +152,9 @@ onPress={async () => {
         contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
-              refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                  }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </SafeAreaView>
   );
@@ -188,7 +165,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Platform.OS === "android" ? 25 : 0,
     backgroundColor: "#fff",
-
   },
   headerRow: {
     flexDirection: "row",
@@ -200,11 +176,12 @@ const styles = StyleSheet.create({
   },
   headerTextContainer: {
     flex: 1,
+    bottom:30,
   },
   headerTitle: {
     fontSize: 35,
     fontFamily: "PlusSB",
-    marginTop: -89,
+    
   },
   headerSubTitle: {
     fontSize: 30,
@@ -231,6 +208,7 @@ const styles = StyleSheet.create({
     height: 200,
     padding: 15,
     marginBottom: 15,
+    
     elevation: 5,
     shadowColor: "#32cd32",
     shadowOffset: { width: 0, height: 2 },
@@ -240,11 +218,11 @@ const styles = StyleSheet.create({
   cardRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    
   },
   serial: {
     fontSize: 16,
     fontFamily: "PlusR",
-   
     color: "#444",
   },
   date: {

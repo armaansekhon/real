@@ -1,21 +1,23 @@
-import { StyleSheet, Text, TouchableOpacity, Modal, View, TextInput, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Modal, View, TextInput, FlatList, Image, Alert, RefreshControl } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
 import { useRouter } from 'expo-router';
 import { useUser } from '../../../context/UserContext';
+import * as SecureStore from 'expo-secure-store';
+import axios from 'axios';
 
 const statusColors = {
   'Not Started': '#888c4a',  // Gray
   'Not Picked': '#000000',   // Red
-  "HOT":"#5a0202",
-  'WARM': '#fa6161',         // Orange (optional if backend sends uppercase)
-  'Registered':"#5ee802",
+  "HOT": "#5a0202",
+  'WARM': '#fa6161',         // Orange
+  'Registered': "#5ee802",
   'COLD': '#0275d8',         // Blue
-  "STARTED": '#ee961b',         // Blue
-  "Duplicate": '#1808f7',         // Blue
-  'CLOSED': '#30b3df',         // Blue
+  "STARTED": '#ee961b',      // Blue
+  "Duplicate": '#1808f7',    // Blue
+  'CLOSED': '#30b3df',       // Blue
   Default: '#5aaf57',        // Green
 };
 
@@ -23,28 +25,83 @@ const ManageLeads = () => {
   const [search, setSearch] = useState('');
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const Navigation = useNavigation();
   const [selectedLead, setSelectedLead] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const Router = useRouter();
 
-  
   const filteredLeads = leads.filter(lead =>
     lead.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const fetchLeads = async () => {
     try {
+      setLoading(true);
+      const secretKey = await SecureStore.getItemAsync('auth_token');
       const res = await fetch(
-        'http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/getAllCustomerLeads'
+        'http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/getAllCustomerLeads',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'secret_key': secretKey,
+          },
+        }
       );
       const data = await res.json();
       setLeads(data);
     } catch (err) {
       console.error('Error fetching leads:', err);
+      Alert.alert('Error', 'Failed to fetch leads. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const deleteLead = async (leadId) => {
+    try {
+      const secretKey = await SecureStore.getItemAsync('auth_token');
+      const response = await axios.delete(
+        `http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/realestateCustomerLeadDelete?id=${leadId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'secret_key': secretKey,
+          },
+        }
+      );
+      if (response.status === 200 || response.status === 204) {
+        Alert.alert('Success', 'Lead deleted successfully!');
+        await fetchLeads(); // Refresh the lead list
+      }
+    } catch (error) {
+      console.error('Error deleting lead:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to delete lead. Please try again.';
+      Alert.alert('Error', errorMessage);
+    }
+  };
+
+  const handleDeletePress = (leadId, leadName) => {
+    Alert.alert(
+      'Confirm Delete',
+      `Do you really want to delete the lead "${leadName}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteLead(leadId),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchLeads();
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -80,7 +137,7 @@ const ManageLeads = () => {
       <FlatList
         showsVerticalScrollIndicator={false}
         data={filteredLeads}
-        keyExtractor={(item) => item.id.toString()} // Ensure id is a string
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => {
           const normalizedStatus = item.currentFollowUpStatus?.trim();
           const badgeColor = statusColors[normalizedStatus] || statusColors.Default;
@@ -98,7 +155,10 @@ const ManageLeads = () => {
                 </View>
 
                 {/* Delete icon - top right */}
-                <TouchableOpacity style={styles.deleteIcon}>
+                <TouchableOpacity
+                  style={styles.deleteIcon}
+                  onPress={() => handleDeletePress(item.id, item.name)}
+                >
                   <Ionicons name="close" size={24} color="#d11a2a" />
                 </TouchableOpacity>
 
@@ -107,7 +167,7 @@ const ManageLeads = () => {
                   source={
                     item.profile
                       ? { uri: `data:image/jpeg;base64,${item.profile}` }
-                      : require('../../../assets/images/onboard.jpg') // fallback image
+                      : require('../../../assets/images/onboard.jpg')
                   }
                   style={styles.image}
                 />
@@ -121,10 +181,9 @@ const ManageLeads = () => {
                   <View style={styles.buttonRow}>
                     <TouchableOpacity
                       onPress={() => {
-                 
                         Router.push({
                           pathname: "/(drawer)/CRM/UpdateLead",
-                          params: { leadData: JSON.stringify(item) }, // Serialize item to string
+                          params: { leadData: JSON.stringify(item) },
                         });
                       }}
                       style={styles.actionBtn}
@@ -134,10 +193,9 @@ const ManageLeads = () => {
                     <TouchableOpacity
                       style={styles.actionBtn}
                       onPress={() => {
-                         
                         Router.push({
                           pathname: "/(drawer)/CRM/Followup",
-                          params: { leadData: JSON.stringify(item) }, // Serialize item to string
+                          params: { leadData: JSON.stringify(item) },
                         });
                       }}
                     >
@@ -149,6 +207,9 @@ const ManageLeads = () => {
             </TouchableOpacity>
           );
         }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
 
       <Modal

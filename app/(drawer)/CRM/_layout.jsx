@@ -11,6 +11,8 @@ const Layout = () => {
          <Stack.Screen name="ManageLeads" options={{ title: "Manage Leads", headerShown: false }} />
          <Stack.Screen name="Appointments" options={{ title: "Appointments", headerShown: false }} />
          <Stack.Screen name="Followup" options={{ title: "Followups", headerShown: false }} />
+         <Stack.Screen name="AddCustomers" options={{ title: "Add Customers", headerShown: false }} />
+         <Stack.Screen name="ManageCustomers" options={{ title: "Manage Customers", headerShown: false }} />
         
 
         

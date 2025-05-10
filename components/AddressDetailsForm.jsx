@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 42,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 14,
     fontSize: 13,
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     height: 42,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 14,
     borderColor: "#ccc",

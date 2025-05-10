@@ -9,18 +9,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
-
-// Sample backend-style appointment data
-const sampleAppointments = {
-  '2025-04-19': [
-    { text: 'Meeting with Client', time: '1:23 PM' },
-    { text: 'Scheduled at Mohali ', time: '1:30 PM' },
-  ],
-  '2025-04-18': [
-    { text: 'Scheduled at Mohali ', time: '10:00 AM' },
-    { text: 'Deployed update to staging', time: '4:00 PM' },
-  ],
-};
+import { useUser } from '../context/UserContext';
+import * as SecureStore from 'expo-secure-store';
 
 const generateWeekDates = (centerDate = dayjs()) => {
   const days = [];
@@ -38,6 +28,36 @@ const generateWeekDates = (centerDate = dayjs()) => {
 export default function AdminAppointments() {
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [weekDates, setWeekDates] = useState(generateWeekDates(dayjs()));
+  const [appointments, setAppointments] = useState([]);
+  const { user } = useUser();
+
+  const userId = user.id;
+
+  // Fetch appointments when the selected date changes
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+              const secretKey = await SecureStore.getItemAsync('auth_token');
+        const response = await fetch(
+          `http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/realestateCustomerLeadApointments/${userId}/${selectedDate}`,
+
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'secret_key':secretKey,
+            }
+          }
+        );
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+        setAppointments([]);
+      }
+    };
+
+    fetchAppointments();
+  }, [selectedDate, userId]);
 
   // Auto-update the date at midnight
   useEffect(() => {
@@ -47,23 +67,25 @@ export default function AdminAppointments() {
         setSelectedDate(now);
         setWeekDates(generateWeekDates(dayjs()));
       }
-    }, 60 * 1000); // check every 60 seconds
+    }, 60 * 1000);
 
     return () => clearInterval(interval);
   }, [selectedDate]);
 
-  const appointments = sampleAppointments[selectedDate] || [];
-
   return (
     <View style={styles.container}>
-      <Text style={styles.header}> Latest  <Text style={{ fontFamily:"PlusSB",color:"#196f3d"}} > Appointments</Text> </Text>
+      <Text style={styles.header}>
+        Latest <Text style={{ fontFamily: "PlusSB", color: "#196f3d" }}> Appointments</Text>
+      </Text>
 
       <FlatList
         data={weekDates}
         horizontal
         keyExtractor={(item) => item.fullDate}
         showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.dateSelector}
+        
         renderItem={({ item }) => {
           const isSelected = item.fullDate === selectedDate;
           return (
@@ -82,7 +104,7 @@ export default function AdminAppointments() {
         }}
       />
 
-      <ScrollView contentContainerStyle={styles.timeline}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.timeline}>
         {appointments.length === 0 ? (
           <Text style={styles.noAppointments}>No appointments</Text>
         ) : (
@@ -92,8 +114,9 @@ export default function AdminAppointments() {
                 <Ionicons name="calendar-outline" size={24} color="#007bff" />
               </View>
               <View style={styles.textContainer}>
-                <Text style={styles.itemText}>{item.text}</Text>
-                <Text style={styles.timeText}>{item.time}</Text>
+                <Text style={styles.itemText}>{item.name}</Text>
+                <Text style={styles.timeText}>{item.mobileNo}</Text>
+                <Text style={styles.descriptionText}>{item.description || 'No description'}</Text>
               </View>
             </View>
           ))
@@ -117,13 +140,10 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 16,
-    // fontWeight: '600',
     marginBottom: 12,
     color: '#000',
-    fontFamily:"PlusR"
-
+    fontFamily: "PlusR",
   },
-
   dateSelector: {
     paddingBottom: 12,
     justifyContent: 'space-between',
@@ -135,7 +155,7 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 12,
     color: '#444',
-    fontFamily:"PlusR"
+    fontFamily: "PlusR",
   },
   dateCircle: {
     width: 36,
@@ -158,6 +178,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   timeline: {
+    maxHeight: 210, // Height for 3 appointment cards (3 * ~70px each)
     paddingTop: 8,
     paddingBottom: 16,
   },
@@ -176,18 +197,21 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     borderLeftWidth: 2,
     borderLeftColor: '#ccc',
-    
   },
   itemText: {
     fontSize: 14,
     color: '#111',
     marginBottom: 2,
-    fontFamily:"PlusR"
-    
+    fontFamily: "PlusR",
   },
   timeText: {
     fontSize: 12,
     color: '#888',
+    marginBottom: 2,
+  },
+  descriptionText: {
+    fontSize: 12,
+    color: '#666',
   },
   noAppointments: {
     padding: 16,

@@ -1,60 +1,53 @@
-import { Text } from 'react-native'
-import { Redirect } from "expo-router";
-import React, {useState, useEffect} from 'react';
-import AppLoading from 'expo-app-loading'; 
-import {useFonts} from "expo-font"
-import { SafeAreaView } from 'react-native-safe-area-context'
-
+import React, { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
+import { useFonts } from 'expo-font';
 import { UserProvider } from '../context/UserContext';
+import useLogin from '../hooks/useLogin';
 
-export  function AppEntry() {
+const Index = () => {
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
+  const { checkAuth } = useLogin();
 
+  const [fontsLoaded] = useFonts({
+    PlusEL: require('../assets/fonts/PlusJakartaSans-ExtraLight.ttf'),
+    PlusL: require('../assets/fonts/PlusJakartaSans-Light.ttf'),
+    PlusR: require('../assets/fonts/PlusJakartaSans-Regular.ttf'),
+    PlusSB: require('../assets/fonts/PlusJakartaSans-SemiBold.ttf'),
+    PlusB: require('../assets/fonts/PlusJakartaSans-Bold.ttf'),
+  });
 
   useEffect(() => {
-    const checkLogin = async () => {
-      const token = await SecureStore.getItemAsync('userToken');
-      if (token) {
-        router.replace("/(drawer)/(tabs)/Home");
-      } else {
-        router.replace("/Login");
-      }
+    const initializeApp = async () => {
+      const { isAuthenticated } = await checkAuth();
+      setIsAuthenticated(isAuthenticated);
       setCheckingAuth(false);
     };
 
-    checkLogin();
-  }, []);
+    if (fontsLoaded) {
+      initializeApp();
+    }
+  }, [fontsLoaded]);
 
-  if (checkingAuth) {
+  if (!fontsLoaded || checkingAuth) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#5aaf57" />
       </View>
     );
   }
-  return null;
-}
-
-const index = () => {
-    const [fontsLoaded]=useFonts({
-        "PlusEL":require("../assets/fonts/PlusJakartaSans-ExtraLight.ttf"),
-        "PlusL":require("../assets/fonts/PlusJakartaSans-Light.ttf"),
-        "PlusR":require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
-        "PlusSB":require("../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
-        "PlusB":require("../assets/fonts/PlusJakartaSans-Bold.ttf")
-    });
-    if (!fontsLoaded) {
-      return <AppLoading />; }
 
   return (
-    <Redirect href="/Onboard" />
+    <UserProvider>
+      {isAuthenticated ? (
+        <Redirect href="/(drawer)/(tabs)/Home" />
+      ) : (
+        <Redirect href="/Onboard" />
+      )}
+    </UserProvider>
+  );
+};
 
-   
-  )
-}
-
-export default index
+export default Index;

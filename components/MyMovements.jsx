@@ -186,6 +186,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding:10,
   },
   header: {
     paddingHorizontal: 22,
@@ -198,6 +199,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 32,
     fontFamily: "PlusR",
+    marginTop:10,
   },
   card: {
     backgroundColor: '#fff',
@@ -242,6 +244,8 @@ const styles = StyleSheet.create({
   cardContent: {
     marginTop: 8,
     paddingHorizontal: 8,
+    
+
   },
   cardText: {
     fontSize: 14,

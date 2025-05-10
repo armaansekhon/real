@@ -34,59 +34,50 @@ const getStatusColor = (status) => {
   }
 };
 
-
-
 const ManageMovement = () => {
-
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedMovementId, setSelectedMovementId] = useState(null);
   const router = useRouter();
   const navigation = useNavigation();
-
   const [refreshing, setRefreshing] = useState(false);
+  const { user } = useUser();
 
-  const{user}=useUser();
-
-  
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchInitialData();
-    resetForm();
+    await fetchMovements();
     setRefreshing(false);
   };
 
+  const fetchMovements = async () => {
+    setLoading(true);
+    const employeeId = user.id;
+    console.log("Fetched employeeId:", employeeId);
+    const data = await getAllJuniorRequestedMovements(employeeId);
+
+    const mappedData = (data || []).map(item => ({
+      id: item.mId,
+      date: item["Movement Requested Date"],
+      initiatedBy: item["Initiated By"],
+      fromTime: item["fromTime"],
+      toTime: item["toTime"],
+      status: item["Status"],
+      leaveAt: item["Currently At"],
+      movementReason: item["Movement Reason "],
+      description: item["description"],
+    }));
+
+    console.log("API Response:", data);
+    setMovements(mappedData || []);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchMovements = async () => {
-      setLoading(true);
-      const employeeId =user.id;
-      console.log("Fetched employeeId:", employeeId);
-      const data = await getAllJuniorRequestedMovements(employeeId);
-
-
-      const mappedData = (data || []).map(item => ({
-        id: item.mId, 
-      date: item["Movement Requested Date"], 
-      initiatedBy: item["Initiated By"], 
-      fromTime: item["fromTime"],
-      toTime: item["toTime"], 
-      status: item["Status"], 
-      leaveAt: item["Currently At"], 
-      movementReason: item["Movement Reason "], 
-      description: item["description"], 
-    }));
- 
-      console.log("API Response:", data);``
-      setMovements(mappedData || []);
-      setLoading(false);
-    };
-
     fetchMovements();
   }, []);
 
   const renderItem = ({ item, index }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.card}
     //   onPress={() => router.push({ pathname: "/(drawer)/HR/MovementRegister/MovementDetails", params: { mId: item.id } })}
     // >
@@ -106,37 +97,22 @@ onPress={async () => {
         <Text style={styles.date}>{item.date}</Text>
       </View>
       
-      {/* Initiated By */}
       <Text style={styles.info}>
         <Text style={styles.label}>Initiated By:</Text> {item.initiatedBy}
       </Text>
   
-      {/* Leave Currently At */}
       <Text style={styles.info}>
         <Text style={styles.label}>Leave Currently At:</Text> {item.leaveAt}
       </Text>
   
-      {/* Movement Reason */}
-      {/* <Text style={styles.info}>
-        <Text style={styles.label}>Movement Reason:</Text> {item.movementReason}
-      </Text> */}
-  
-      {/* Description */}
-      {/* <Text style={styles.info}>
-        <Text style={styles.label}>Description:</Text> {item.description}
-      </Text>
-   */}
-      {/* From Time */}
       <Text style={styles.info}>
         <Text style={styles.label}>Leave From:</Text> {item.fromTime}
       </Text>
   
-      {/* To Time */}
       <Text style={styles.info}>
         <Text style={styles.label}>To:</Text> {item.toTime}
       </Text>
   
-      {/* Status */}
       <Text
         style={[
           styles.status,
@@ -147,21 +123,19 @@ onPress={async () => {
       </Text>
     </TouchableOpacity>
   );
-  
 
   return (
     <SafeAreaView style={styles.container}>
-               <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                         <Ionicons name="menu" size={26} color="#000" />
-                       </TouchableOpacity>
-         
-               </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={26} color="#000" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.headerRow}>
-              
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Manage</Text>
           <Text style={styles.headerSubTitle}>Movements</Text>
-          <Text style={styles.headerDesc}>View all the pending movements here!</Text>  
+          <Text style={styles.headerDesc}>View all the pending movements here!</Text>
         </View>
         <LottieView
           source={require("../../../../assets/svg/EMP.json")}
@@ -178,9 +152,9 @@ onPress={async () => {
         contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
-              refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                  }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </SafeAreaView>
   );
@@ -191,14 +165,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Platform.OS === "android" ? 25 : 0,
     backgroundColor: "#fff",
-
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    marginTop: Platform.OS === "ios" ? 60 : 70,
+    marginTop: Platform.OS === "ios" ? 90 : 80,
     marginBottom: 20,
   },
   headerTextContainer: {
@@ -247,7 +220,6 @@ const styles = StyleSheet.create({
   serial: {
     fontSize: 16,
     fontFamily: "PlusR",
-   
     color: "#444",
   },
   date: {

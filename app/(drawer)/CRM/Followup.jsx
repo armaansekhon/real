@@ -126,19 +126,17 @@ const Followup = () => {
     fetchInitialData();
   }, []);
 
-  
   useEffect(() => {
-    const fetchfollowupstatus = async () => {
-     
+    const fetchFollowUpStatus = async () => {
       try {
-        // const secretKey = await SecureStore.getItemAsync("auth_token");
+        const secretKey = await SecureStore.getItemAsync("auth_token");
         const res = await fetch(
-          `http://192.168.6.210:8000/pipl/api/v1/followUpStatus/followUpStatusFrom`,
+          `http://192.168.6.210:8686/pipl/api/v1/followUpStatus/followUpStatusFrom`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              // secret_key: secretKey,
+              secret_key: secretKey,
             },
           }
         );
@@ -153,21 +151,20 @@ const Followup = () => {
         console.error("Error fetching status", err);
       }
     };
-    fetchfollowupstatus();
+    fetchFollowUpStatus();
   }, []);
 
   useEffect(() => {
-    const fetchfollowupVia = async () => {
-     
+    const fetchFollowUpVia = async () => {
       try {
-        // const secretKey = await SecureStore.getItemAsync("auth_token");
+        const secretKey = await SecureStore.getItemAsync("auth_token");
         const res = await fetch(
-          `http://192.168.6.210:8000/pipl/api/v1/followUpVia/followUpViaForm`,
+          `http://192.168.6.210:8686/pipl/api/v1/followUpVia/followUpViaForm`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              // secret_key: secretKey,
+              secret_key: secretKey,
             },
           }
         );
@@ -179,14 +176,11 @@ const Followup = () => {
         setFollowUpViaItems(formatted);
         setFollowUpViaValue(null);
       } catch (err) {
-        console.error("Error fetching status", err);
+        console.error("Error fetching via", err);
       }
     };
-    fetchfollowupVia();
+    fetchFollowUpVia();
   }, []);
-
-
-
 
   useEffect(() => {
     const fetchStates = async () => {
@@ -317,47 +311,47 @@ const Followup = () => {
 
     try {
       const payload = {
-        leadId: parsedLeadData.id,
+        realEstateCustomerLead: { id: parsedLeadData.id },
         followUpDate: moment(followUpDate).format("YYYY-MM-DD"),
-        followUpStatus:{id:followUpStatusValue} ,
-        followUpVia: {id:followUpViaValue},
+        followUpStatus: { id: followUpStatusValue },
+        followUpVia: { id: followUpViaValue },
         nextFollowUpDate: moment(nextFollowUpDate).format("YYYY-MM-DD"),
         remarks: form.remarks,
-        appointmentDetails: gotAppointment
-          ? {
-              appointmentDate: moment(appointmentDate).format("YYYY-MM-DD"),
-              remarks: form.appointmentRemarks,
-              addressDetails: {
-             
-                address1: form.addressLine1,
-                address2: form.addressLine2,
-                city: form.city,
-                district: {
-                  id: districtValue,
-                  state: {
-                    id: stateValue,
-                    country: {
-                      id: countryValue,
+        appointment: gotAppointment
+          ? [
+              {
+                appointementDate: moment(appointmentDate).format("YYYY-MM-DD"),
+                remarks: form.appointmentRemarks,
+                addressDetails: {
+                  address1: form.addressLine1,
+                  address2: form.addressLine2,
+                  city: form.city,
+                  district: {
+                    id: districtValue,
+                    state: {
+                      id: stateValue,
+                      country: {
+                        id: countryValue,
+                      },
                     },
                   },
                 },
               },
-            }
-          : null,
-          entryBy: { id: user.id },
-        // branch: { id: branch.id },
+            ]
+          : [],
+        entryBy: { id: user.id },
       };
 
-      console.log("Data Sending .......",payload)
+      console.log("Data Sending .......", payload);
 
-      // const secretKey = await SecureStore.getItemAsync("auth_token");
+      const secretKey = await SecureStore.getItemAsync("auth_token");
       const response = await axios.post(
-        `http://192.168.6.210:8000/pipl/api/v1/realestateCustomerLead/addFollowUpCustomerLead`,
+        `http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/addFollowUpCustomerLead`,
         payload,
         {
           headers: {
             "Content-Type": "application/json",
-            // secret_key: secretKey,
+            secret_key: secretKey,
           },
         }
       );
@@ -374,13 +368,13 @@ const Followup = () => {
 
   const RequiredLabel = ({ text, isRequired }) => (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      {isRequired && <Text style={styles.requiredMark}>* </Text>}
       <Text style={styles.label}>{text}</Text>
+      {isRequired && <Text style={styles.requiredMark}>*</Text>}
     </View>
   );
 
   if (!parsedLeadData) {
-    return null; // Render nothing until leadData is parsed
+    return null;
   }
 
   return (
@@ -407,7 +401,6 @@ const Followup = () => {
           </Text>
         </View>
 
-        {/* Detail Card */}
         <View style={styles.detailCard}>
           <Text style={styles.detailTitle}>Lead Details</Text>
           <View style={styles.detailRow}>
@@ -453,7 +446,6 @@ const Followup = () => {
           </View>
         </View>
 
-        {/* Follow Up Form */}
         <RequiredLabel text="Follow Up Date" isRequired={false} />
         <TouchableOpacity
           style={styles.input}
@@ -461,6 +453,40 @@ const Followup = () => {
         >
           <Text>{moment(followUpDate).format("MM/DD/YYYY")}</Text>
         </TouchableOpacity>
+        <Modal
+          visible={showFollowUpDatePicker}
+          transparent
+          animationType="slide"
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "flex-end",
+              backgroundColor: "#00000088",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "white",
+                padding: 16,
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+              }}
+            >
+              <DateTimePicker
+                value={followUpDate || new Date()}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={(event, selectedDate) => {
+                  setShowFollowUpDatePicker(false);
+                  if (selectedDate) {
+                    setFollowUpDate(selectedDate);
+                  }
+                }}
+              />
+            </View>
+          </View>
+        </Modal>
 
         <RequiredLabel text="Follow Up Status" isRequired={true} />
         <View style={{ zIndex: 1000, marginTop: 4 }}>
@@ -477,6 +503,8 @@ const Followup = () => {
             placeholder="Select Follow Up Status"
             listMode="SCROLLVIEW"
             zIndex={1000}
+            style={[styles.input, errors.followUpStatus && styles.inputError]}
+            dropDownContainerStyle={styles.dropDownContainer}
           />
         </View>
         {errors.followUpStatus && (
@@ -498,6 +526,8 @@ const Followup = () => {
             placeholder="Select Follow Up Via"
             listMode="SCROLLVIEW"
             zIndex={900}
+            style={[styles.input, errors.followUpVia && styles.inputError]}
+            dropDownContainerStyle={styles.dropDownContainer}
           />
         </View>
         {errors.followUpVia && (
@@ -566,7 +596,6 @@ const Followup = () => {
           <Text style={styles.errorText}>{errors.remarks}</Text>
         )}
 
-        {/* Appointment Toggle */}
         <View
           style={{
             flexDirection: "row",
@@ -674,6 +703,8 @@ const Followup = () => {
                 placeholder="Select Country"
                 listMode="SCROLLVIEW"
                 zIndex={800}
+                style={[styles.input, errors.country && styles.inputError]}
+                dropDownContainerStyle={styles.dropDownContainer}
               />
             </View>
             {errors.country && (
@@ -695,6 +726,8 @@ const Followup = () => {
                 placeholder="Select State"
                 listMode="SCROLLVIEW"
                 zIndex={700}
+                style={[styles.input, errors.state && styles.inputError]}
+                dropDownContainerStyle={styles.dropDownContainer}
               />
             </View>
             {errors.state && (
@@ -716,6 +749,8 @@ const Followup = () => {
                 placeholder="Select District"
                 listMode="SCROLLVIEW"
                 zIndex={600}
+                style={[styles.input, errors.district && styles.inputError]}
+                dropDownContainerStyle={styles.dropDownContainer}
               />
             </View>
             {errors.district && (
@@ -770,16 +805,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   detailCard: {
-    backgroundColor: "#ffff",
+    backgroundColor: "#fff",
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
-    shadowColor: '#5aaf57',
+    shadowColor: "#5aaf57",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 5,
-    // borderWidth: 1,
     borderColor: "#ddd",
   },
   detailTitle: {
@@ -787,7 +821,7 @@ const styles = StyleSheet.create({
     fontFamily: "PlusSB",
     color: "#5aaf57",
     marginBottom: 10,
-    marginLeft:10,
+    marginLeft: 10,
   },
   detailRow: {
     flexDirection: "row",
@@ -797,16 +831,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "PlusSB",
     color: "#333",
-    marginLeft:10,
+    marginLeft: 10,
     width: 210,
-    
   },
   detailValue: {
     fontSize: 14,
     fontFamily: "PlusR",
     color: "#555",
     flex: 1,
-    
   },
   input: {
     borderWidth: 1,
@@ -842,19 +874,24 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 40,
   },
+  dropDownContainer: {
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
   label: {
     fontSize: 14,
     marginBottom: 4,
     marginTop: 13,
     color: "#5aaf57",
     fontFamily: "PlusSB",
-    marginLeft: 8,
+    marginRight: 4,
   },
   requiredMark: {
     color: "red",
     fontSize: 14,
     marginTop: 13,
-    marginLeft: 4,
   },
   errorText: {
     color: "red",

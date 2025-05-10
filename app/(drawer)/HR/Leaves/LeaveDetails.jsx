@@ -20,9 +20,8 @@ import axios from 'axios';
 import { getLeaveById } from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "expo-router";
-
-import { Dropdown } from "react-native-element-dropdown" 
-import {getLeaveApprovalAuthority} from  "../../../../services/api";
+import { Dropdown } from "react-native-element-dropdown";
+import { getLeaveApprovalAuthority } from "../../../../services/api";
 import { useUser } from '../../../../context/UserContext';
 import { submitLeaveAction } from "../../../../services/api";
 
@@ -50,20 +49,15 @@ const CustomDropdown = ({ value, setValue, data, placeholder, loading }) => {
   );
 };
 
-
-
-
 const LeaveDetails = () => {
-  const{user, date}=useUser();
-  const { leaveId } = useLocalSearchParams(); // from router.push({ pathname: ..., params: { leaveId } })
+  const { user, date } = useUser();
+  const { leaveId } = useLocalSearchParams();
   const [leaveDetails, setLeaveDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const [showDatePicker, setShowDatePicker] = useState(false);
-
   const [statusOptions, setStatusOptions] = useState([]);
   const [statusLoading, setStatusLoading] = useState(true);
-
   const [refreshing, setRefreshing] = useState(false);
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
    const [historyLoading, setHistoryLoading] = useState(false);
@@ -72,27 +66,18 @@ const LeaveDetails = () => {
     status: null,
     date: null,
     remarks: null,
- 
   });
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchInitialData();
-    resetForm();
+    await fetchLeaveDetails();
     setRefreshing(false);
   };
 
-
- 
-  console.log("User context:", user);
-  console.log("Employee ID:", user?.id);
-
   const groupedFields = [
-    [{ key: "status", placeholder: "Update Status" },],
+    [{ key: "status", placeholder: "Update Status" }],
     [{ key: "date", placeholder: "Update Date" }],
     [{ key: "remarks", placeholder: "Remarks" }],
-
-    
   ];
 
   useEffect(() => {
@@ -100,44 +85,37 @@ const LeaveDetails = () => {
       setData((prev) => ({ ...prev, date }));
     }
   }, [date]);
-  
 
-  
+  const fetchLeaveDetails = async () => {
+    if (!leaveId) return;
+    setLoading(true);
+    console.log("User context:", user);
+    console.log("Employee ID:", user?.id);
+    const data = await getLeaveById(leaveId);
+    setLeaveDetails(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchLeaveDetails = async () => {
-      if (!leaveId) return;
-      setLoading(true);
-      const data = await getLeaveById(leaveId);
-      setLeaveDetails(data);
-      setLoading(false);
-    };
-
     fetchLeaveDetails();
-    
   }, [leaveId]);
 
-
   useEffect(() => {
-
-   if (!user || !user.id) {
+    if (!user || !user.id) {
       console.warn("User or employeeId not available yet.");
-     return; // prevent running API call if user is not ready
+      return;
     }
-  
+
     const fetchStatusOptions = async () => {
       try {
         setStatusLoading(true);
         console.log("Fetching approval authority for employeeId:", user.id);
-  
         const response = await getLeaveApprovalAuthority(user.id);
         console.log("Approval authority response:", response);
-  
         const formatted = response.roles.map((role) => ({
           label: role.role,
           value: role.role,
         }));
-  
         setStatusOptions(formatted);
       } catch (error) {
         console.error("Error fetching status options:", error);
@@ -145,9 +123,10 @@ const LeaveDetails = () => {
         setStatusLoading(false);
       }
     };
-  
+
     fetchStatusOptions();
   }, [user?.id]);
+<<<<<<< HEAD
   
 
 
@@ -173,6 +152,8 @@ const LeaveDetails = () => {
     }
   };
   
+=======
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 
   if (loading) {
     return (
@@ -201,9 +182,6 @@ const LeaveDetails = () => {
       remarks: null,
     });
   };
-  
-
-
 
   const handleSubmit = async () => {
     try {
@@ -214,7 +192,6 @@ const LeaveDetails = () => {
         updatedBy: user?.id,
         updateDate: data.date,
       };
-  
       const res = await submitLeaveAction(payload);
       alert(res.message || "Leave action successful!");
       resetForm();
@@ -223,35 +200,30 @@ const LeaveDetails = () => {
     }
   };
 
-
   const statuses = [
     { label: "Approved", value: "approved" },
     { label: "Rejected", value: "rejected" },
     { label: "Pending", value: "pending" },
-
   ];
-  
+
   const dates = [
     { label: "Today", value: new Date().toISOString().split("T")[0] },
     { label: "Tomorrow", value: new Date(Date.now() + 86400000).toISOString().split("T")[0] },
   ];
-  
+
   const remarks = [
     { label: "Approved by Manager", value: "Approved by Manager" },
     { label: "Needs clarification", value: "Needs clarification" },
   ];
 
-
-
-  
-
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                <Ionicons name="chevron-back" size={28} color="#000" />
-              </TouchableOpacity>
-
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={28} color="#000" />
+        </TouchableOpacity>
       </View>
+<<<<<<< HEAD
    
                 <View style={styles.headerRow}>
                 <View style={styles.headerTextContainer}> 
@@ -289,6 +261,28 @@ const LeaveDetails = () => {
  
         {/* <Text style={styles.heading}>Leave Details</Text> */}
         <Detail label="Leave Type" value={leaveDetails["Leave Type"]}/>
+=======
+      <View style={styles.headerRow}>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerTitle}>Leave</Text>
+          <Text style={styles.headerSubTitle}>Details</Text>
+        </View>
+        <LottieView
+          source={require("../../../../assets/svg/EMP.json")}
+          autoPlay
+          loop
+          style={styles.lottie}
+        />
+      </View>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <Detail label="Leave Type" value={leaveDetails["Leave Type"]} />
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
         <Detail label="Status" value={leaveDetails["Status"]} />
         <Detail label="Requested On" value={leaveDetails["Leave Requested Date"]} />
         <Detail label="From Date" value={leaveDetails["From"]} />
@@ -296,73 +290,65 @@ const LeaveDetails = () => {
         <Detail label="Initiated By" value={leaveDetails["Initiated By"]} />
         <Detail label="Leave Currently At" value={leaveDetails["Leave Currently At"]} />
         <Detail label="Reason" value={leaveDetails["Reason"]} />
-      
 
-
-      {groupedFields.map((row, rowIndex) => (
+        {groupedFields.map((row, rowIndex) => (
           <View
             key={rowIndex}
             style={[styles.rowContainer, { zIndex: 1000 - rowIndex * 10 }]}
           >
-
-{row.map((item, itemIndex) => (
+            {row.map((item, itemIndex) => (
               <View key={item.key} style={styles.inputWrapper}>
                 <Text style={styles.label}>
                   {item.placeholder}
-             
                 </Text>
-
-                {["status", ].includes(item.key) ? (
-  <CustomDropdown
-    value={data[item.key]}
-    setValue={(val) => handleValueChange(item.key, val)}
-    data={
-      item.key === "status"
-        ? statusOptions 
-        : []
-    }
-    placeholder={` ${item.placeholder}`}
-    loading={item.key === "status" && statusLoading}
-  />
-) : item.key === "date" ? (
-  <TouchableOpacity
-    onPress={() => setShowDatePicker(true)}
-    style={[styles.input, styles.dateInputContainer]}
-  >
-    <Text
-      style={[
-        styles.select,
-        { color: data.date ? "#333" : "#999", fontFamily: "PlusR" },
-      ]}
-    >
-      {data.date || "YYYY-MM-DD"}
-    </Text>
-    <View style={{ marginLeft: "auto" }}>
-    <Ionicons
-      name="calendar-outline"
-      size={18}
-      color="#777"
-     
-    />
-    </View>
-  </TouchableOpacity>
-) : (
-  <TextInput
-    style={styles.input}
-    placeholder={item.placeholder}
-    placeholderTextColor="#999"
-    value={data[item.key] || ""}
-    onChangeText={(text) => handleValueChange(item.key, text)}
-  />
-)}
-
-                
-                </View>
-                ))}
-                </View>
-              ))}
-        </ScrollView>
-        <TouchableOpacity
+                {["status"].includes(item.key) ? (
+                  <CustomDropdown
+                    value={data[item.key]}
+                    setValue={(val) => handleValueChange(item.key, val)}
+                    data={
+                      item.key === "status"
+                        ? statusOptions
+                        : []
+                    }
+                    placeholder={` ${item.placeholder}`}
+                    loading={item.key === "status" && statusLoading}
+                  />
+                ) : item.key === "date" ? (
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(true)}
+                    style={[styles.input, styles.dateInputContainer]}
+                  >
+                    <Text
+                      style={[
+                        styles.select,
+                        { color: data.date ? "#333" : "#999", fontFamily: "PlusR" },
+                      ]}
+                    >
+                      {data.date || "YYYY-MM-DD"}
+                    </Text>
+                    <View style={{ marginLeft: "auto" }}>
+                      <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color="#777"
+                      />
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  <TextInput
+                    style={styles.input}
+                    placeholder={item.placeholder}
+                    placeholderTextColor="#999"
+                    value={data[item.key] || ""}
+                    onChangeText={(text) => handleValueChange(item.key, text)}
+                  />
+                )}
+              </View>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
+      <TouchableOpacity
         style={styles.submitButton}
         onPress={handleSubmit}
       >
@@ -437,24 +423,21 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    marginTop: -20,
+    // marginTop: -20,
+    paddingBottom:250,
   },
-
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 3,
-    // paddingHorizontal: 4, 
+    marginBottom: 10,
   },
   label: {
     fontSize: 14,
     fontFamily: "PlusSB",
     color: "#555",
     maxWidth: "40%",
-    // flexShrink: 1,
-
-
+    marginBottom:5,
   },
   value: {
     fontSize: 13,
@@ -462,11 +445,7 @@ const styles = StyleSheet.create({
     color: "#222",
     maxWidth: "55%",
     textAlign: "right",
-    // flexShrink: 1,
-    // numberOfLines: 1,
-    // ellipsizeMode: "tail",
   },
-  
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -477,7 +456,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "PlusR",
   },
-
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -513,14 +491,6 @@ marginTop: -70,
     right: -15,
     marginRight: 20,
   },
-
-
-
-  // rowContainer: {
-  //   flexDirection: "row",
-  //   justifyContent: "space-between",
-  //   gap: 12,
-  // },
   inputWrapper: {
     flex: 1,
     marginBottom: 10,
@@ -536,9 +506,11 @@ marginTop: -70,
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
+<<<<<<< HEAD
 
+=======
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   },
-
   dropdown: {
     height: 42,
     backgroundColor: "#f9f9f9",
@@ -549,41 +521,32 @@ marginTop: -70,
     fontSize: 13,
     fontFamily: "PlusR",
     justifyContent: "center",
-
   },
-
   dropdownPlaceholder: {
     color: "#999",
     fontFamily: "PlusR",
     fontSize: 14,
-  
-    
   },
-  
   dropdownText: {
     color: "#333",
     fontFamily: "PlusR",
     fontSize: 14,
-  
-    
   },
   dateInputContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-
   submitButton: {
     alignItems: "center",
     marginTop: 20,
   },
-
-
   header: {
     paddingHorizontal: 16,
     paddingBottom: 10,
     // paddingTop: 40,
   },
+<<<<<<< HEAD
   
 
   historyButton: {
@@ -687,6 +650,8 @@ marginTop: -70,
     backgroundColor: '#5aaf57',
     zIndex: -1,
   },
+=======
+>>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 });
 
 export default LeaveDetails;

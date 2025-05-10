@@ -7,7 +7,7 @@ export const defaultModules   = [
     {
       name: "Home",
       path: "/(drawer)/(tabs)/Home",
-      title: "Tabs",
+      title: "Home",
     //   icon: "home-outline",
       icon: Property,
       alwaysVisible: true
@@ -107,7 +107,49 @@ export const defaultModules   = [
       ],
     },
 
-  
+   
+
+    {
+      name:"CRM",
+      path: "/(drawer)/CRM",
+      title: "CRM",
+
+      icon: CRM,
+     children: [
+      {
+        name: "AddLeads",
+        path: "/(drawer)/CRM/AddLeads",
+        title: "Add Leads",
+        alwaysVisible: true
+      },
+      {
+        name: "ManageLeads",
+        path: "/(drawer)/CRM/ManageLeads",
+        title: "Manage Leads",
+       
+      },
+      {
+        name: "Appointments",
+        path: "/(drawer)/CRM/Appointments",
+        title: "Appointments",
+       
+      },
+      {
+        name: "AddCustomer",
+        path: "/(drawer)/CRM/AddCustomer",
+        title: "Add Customer",
+       
+      },
+      {
+        name: "ManageCustomers",
+        path: "/(drawer)/CRM/ManageCustomers",
+        title: "Manage Customers",
+       
+      },
+
+      ]
+
+    },
 
 
     
@@ -146,35 +188,7 @@ export const defaultModules   = [
           },
         ],
       },
-    {
-      name:"CRM",
-      path: "/(drawer)/CRM",
-      title: "CRM",
-
-      icon: CRM,
-     children: [
-      {
-        name: "AddLeads",
-        path: "/(drawer)/CRM/AddLeads",
-        title: "Add Leads",
-        alwaysVisible: true
-      },
-      {
-        name: "ManageLeads",
-        path: "/(drawer)/CRM/ManageLeads",
-        title: "Manage Leads",
-       
-      },
-      {
-        name: "Appointments",
-        path: "/(drawer)/CRM/Appointments",
-        title: "Appointments",
-       
-      },
-
-      ]
-
-    },
+   
 
 
 

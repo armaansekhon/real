@@ -32,6 +32,10 @@ const CARD_HEIGHT = height * 0.12;
 const AdminDashboard = () => {
   const navigation = useNavigation();
    const {user,img}=useUser();
+
+
+   const desi=user.designation
+   console.log("desi",desi)
    
 
 
@@ -157,8 +161,10 @@ const AdminDashboard = () => {
   style={styles.avatar}
 />
         <View style={styles.cardContent}>
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.designation}>{user.designation.name}</Text>
+          <Text style={styles.name}>{user.name? user.name.split(' ')[0] : 'User'}</Text>
+          <Text style={styles.designation}>
+            {user.designation?.name || 'No Designation'}
+          </Text>
           {/* <Text style={styles.details}>ID: EMP12345</Text> */}
         </View>
       </Animated.View>
