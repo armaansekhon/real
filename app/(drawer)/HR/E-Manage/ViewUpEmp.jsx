@@ -98,10 +98,10 @@ const ViewUpEmp = () => {
 
   const navigateToEdit = (id) => {
     console.log("Navigating to Edit Employee");
-    Router.push({
-      pathname: "/(drawer)/HR/E-Manage/AddEmp",
-      params: { id, isEdit: true },
-    });
+    // Router.push({
+    //   pathname: "/(drawer)/HR/E-Manage/AddEmp",
+    //   params: { id, isEdit: true },
+    // });
   };
 
   const renderEmployee = ({ item }) => (

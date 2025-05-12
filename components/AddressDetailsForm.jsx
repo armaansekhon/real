@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     fontFamily: "PlusSB",
     fontWeight: "600",
     marginBottom: 4,
-    color: "#222",
+    color: "#5aaf57",
   },
   dropdown: {
     height: 42,

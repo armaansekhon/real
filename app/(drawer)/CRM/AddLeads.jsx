@@ -151,7 +151,7 @@ const AddLead = () => {
       if (!stateValue) return;
       try {
         const secretKey = await SecureStore.getItemAsync('auth_token');
-        const res = await fetch(`.168.6.210:8686/pipl/api/v1/employee/getDistrictByStateId/${stateValue}`, {
+        const res = await fetch(`${API_BASE_URL}/employee/getDistrictByStateId/${stateValue}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

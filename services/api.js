@@ -329,7 +329,7 @@ export const submitLeaveAction = async ({ leaveId, leaveStatus, remarks, updated
       data = await response.json();
     } else {
       const text = await response.text();
-      throw new Error(`Unexpected response: ${text}`);
+      throw new Error(`Unexpected response:  Admin can't perform Leave actions `);
     }
 
     if (!response.ok) {
@@ -415,7 +415,7 @@ export const submitMovementRequest = async ({
       data = await response.json();
     } else {
       const text = await response.text();
-      throw new Error(`Unexpected response: ${text}`);
+      throw new Error(`Unexpected response:  Admin can't perform Leave actions ${text}`);
     }
 
     if (!response.ok) {
