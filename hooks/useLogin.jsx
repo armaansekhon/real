@@ -42,6 +42,7 @@ const useLogin = () => {
         });
 
         // Store values in SecureStore, ensuring strings
+        await SecureStore.setItemAsync('ggender', String(data.user.gender));
         await SecureStore.setItemAsync('auth_token', String(data.secretKey));
         await SecureStore.setItemAsync('userType', String(data.user.userCategoryCode || ''));
         await SecureStore.setItemAsync('userid', JSON.stringify(data.user.id ?? ''));
@@ -54,6 +55,8 @@ const useLogin = () => {
 
         // Update UserContext
         setUser({
+
+          gender :data.user.gender??null,
           id: data.user.id ?? null,
           userCategoryCode: data.user.userCategoryCode || null,
           name: data.user.name || null,
@@ -75,6 +78,7 @@ const useLogin = () => {
       } else {
         // Clear SecureStore on failed login
         await SecureStore.deleteItemAsync('auth_token');
+         await SecureStore.deleteItemAsync('ggender');
         await SecureStore.deleteItemAsync('userType');
         await SecureStore.deleteItemAsync('userid');
         await SecureStore.deleteItemAsync('userName');
@@ -103,6 +107,7 @@ const useLogin = () => {
       }
 
       // Load user data from SecureStore
+      const gen=await SecureStore.getItemAsync('ggender');
       const userType = await SecureStore.getItemAsync('userType');
       const userid = await SecureStore.getItemAsync('userid');
       const userName = await SecureStore.getItemAsync('userName');
@@ -155,6 +160,7 @@ const useLogin = () => {
       setdate(currentDayDate || null);
       setbranch(branch || null);
       setUser({
+        gender:gen,
         id: userid ? JSON.parse(userid) : null,
         userCategoryCode: userType || null,
         name: userName || null,

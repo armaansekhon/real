@@ -37,7 +37,7 @@ const AdminStatsSection = () => {
 
       <View style={styles.cardWrapper}>
         <StatCard
-          title="Revenue"
+          title="Leads"
           value="$695"
           percentage="+15.03%"
           iconName="trending-up"

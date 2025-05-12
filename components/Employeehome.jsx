@@ -19,6 +19,8 @@ import AdminAppointments from './AdminAppointments';
 import { useNavigation } from 'expo-router';
 import { useUser } from "../context/UserContext";
 import AttendanceCard from './AttendenceCard';
+import  Userlogo from '../assets/svg/loguser.svg';
+import Felogo from '../assets/svg/Folder.svg';
 
 const { height, width } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = height * 0.27;
@@ -36,6 +38,7 @@ const AdminDashboard = () => {
 
    const desi=user.designation
    console.log("desi",desi)
+   console.log(user.gender)
    
 
 
@@ -156,10 +159,35 @@ const AdminDashboard = () => {
         ]}
       >
         
-        <Image
-  source={{ uri: `data:image/jpeg;base64,${img}` }}
-  style={styles.avatar}
-/>
+        {/* {img ? (
+    <Image
+      source={{ uri: `data:image/jpeg;base64,${img}` }}
+      style={styles.avatar}
+    />
+  ) : (
+    <Userlogo style={styles.svgicon} height={55} width={55} />
+  )} */}
+
+
+  
+    {img ? (
+      <Image
+      source={{uri:`data:image/jpeg;base64,${img}`}}
+      style={styles.avatar}
+      
+      />
+    ): user.gender==='Male'?(
+      <Userlogo style={styles.svgicon} height={55} width={55} />
+    ):(
+      <Felogo style={styles.svgicon} height={55} width={55} ></Felogo>
+      
+    )
+    
+
+    }
+  
+
+
         <View style={styles.cardContent}>
           <Text style={styles.name}>{user.name? user.name.split(' ')[0] : 'User'}</Text>
           <Text style={styles.designation}>
@@ -184,8 +212,10 @@ const AdminDashboard = () => {
        
 
          <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-   {/* <AdminAppointments></AdminAppointments> */}
+  
    <AttendanceCard></AttendanceCard>
+
+    <AdminAppointments></AdminAppointments>
     
     </SafeAreaView>
 
@@ -231,10 +261,13 @@ const styles = StyleSheet.create({
     // fontWeight: '700',
     fontFamily:"PlusR"
   },
+  svgicon:{
+    right:10,
+  },
  
   card: {
     position: 'absolute',
-    top: HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.2,
+    top: HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.1,
     alignSelf: 'center',
     width: width * 0.75,
     height: CARD_HEIGHT,
@@ -269,7 +302,7 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     
-    marginLeft:30,
+    marginLeft:20,
     flexShrink: 1,
   },
   ani: {
