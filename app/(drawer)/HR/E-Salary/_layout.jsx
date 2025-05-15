@@ -8,7 +8,7 @@ const RootLayout = () => {
 
     <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
          <Stack.Screen name="MonthlySalary" options={{ title: "MonthlySalary", headerShown: false }} />
-      
+        <Stack.Screen name="ViewSalary" options={{ title: "ViewSalary", headerShown: false }} />
         
 
         

@@ -57,6 +57,24 @@ export const defaultModules   = [
        
           ],
         },
+         {
+          name: "E-Salary",
+          path: "/(drawer)/HR/E-Salary",
+          title: "Employee Salary",
+          children: [
+            {
+              name: "MonthlySalary",
+              path: "/(drawer)/HR/E-Status/MonthlySalary",
+              title: "Monthly Salary",
+            },
+            {
+              name: "ViewSalary",
+              path: "/(drawer)/HR/E-Status/ViewSalary",
+              title: "View Salary",
+            },
+       
+          ],
+        },
         {
           name:"Leaves",
           path: "/(drawer)/HR/Leaves",

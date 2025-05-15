@@ -129,8 +129,10 @@ const AttendanceCard = () => {
 
   return (
     <View style={styles.card}>
+      <Text style={styles.mark} > <Text style={styles.mark1}>Mark </Text  > Attendance</Text>
       <Text style={styles.clock}>{clock}</Text>
       <Text style={styles.date}>{date}</Text>
+
 
       <TouchableOpacity
         onPress={handleClick}
@@ -144,13 +146,13 @@ const AttendanceCard = () => {
           loop={false}
           style={styles.lottie}
         />
-        <Text style={[styles.clickText, isButtonDisabled && { color: '#999' }]}>
+        {/* <Text style={[styles.clickText, isButtonDisabled && { color: '#999' }]}>
           {isButtonDisabled
             ? attendance?.message || 'Attendance Completed'
             : clickedIn
             ? 'Click Out'
             : 'Click In'}
-        </Text>
+        </Text> */}
       </TouchableOpacity>
 
       <View style={styles.footerRow}>
@@ -180,7 +182,7 @@ const AttendanceCard = () => {
 const styles = StyleSheet.create({
   card: {
     width: width - 70,
-    height: height / 2.8,
+    height: height / 2.5,
     marginHorizontal: 14,
     backgroundColor: '#fff',
     borderRadius: 20,
@@ -253,6 +255,24 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
+  },
+  mark:{
+    // alignSelf:"flex-start",
+    padding:10,
+    color:"#333",
+    fontSize:22,
+    fontFamily:"PlusSB"
+    
+
+  },
+   mark1:{
+    // alignSelf:"flex-start",
+    padding:10,
+    color:"#5aaf57",
+    fontSize:22,
+    fontFamily:"PlusSB"
+    
+
   },
   retryButtonText: {
     color: '#fff',

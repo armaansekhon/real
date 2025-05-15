@@ -159,14 +159,7 @@ const AdminDashboard = () => {
         ]}
       >
         
-        {/* {img ? (
-    <Image
-      source={{ uri: `data:image/jpeg;base64,${img}` }}
-      style={styles.avatar}
-    />
-  ) : (
-    <Userlogo style={styles.svgicon} height={55} width={55} />
-  )} */}
+       
 
 
   
@@ -179,8 +172,11 @@ const AdminDashboard = () => {
     ): user.gender==='Male'?(
       <Userlogo style={styles.svgicon} height={55} width={55} />
     ):(
-      <Felogo style={styles.svgicon} height={55} width={55} ></Felogo>
+       <Image
+      source={require("../assets/images/woman.png")}
+      style={styles.avatar}
       
+      />
     )
     
 
@@ -262,6 +258,7 @@ const styles = StyleSheet.create({
     fontFamily:"PlusR"
   },
   svgicon:{
+    marginLeft:30,
     right:10,
   },
  
@@ -269,7 +266,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.1,
     alignSelf: 'center',
-    width: width * 0.75,
+    width: width * 0.80,
     height: CARD_HEIGHT,
     // borderBottomWidth:0.5,
     backgroundColor: 'transparent',
@@ -295,11 +292,13 @@ const styles = StyleSheet.create({
     width: 65,
     height: 65,
     borderRadius: 40,
+    marginLeft:50,
     
     // borderColor: '#00AC88',
     // borderWidth: 2,
     resizeMode: 'cover',
   },
+  
   cardContent: {
     
     marginLeft:20,
@@ -344,7 +343,7 @@ transform:[{scale:4.5}],
   },
   scrollContent: {
     paddingTop: HEADER_MAX_HEIGHT -160 ,
-    paddingBottom: 20,
+    paddingBottom: 150,
     // borderWidth:1,
     
   },
