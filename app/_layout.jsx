@@ -5,21 +5,13 @@ import React from "react";
 
 const RootLayout = () => {
   return (
-
     <UserProvider>
       <ModuleProvider>
-    <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
-
-
-        
-
-      
-  
-    </Stack>
-    </ModuleProvider>
+        <Stack
+          screenOptions={{ headerShown: false, gestureEnabled: true }}
+        ></Stack>
+      </ModuleProvider>
     </UserProvider>
- 
- 
   );
 };
 

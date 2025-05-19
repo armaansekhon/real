@@ -18,15 +18,10 @@ import { useLocalSearchParams } from "expo-router";
 import { getMovementById } from "../../../../services/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "expo-router";
-<<<<<<< HEAD
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import { Dropdown } from "react-native-element-dropdown" 
 import {getLeaveApprovalAuthority} from  "../../../../services/api";
-=======
-import { Dropdown } from "react-native-element-dropdown";
-import { getLeaveApprovalAuthority } from "../../../../services/api";
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 import { useUser } from '../../../../context/UserContext';
 import { submitMovementAction } from "../../../../services/api";
 
@@ -63,12 +58,9 @@ const MovementDetails = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [statusOptions, setStatusOptions] = useState([]);
   const [statusLoading, setStatusLoading] = useState(true);
-<<<<<<< HEAD
  const [historyModalVisible, setHistoryModalVisible] = useState(false);
   const [movementHistory, setMovementHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(false);
-=======
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   const [refreshing, setRefreshing] = useState(false);
 
   const [data, setData] = useState({
@@ -135,7 +127,6 @@ const MovementDetails = () => {
 
     fetchStatusOptions();
   }, [user?.id]);
-<<<<<<< HEAD
   
 
 
@@ -161,8 +152,6 @@ const MovementDetails = () => {
     }
   };
   
-=======
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 
   if (loading) {
     return (
@@ -238,84 +227,6 @@ const MovementDetails = () => {
           <Ionicons name="chevron-back" size={28} color="#000" />
         </TouchableOpacity>
       </View>
-<<<<<<< HEAD
-   
-                <View style={styles.headerRow}>
-                <View style={styles.headerTextContainer}> 
-                  <Text style={styles.headerTitle}>Movement</Text>
-                  <Text style={styles.headerSubTitle}>Details</Text>
-                
-                </View>
-                <LottieView
-                  source={require("../../../../assets/svg/EMP.json")}
-                  autoPlay
-                  loop
-                  style={styles.lottie}
-                />
-
-                 <TouchableOpacity
-                        style={styles.historyButton}
-                        onPress={() => fetchMovementHistory(mId)}
-                      >
-                        <Text style={styles.historyButtonText}>History</Text>
-                      </TouchableOpacity>
-              </View>
-
-
-
-               {/* Movement History Modal */}
-                    <Modal
-                visible={historyModalVisible}
-                animationType="slide"
-                transparent={true}
-                onRequestClose={() => setHistoryModalVisible(false)}
-              >
-                <View style={styles.modalOverlay}>
-                  <View style={styles.updatedModalContent}>
-                    <View style={styles.modalHeader}>
-                      <Text style={styles.modalTitle}>Movement History</Text>
-                      <TouchableOpacity onPress={() => setHistoryModalVisible(false)}>
-                        <Ionicons name="close" size={24} color="black" />
-                      </TouchableOpacity>
-                    </View>
-              
-                    {historyLoading ? (
-                      <ActivityIndicator size="large" color="#007bff" />
-                    ) : (
-                      <ScrollView style={{ marginTop: 10 }}>
-                        {movementHistory.length === 0 ? (
-                          <Text style={{ textAlign: 'center', marginTop: 20 }}>No history found.</Text>
-                        ) : (
-                          <View style={styles.timelineContainer}>
-                            {movementHistory.map((historyItem, index) => (
-                              <View key={index} style={styles.timelineItem}>
-                                {/* Vertical Line */}
-                                {index !== 0 && <View style={styles.timelineLine} />}
-                                
-                                {/* Card */}
-                                <View style={styles.historyCard}>
-                                  <Text style={styles.historyLabel}>Updated On: <Text style={styles.historyValue}>{historyItem['Updated On ']}</Text></Text>
-                                  <Text style={styles.historyLabel}>Movement Status: <Text style={styles.historyValue}>{historyItem['Movement Status ']}</Text></Text>
-                                  <Text style={styles.historyLabel}>Updated By: <Text style={styles.historyValue}>{historyItem['Updated By ']}</Text></Text>
-                                  <Text style={styles.historyLabel}>Remarks: <Text style={styles.historyValue}>{historyItem['Remarks ']}</Text></Text>
-                                </View>
-                              </View>
-                            ))}
-                          </View>
-                        )}
-                      </ScrollView>
-                    )}
-                  </View>
-                </View>
-              </Modal>
-      <ScrollView 
-          contentContainerStyle={styles.content}
-         keyboardShouldPersistTaps="handled"
-            refreshControl={
-                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
-  >
-=======
       <View style={styles.headerRow}>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Movement</Text>
@@ -343,7 +254,6 @@ const MovementDetails = () => {
         <Detail label="Currently At" value={movementDetails["Currently At"]} />
         <Detail label="Reason" value={movementDetails["Movement Reason "]?.trim()} />
         <Detail label="Description" value={movementDetails["description"] || "N/A"} />
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 
         {groupedFields.map((row, rowIndex) => (
           <View
@@ -470,19 +380,11 @@ const styles = StyleSheet.create({
   },
   headerTextContainer: {
     flex: 1,
-<<<<<<< HEAD
-    paddingBottom: 10,
-=======
     bottom: 30,
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   },
   headerTitle: {
     fontSize: 37,
     fontFamily: "PlusSB",
-<<<<<<< HEAD
-    marginTop: -70,
-=======
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   },
   headerSubTitle: {
     fontSize: 32,
@@ -549,7 +451,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 10,
   },
-<<<<<<< HEAD
 
   historyButton: {
     flex: 1,
@@ -653,8 +554,6 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   
-=======
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 });
 
 export default MovementDetails;

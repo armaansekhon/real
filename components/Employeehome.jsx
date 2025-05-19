@@ -121,7 +121,7 @@ const AdminDashboard = () => {
      style={styles.ani2}
    />
   </Animated.View>
-     Welcome <Text style={{ color: '#5aaf57', fontFamily: 'PlusR' }}>{user.name.split(' ')[0]}</Text>
+     {/* Welcome <Text style={{ color: '#5aaf57', fontFamily: 'PlusR' }}>{user.name.split(' ')[0]}</Text> */}
 
   </Animated.Text>
 </Animated.View>
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
 
 
         <View style={styles.cardContent}>
-          <Text style={styles.name}>{user.name? user.name.split(' ')[0] : 'User'}</Text>
+          {/* <Text style={styles.name}>{user.name? user.name.split(' ')[0] : 'User'}</Text>  */}
           <Text style={styles.designation}>
             {user.designation?.name || 'No Designation'}
           </Text>

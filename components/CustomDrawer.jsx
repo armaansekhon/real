@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 15,
     borderRadius: 15,
-    marginLeft:10,
+    marginLeft: Platform.OS === "android" ? 0 : 10,
     marginBottom: 10,
     backgroundColor: "transparent",
   },

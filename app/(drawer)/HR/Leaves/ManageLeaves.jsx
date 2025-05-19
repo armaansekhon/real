@@ -74,7 +74,6 @@ const ManageLeaves = () => {
   }, []);
 
   const renderItem = ({ item, index }) => (
-<<<<<<< HEAD
     <TouchableOpacity 
     style={styles.card}
     // onPress={() => router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } })}
@@ -92,12 +91,6 @@ onPress={async () => {
     }}
   >
 
-=======
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => router.push({ pathname: "/(drawer)/HR/Leaves/LeaveDetails", params: { leaveId: item.id } })}
-    >
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
       <View style={styles.cardRow}>
         <Text style={styles.serial}>#{index + 1}</Text>
         <Text style={styles.date}>{item.date}</Text>

@@ -17,7 +17,6 @@ export const defaultModules   = [
       name: "HR",
       path: "/(drawer)/HR",
       title: "HR",
-    //   icon: "briefcase-outline",
       icon: Brief,
       children: [
        
