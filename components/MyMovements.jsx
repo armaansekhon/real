@@ -6,6 +6,7 @@ import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUser } from '../context/UserContext';
 // import {getMyMovements} from "../services/api"
+import { API_BASE_URL } from '../services/api';
 
 const MyMovements= ({ goBack }) => {
   const [movements, setMovements] = useState([]);
@@ -22,7 +23,7 @@ const MyMovements= ({ goBack }) => {
       const userId = user.id;
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.get(
-        `http://192.168.6.210:8686/pipl/api/v1/employee/my-movements/employeeId/${userId}`,
+        `${API_BASE_URL}/employee/my-movements/employeeId/${userId}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -45,7 +46,7 @@ const MyMovements= ({ goBack }) => {
       setHistoryLoading(true);
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.get(
-        `http://192.168.6.210:8686/pipl/api/v1/employee/getMovementHistories/movementId/${mId}`,
+        `${API_BASE_URL}/employee/getMovementHistories/movementId/${mId}`,
         {
           headers: {
             'Content-Type': 'application/json',

@@ -60,7 +60,7 @@ const Login = () => {
             >
               <View style={styles.Iconcontainer}>
                 <Ionicons
-                  onPress={() => router.back()}
+                  onPress={() => router.push("/Onboard")}
                   style={styles.backIcon}
                   name="chevron-back-sharp"
                   size={22}

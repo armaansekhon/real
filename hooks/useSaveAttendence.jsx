@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import { Alert } from 'react-native';
+import { API_BASE_URL } from '../services/api';
 
 const useSaveAttendance = () => {
   // Accepts an array of attendance data (employeeId + colorCode)
@@ -27,7 +28,7 @@ const useSaveAttendance = () => {
       console.log('Sending attendance payload:', payload); // Debug log
 
       const response = await axios.post(
-        'http://192.168.6.210:8686/pipl/api/v1/employee/save-emp-attendance',
+        `${API_BASE_URL}/employee/save-emp-attendance`,
         payload,
         {
           headers: {

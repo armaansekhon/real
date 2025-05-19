@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../../../../services/api';
 
 const GeneratedSalary = () => {
   const navigation = useNavigation();
@@ -35,7 +36,7 @@ const GeneratedSalary = () => {
     setLoading(true);
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const url = `http://192.168.6.210:8686/pipl/api/v1/employee/salaries/calculate?selectedYear=${selectedYear}&selectedMonth=${selectedMonth}&selectedEmployeeIds=${selectedEmployeeIds?.join(',') || ''}`;
+      const url = `${API_BASE_URL}/employee/salaries/calculate?selectedYear=${selectedYear}&selectedMonth=${selectedMonth}&selectedEmployeeIds=${selectedEmployeeIds?.join(',') || ''}`;
 
       const response = await axios.get(url, {
         headers: {
@@ -97,7 +98,7 @@ const GeneratedSalary = () => {
         throw new Error('Authentication token not found');
       }
 
-      const url = `http://192.168.6.210:8686/pipl/api/v1/employee/salaries/save?selectedYear=${selectedYear || '2025'}&selectedMonth=${selectedMonth || 'March'}&selectedEmployeeIds=${selectedEmployeeIds?.join(',')}`;
+      const url = `${API_BASE_URL}/employee/salaries/save?selectedYear=${selectedYear || '2025'}&selectedMonth=${selectedMonth || 'March'}&selectedEmployeeIds=${selectedEmployeeIds?.join(',')}`;
       
       const response = await axios.post(url, {}, {
         headers: {

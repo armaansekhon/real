@@ -1,21 +1,8 @@
-// api.js
-// export const API_BASE_URL = 'http://192.168.6.210:8686/pipl/api/v1';
 
-// export const test1="GET /api/v1/property-natures";
-// // GET /api/v1/face-directions
-// // GET /api/v1/facilities
-// // GET /api/v1/amenities
-// // GET /api/v1/furnishing-statuses
-// // GET /api/v1/flat-house-structures
-// // GET /api/v1/parking-types
-// // GET /api/v1/shop-showroom-categories
-// // GET /api/v1/room-types
-// // GET /api/v1/ownership-types
-// // GET /api/v1/measurement-units
 
 import * as SecureStore from "expo-secure-store";
 
-export const API_BASE_URL = "http://192.168.6.210:8686/pipl/api/v1";
+export const API_BASE_URL = "http://192.168.6.210:8686/realestate/api/v1";
 
 export const addNewEmployee = async (payload) => {
   try {
@@ -342,7 +329,7 @@ export const submitLeaveAction = async ({ leaveId, leaveStatus, remarks, updated
       data = await response.json();
     } else {
       const text = await response.text();
-      throw new Error(`Unexpected response: ${text}`);
+      throw new Error(`Unexpected response:  Admin can't perform Leave actions `);
     }
 
     if (!response.ok) {
@@ -428,7 +415,7 @@ export const submitMovementRequest = async ({
       data = await response.json();
     } else {
       const text = await response.text();
-      throw new Error(`Unexpected response: ${text}`);
+      throw new Error(`Unexpected response:  Admin can't perform Leave actions ${text}`);
     }
 
     if (!response.ok) {

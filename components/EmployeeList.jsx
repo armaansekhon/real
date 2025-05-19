@@ -16,6 +16,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../services/api';
 
 const EmployeeList = ({ onSelectEmployee }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,7 +37,7 @@ const EmployeeList = ({ onSelectEmployee }) => {
       console.log("Date Used:", dateToUse );
       console.log("Date Used:", formattedDate );
       const response = await fetch(
-        `http://192.168.6.210:8686/pipl/api/v1/employee/today-all-employee-attendance/selectedDate/${formattedDate}`,
+        `${API_BASE_URL}/employee/today-all-employee-attendance/selectedDate/${formattedDate}`,
         {
           headers: {
             'Content-Type': 'application/json',

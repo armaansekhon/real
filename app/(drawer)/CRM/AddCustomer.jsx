@@ -8,6 +8,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../../../services/api';
 
 const AddCustomer = () => {
   const navigation = useNavigation();
@@ -21,10 +22,9 @@ const AddCustomer = () => {
     fatherName: '',
     emailId: '',
     motherName: '',
-   
     gender: '',
     aadharNumber: '',
-    panNo:'',
+    panNo: '',
     dateOfBirth: null, // Initially null, user will set it
     maritalStatus: '',
     permanentAddress: {
@@ -71,7 +71,7 @@ const AddCustomer = () => {
   const fetchCountries = async () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get('http://192.168.6.210:8686/pipl/api/v1/employee/countries', {
+      const response = await axios.get(`${API_BASE_URL}/employee/countries`, {
         headers: { 'secret_key': secretKey },
       });
       setCountries(response.data.map(item => ({ label: item.country, value: item.id })));
@@ -85,7 +85,7 @@ const AddCustomer = () => {
     if (!countryId) return;
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get(`http://192.168.6.210:8686/pipl/api/v1/employee/getStatesByCountryId/${countryId}`, {
+      const response = await axios.get(`${API_BASE_URL}/employee/getStatesByCountryId/${countryId}`, {
         headers: { 'secret_key': secretKey },
       });
       const stateOptions = response.data.map(item => ({ label: item.state, value: item.id }));
@@ -104,7 +104,7 @@ const AddCustomer = () => {
     if (!stateId) return;
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
-      const response = await axios.get(`http://192.168.6.210:8686/pipl/api/v1/employee/getDistrictByStateId/${stateId}`, {
+      const response = await axios.get(`${API_BASE_URL}/employee/getDistrictByStateId/${stateId}`, {
         headers: { 'secret_key': secretKey },
       });
       const districtOptions = response.data.map(item => ({ label: item.district, value: item.id }));
@@ -152,10 +152,9 @@ const AddCustomer = () => {
       fatherName: '',
       emailId: '',
       motherName: '',
-  
       gender: '',
       aadharNumber: '',
-      panNo:'',
+      panNo: '',
       dateOfBirth: null, // Reset to null
       maritalStatus: '',
       permanentAddress: {
@@ -175,7 +174,6 @@ const AddCustomer = () => {
         addressLine1: '',
         addressLine2: '',
         pincode: '',
-
       },
     });
     setErrors({});
@@ -192,7 +190,6 @@ const AddCustomer = () => {
     if (!form.mobileNumber.match(/^\d{10}$/)) newErrors.mobileNumber = 'Mobile Number must be 10 digits';
     if (!form.fatherName.trim()) newErrors.fatherName = 'Father\'s Name is required';
     if (!form.emailId.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.emailId = 'Enter a valid Email ID';
-   
     if (!form.gender) newErrors.gender = 'Gender is required';
     if (!form.permanentAddress.countryId) newErrors.permanentCountry = 'Country is required';
     if (!form.permanentAddress.stateId) newErrors.permanentState = 'State is required';
@@ -218,9 +215,8 @@ const AddCustomer = () => {
         father_Name: form.fatherName,
         email_Id: form.emailId,
         mother_Name: form.motherName || null,
-    
         gender: form.gender,
-        panNo:form.panNo,
+        panNo: form.panNo,
         aaddharNo: form.aadharNumber || null,
         dateOfBirth: form.dateOfBirth ? form.dateOfBirth.toISOString().split('T')[0] : null,
         maritalStatus: form.maritalStatus || null,
@@ -244,9 +240,9 @@ const AddCustomer = () => {
         },
         dp: image || null,
       };
-      console.log("payload:",payload);
+      console.log("payload:", payload);
 
-      await axios.post('http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/addRealEstateCustomer', payload, {
+      await axios.post(`${API_BASE_URL}/realestateCustomer/addRealEstateCustomer`, payload, {
         headers: {
           'Content-Type': 'application/json',
           'secret_key': secretKey,
@@ -258,10 +254,10 @@ const AddCustomer = () => {
       navigation.goBack();
     } catch (error) {
       console.error('Error adding customer:', error);
-      errorMessage = error.response.data?.message ||
-                   error.response.data?.error ||
-                   JSON.stringify(error.response.data) || 
-                   errorMessage || "failed to add the customer";
+      const errorMessage = error.response?.data?.message ||
+                          error.response?.data?.error ||
+                          JSON.stringify(error.response?.data) ||
+                          "Failed to add the customer";
       Alert.alert('Error', errorMessage);
     }
   };
@@ -338,7 +334,10 @@ const AddCustomer = () => {
         <View style={styles.formContainer}>
           {/* Full Name (Full Width) */}
           <View style={[styles.inputContainer, styles.fullWidth]}>
-            <Text style={styles.label}>Full Name *</Text>
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>Full Name </Text>
+              <Text style={styles.required}>*</Text>
+            </View>
             <TextInput
               style={styles.input}
               value={form.fullName}
@@ -348,11 +347,14 @@ const AddCustomer = () => {
             {errors.fullName && <Text style={styles.error}>{errors.fullName}</Text>}
           </View>
 
-          {/* Mobile Number and Phone Number (Half Width) */}
+          {/* Mobile Number and Pan Number (Half Width) */}
           <View style={styles.row}>
             {/* Mobile Number */}
             <View style={[styles.inputContainer, styles.halfWidth]}>
-              <Text style={styles.label}>Mobile Number *</Text>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>Mobile Number </Text>
+                <Text style={styles.required}>*</Text>
+              </View>
               <TextInput
                 style={styles.input}
                 value={form.mobileNumber}
@@ -364,14 +366,14 @@ const AddCustomer = () => {
               {errors.mobileNumber && <Text style={styles.error}>{errors.mobileNumber}</Text>}
             </View>
 
-            {/* Phone Number */}
+            {/* Pan Number */}
             <View style={[styles.inputContainer, styles.halfWidth]}>
               <Text style={styles.label}>Pan Number</Text>
               <TextInput
                 style={styles.input}
                 value={form.panNo}
                 onChangeText={text => setForm({ ...form, panNo: text })}
-                placeholder="Enter Phone Number"
+                placeholder="Enter Pan Number"
                 keyboardType="numeric"
               />
             </View>
@@ -379,7 +381,10 @@ const AddCustomer = () => {
 
           {/* Father's Name (Full Width) */}
           <View style={[styles.inputContainer, styles.fullWidth]}>
-            <Text style={styles.label}>Father's Name *</Text>
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>Father's Name </Text>
+              <Text style={styles.required}>*</Text>
+            </View>
             <TextInput
               style={styles.input}
               value={form.fatherName}
@@ -402,7 +407,10 @@ const AddCustomer = () => {
 
           {/* Email ID (Full Width) */}
           <View style={[styles.inputContainer, styles.fullWidth]}>
-            <Text style={styles.label}>Email ID *</Text>
+            <View style={styles.labelContainer}>
+              <Text style={styles.label}>Email ID </Text>
+              <Text style={styles.required}>*</Text>
+            </View>
             <TextInput
               style={styles.input}
               value={form.emailId}
@@ -417,10 +425,13 @@ const AddCustomer = () => {
           <View style={styles.row}>
             {/* Gender */}
             <View style={[styles.inputContainer, styles.halfWidth]}>
-              <Text style={styles.label}>Gender *</Text>
+              <View style={styles.labelContainer}>
+                <Text style={styles.label}>Gender </Text>
+                <Text style={styles.required}>*</Text>
+              </View>
               <Dropdown
                 style={styles.dropdown}
-                placeholderStyle={{color:"#bbb"}}
+                placeholderStyle={{ color: "#bbb" }}
                 data={genderOptions}
                 labelField="label"
                 valueField="value"
@@ -436,7 +447,7 @@ const AddCustomer = () => {
               <Text style={styles.label}>Marital Status</Text>
               <Dropdown
                 style={styles.dropdown}
-                placeholderStyle={{color:"#bbb"}}
+                placeholderStyle={{ color: "#bbb" }}
                 data={maritalStatusOptions}
                 labelField="label"
                 valueField="value"
@@ -474,7 +485,6 @@ const AddCustomer = () => {
               </TouchableOpacity>
             </View>
           </View>
-         
 
           {/* Date Picker Modal */}
           <Modal
@@ -511,10 +521,13 @@ const AddCustomer = () => {
             <View style={styles.row}>
               {/* Country */}
               <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={styles.label}>Country *</Text>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Country </Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
                 <Dropdown
                   style={styles.dropdown}
-                  placeholderStyle={{color:"#bbb"}}
+                  placeholderStyle={{ color: "#bbb" }}
                   data={countries}
                   labelField="label"
                   valueField="value"
@@ -535,10 +548,13 @@ const AddCustomer = () => {
 
               {/* State */}
               <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={styles.label}>State *</Text>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>State </Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
                 <Dropdown
                   style={styles.dropdown}
-                  placeholderStyle={{color:"#bbb"}}
+                  placeholderStyle={{ color: "#bbb" }}
                   data={states}
                   labelField="label"
                   valueField="value"
@@ -561,10 +577,13 @@ const AddCustomer = () => {
             <View style={styles.row}>
               {/* District */}
               <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={styles.label}>District *</Text>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>District </Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
                 <Dropdown
                   style={styles.dropdown}
-                  placeholderStyle={{color:"#bbb"}}
+                  placeholderStyle={{ color: "#bbb" }}
                   data={districts}
                   labelField="label"
                   valueField="value"
@@ -667,10 +686,13 @@ const AddCustomer = () => {
             <View style={styles.row}>
               {/* Country */}
               <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={styles.label}>Country *</Text>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>Country </Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
                 <Dropdown
                   style={styles.dropdown}
-                  placeholderStyle={{color:"#bbb"}}
+                  placeholderStyle={{ color: "#bbb" }}
                   data={countries}
                   labelField="label"
                   valueField="value"
@@ -692,10 +714,13 @@ const AddCustomer = () => {
 
               {/* State */}
               <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={styles.label}>State *</Text>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>State </Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
                 <Dropdown
                   style={styles.dropdown}
-                  placeholderStyle={{color:"#bbb"}}
+                  placeholderStyle={{ color: "#bbb" }}
                   data={correspondingStates}
                   labelField="label"
                   valueField="value"
@@ -719,10 +744,13 @@ const AddCustomer = () => {
             <View style={styles.row}>
               {/* District */}
               <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={styles.label}>District *</Text>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.label}>District </Text>
+                  <Text style={styles.required}>*</Text>
+                </View>
                 <Dropdown
                   style={styles.dropdown}
-                  placeholderStyle={{color:"#bbb"}}
+                  placeholderStyle={{ color: "#bbb" }}
                   data={correspondingDistricts}
                   labelField="label"
                   valueField="value"
@@ -872,11 +900,20 @@ const styles = StyleSheet.create({
   halfWidth: {
     width: '48%',
   },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
   label: {
     fontSize: 16,
     fontFamily: 'PlusSB',
     color: '#5aaf57',
-    marginBottom: 5,
+  },
+  required: {
+    fontSize: 16,
+    fontFamily: 'PlusSB',
+    color: 'red',
   },
   input: {
     borderWidth: 1,

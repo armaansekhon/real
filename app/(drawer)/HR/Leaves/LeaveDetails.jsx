@@ -126,7 +126,6 @@ const LeaveDetails = () => {
 
     fetchStatusOptions();
   }, [user?.id]);
-<<<<<<< HEAD
   
 
 
@@ -152,8 +151,6 @@ const LeaveDetails = () => {
     }
   };
   
-=======
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 
   if (loading) {
     return (
@@ -223,7 +220,6 @@ const LeaveDetails = () => {
           <Ionicons name="chevron-back" size={28} color="#000" />
         </TouchableOpacity>
       </View>
-<<<<<<< HEAD
    
                 <View style={styles.headerRow}>
                 <View style={styles.headerTextContainer}> 
@@ -261,28 +257,6 @@ const LeaveDetails = () => {
  
         {/* <Text style={styles.heading}>Leave Details</Text> */}
         <Detail label="Leave Type" value={leaveDetails["Leave Type"]}/>
-=======
-      <View style={styles.headerRow}>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>Leave</Text>
-          <Text style={styles.headerSubTitle}>Details</Text>
-        </View>
-        <LottieView
-          source={require("../../../../assets/svg/EMP.json")}
-          autoPlay
-          loop
-          style={styles.lottie}
-        />
-      </View>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <Detail label="Leave Type" value={leaveDetails["Leave Type"]} />
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
         <Detail label="Status" value={leaveDetails["Status"]} />
         <Detail label="Requested On" value={leaveDetails["Leave Requested Date"]} />
         <Detail label="From Date" value={leaveDetails["From"]} />
@@ -506,10 +480,6 @@ marginTop: -70,
     fontFamily: "PlusR",
     borderColor: "#ccc",
     borderWidth: 1,
-<<<<<<< HEAD
-
-=======
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
   },
   dropdown: {
     height: 42,
@@ -546,7 +516,6 @@ marginTop: -70,
     paddingBottom: 10,
     // paddingTop: 40,
   },
-<<<<<<< HEAD
   
 
   historyButton: {
@@ -650,8 +619,6 @@ marginTop: -70,
     backgroundColor: '#5aaf57',
     zIndex: -1,
   },
-=======
->>>>>>> 27b6cf577f7dffd6594eef84b2c22969d5a2b711
 });
 
 export default LeaveDetails;

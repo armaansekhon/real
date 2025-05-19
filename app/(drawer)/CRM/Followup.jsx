@@ -21,6 +21,7 @@ import moment from "moment";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import { useUser } from "../../../context/UserContext";
+import { API_BASE_URL } from "../../../services/api";
 
 const Followup = () => {
   const navigation = useNavigation();
@@ -102,7 +103,7 @@ const Followup = () => {
     try {
       const secretKey = await SecureStore.getItemAsync("auth_token");
       const countryRes = await fetch(
-        "http://192.168.6.210:8686/pipl/api/v1/employee/countries",
+        `${API_BASE_URL}/employee/countries`,
         {
           method: "GET",
           headers: {
@@ -131,7 +132,7 @@ const Followup = () => {
       try {
         const secretKey = await SecureStore.getItemAsync("auth_token");
         const res = await fetch(
-          `http://192.168.6.210:8686/pipl/api/v1/followUpStatus/followUpStatusFrom`,
+          `${API_BASE_URL}/followUpStatus/followUpStatusFrom`,
           {
             method: "GET",
             headers: {
@@ -159,7 +160,7 @@ const Followup = () => {
       try {
         const secretKey = await SecureStore.getItemAsync("auth_token");
         const res = await fetch(
-          `http://192.168.6.210:8686/pipl/api/v1/followUpVia/followUpViaForm`,
+          `${API_BASE_URL}/followUpVia/followUpViaForm`,
           {
             method: "GET",
             headers: {
@@ -188,7 +189,7 @@ const Followup = () => {
       try {
         const secretKey = await SecureStore.getItemAsync("auth_token");
         const res = await fetch(
-          `http://192.168.6.210:8686/pipl/api/v1/employee/getStatesByCountryId/${countryValue}`,
+          `${API_BASE_URL}/employee/getStatesByCountryId/${countryValue}`,
           {
             method: "GET",
             headers: {
@@ -217,7 +218,7 @@ const Followup = () => {
       try {
         const secretKey = await SecureStore.getItemAsync("auth_token");
         const res = await fetch(
-          `http://192.168.6.210:8686/pipl/api/v1/employee/getDistrictByStateId/${stateValue}`,
+          `${API_BASE_URL}/employee/getDistrictByStateId/${stateValue}`,
           {
             method: "GET",
             headers: {
@@ -346,7 +347,7 @@ const Followup = () => {
 
       const secretKey = await SecureStore.getItemAsync("auth_token");
       const response = await axios.post(
-        `http://192.168.6.210:8686/pipl/api/v1/realestateCustomerLead/addFollowUpCustomerLead`,
+        `${API_BASE_URL}/realestateCustomerLead/addFollowUpCustomerLead`,
         payload,
         {
           headers: {

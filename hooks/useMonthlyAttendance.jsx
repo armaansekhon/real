@@ -1,6 +1,7 @@
 // hooks/useMonthlyAttendance.js
 import { useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../services/api';
 
 const useMonthlyAttendance = (employeeId, month, year) => {
   const [attendanceData, setAttendanceData] = useState([]);
@@ -14,7 +15,7 @@ const useMonthlyAttendance = (employeeId, month, year) => {
       try {
         const token = await SecureStore.getItemAsync('auth_token');
         const response = await fetch(
-          `http://192.168.6.210:8686/pipl/api/v1/employee/getMonthlyAttendance/employeeId/${employeeId}/month/${month}/year/${year}`,
+          `${API_BASE_URL}/employee/getMonthlyAttendance/employeeId/${employeeId}/month/${month}/year/${year}`,
           {
             headers: {
               'Content-Type': 'application/json',

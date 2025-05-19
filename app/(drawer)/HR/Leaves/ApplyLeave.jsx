@@ -19,6 +19,7 @@ import { useNavigation } from 'expo-router';
 import moment from 'moment';
 import { useUser } from '../../../../context/UserContext';
 import MyLeaves from '../../../../components/MyLeaves';
+import { API_BASE_URL } from '../../../../services/api';
 
 const ApplyLeave = () => {
   const navigation = useNavigation();
@@ -76,7 +77,7 @@ const [selectedDurations, setSelectedDurations] = useState({}); // to store user
     try {
          const token = await SecureStore.getItemAsync('auth_token');
       const response = await fetch(
-        `http://192.168.6.210:8686/pipl/api/v1/employee/leaveTypes`,
+        `${API_BASE_URL}/employee/leaveTypes`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -101,7 +102,7 @@ const [selectedDurations, setSelectedDurations] = useState({}); // to store user
     try {
       const token = await SecureStore.getItemAsync('auth_token');
       const response = await fetch(
-        `http://192.168.6.210:8686/pipl/api/v1/employee/leave-day-type/startDate/${moment(start).format('YYYY-MM-DD')}/endDate/${moment(end).format('YYYY-MM-DD')}`,
+        `${API_BASE_URL}/employee/leave-day-type/startDate/${moment(start).format('YYYY-MM-DD')}/endDate/${moment(end).format('YYYY-MM-DD')}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -159,7 +160,7 @@ const [selectedDurations, setSelectedDurations] = useState({}); // to store user
   
       console.log('Payload:', payload); // <-- for checking before hitting
   
-      const response = await fetch('http://192.168.6.210:8686/pipl/api/v1/employee/save-leave-request', {
+      const response = await fetch(`${API_BASE_URL}/employee/save-leave-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

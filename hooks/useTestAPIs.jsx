@@ -2,7 +2,8 @@
 import { useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://192.168.6.210:8082/pipl/api/v1/';
+
+// const API_BASE_URL = 'http://192.168.6.210:8082/pipl/api/v1/';
 
 const endpoints = [
   'property-natures',

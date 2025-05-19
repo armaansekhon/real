@@ -1,6 +1,7 @@
 // hooks/useAttendanceNotations.js
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../services/api';
 
 const useAttendanceNotations = () => {
   const [notations, setNotations] = useState([]);
@@ -11,7 +12,7 @@ const useAttendanceNotations = () => {
       try {
         const secretKey = await SecureStore.getItemAsync('auth_token');
         console.log("key",secretKey )
-        const response = await fetch('http://192.168.6.210:8686/pipl/api/v1/employee/attendanceNotations', {
+        const response = await fetch(`${API_BASE_URL}/employee/attendanceNotations`, {
             headers: {
               
                     "Content-Type": "application/json",

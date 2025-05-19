@@ -7,6 +7,7 @@ import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '../../../services/api';
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,7 +27,7 @@ const ViewCustomer = () => {
     try {
       const secretKey = await SecureStore.getItemAsync('auth_token');
       const response = await axios.get(
-        `http://192.168.6.210:8686/pipl/api/v1/realestateCustomer/realEstateCustomerObj/${customerId}`,
+        `${API_BASE_URL}/realestateCustomer/realEstateCustomerObj/${customerId}`,
         {
           headers: {
             'Content-Type': 'application/json',

@@ -57,6 +57,24 @@ export const defaultModules   = [
        
           ],
         },
+         {
+          name: "E-Salary",
+          path: "/(drawer)/HR/E-Salary",
+          title: "Employee Salary",
+          children: [
+            {
+              name: "MonthlySalary",
+              path: "/(drawer)/HR/E-Salary/MonthlySalary",
+              title: "Monthly Salary",
+            },
+            {
+              name: "ViewSalary",
+              path: "/(drawer)/HR/E-Salary/ViewSalary",
+              title: "View Salary",
+            },
+       
+          ],
+        },
         {
           name:"Leaves",
           path: "/(drawer)/HR/Leaves",
@@ -68,13 +86,14 @@ export const defaultModules   = [
             name: "ApplyLeave",
             path: "/(drawer)/HR/Leaves/ApplyLeave",
             title: "Apply Leave",
-            alwaysVisible: true
+            // alwaysVisible: true
           },
           {
             name: "ManageLeaves",
             path: "/(drawer)/HR/Leaves/ManageLeaves",
             title: "Manage Leave",
-            alwaysVisible: true
+            // alwaysVisible: true
+           
           },
     
           ]
@@ -91,14 +110,14 @@ export const defaultModules   = [
             name: "MovementRequest",
             path: "/(drawer)/HR/MovementRegister/MovementRequest",
             title: "Movement Request",
-            alwaysVisible: true
+            // alwaysVisible: true
           },
     
           {
             name: "ManageMovement",
             path: "/(drawer)/HR/MovementRegister/ManageMovement",
             title: "Manage Movement",
-            alwaysVisible: true
+            // alwaysVisible: true
           },
           ]
     
@@ -120,7 +139,7 @@ export const defaultModules   = [
         name: "AddLeads",
         path: "/(drawer)/CRM/AddLeads",
         title: "Add Leads",
-        alwaysVisible: true
+        // alwaysVisible: true
       },
       {
         name: "ManageLeads",
