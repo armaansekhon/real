@@ -2,7 +2,8 @@
 
 import * as SecureStore from "expo-secure-store";
 
-export const API_BASE_URL = "http://192.168.6.210:8686/realestate/api/v1";
+// export const API_BASE_URL = "https://192.168.6.210:8686/realestate/api/v1";
+export const API_BASE_URL = "https://project.pisofterp.com/realestate/api/v1";
 
 export const addNewEmployee = async (payload) => {
   try {

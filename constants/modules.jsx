@@ -64,12 +64,12 @@ export const defaultModules   = [
           children: [
             {
               name: "MonthlySalary",
-              path: "/(drawer)/HR/E-Status/MonthlySalary",
+              path: "/(drawer)/HR/E-Salary/MonthlySalary",
               title: "Monthly Salary",
             },
             {
               name: "ViewSalary",
-              path: "/(drawer)/HR/E-Status/ViewSalary",
+              path: "/(drawer)/HR/E-Salary/ViewSalary",
               title: "View Salary",
             },
        
