@@ -46,24 +46,21 @@ const CustomTabBar = ({ state, navigation }) => {
 };
 
 const styles = {
-  tabBar: {
-    position: "absolute",
-    bottom: Platform.OS === "ios" ? 30 : 15, // Adjust for iOS and Android
-    flexDirection: "row",
-    justifyContent: "center",
-    height: 60,
-    alignSelf: "center",
-    backgroundColor: "white",
-    borderRadius: 40,
-    elevation: 5,
-    // borderWidth:1,
-    bordercolor:"white",
-    shadowColor: "#5aaf57",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    width: width - 30, // Dynamically adjust width
-  },
+ tabBar: {
+  flexDirection: "row",
+  justifyContent: "center",
+  height: 60,
+  backgroundColor: "white",
+  borderRadius: 40,
+  elevation: 5,
+  shadowColor: "#5aaf57",
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.3,
+  shadowRadius: 5,
+  width: width - 30,
+  alignSelf: "center",
+  marginBottom: Platform.OS === "ios" ? 20 : 10, // Adjust margin for iOS and Android
+},
   tabItem: {
     flex: 1, // Each tab takes equal space
     alignItems: "center",

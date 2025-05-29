@@ -341,3 +341,69 @@ const styles = StyleSheet.create({
   },
   
 });
+// {
+//   "expo": {
+//     "name": "real",
+//     "slug": "real",
+//     "version": "1.0.0",
+//     "orientation": "portrait",
+//     "icon": "./assets/images/home.png",
+//     "scheme": "myapp",
+//     "userInterfaceStyle": "automatic",
+//     "newArchEnabled": true,
+//     "ios": {
+//       "supportsTablet": true,
+//       "config": {
+//         "googleMapsApiKey": "AIzaSyDnCsVRHzRBcuK0MKb2XEU_3j33m7j5nu8"
+//       },
+//       "infoPlist": {
+//         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show your position on the map."
+//       }
+//     },
+//     "android": {
+//       "config": {
+//         "googleMaps": {
+//           "apiKey": "AIzaSyBfn929pa3P522jsnDS8gn7mvxcYY7Z_RU"
+//         }
+//       },
+//       "adaptiveIcon": {
+//         "foregroundImage": "./assets/images/home.png",
+//         "backgroundColor": "#ffffff"
+//       },
+//       "permissions": [
+//         "INTERNET",
+//         "CAMERA",
+//         "READ_EXTERNAL_STORAGE",
+//         "WRITE_EXTERNAL_STORAGE"
+//       ],
+//       "package": "com.karishmaraina.real"
+//     },
+//     "web": {
+//       "bundler": "metro",
+//       "output": "static",
+//       "favicon": "./assets/images/home.png"
+//     },
+//     "plugins": [
+//       "expo-router",
+//       [
+//         "expo-splash-screen",
+//         {
+//           "image": "./assets/images/home.png",
+//           "imageWidth": 200,
+//           "resizeMode": "contain",
+//           "backgroundColor": "#ffffff"
+//         }
+//       ],
+//       "expo-secure-store"
+//     ],
+//     "experiments": {
+//       "typedRoutes": true
+//     },
+//     "extra": {
+//       "router": {},
+//       "eas": {
+//         "projectId": "4832712f-ce34-4f8b-a1e8-b02dee382566"
+//       }
+//     }
+//   }
+// }
