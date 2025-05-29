@@ -4,7 +4,7 @@
     "slug": "real",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/house.png",
+    "icon": "./assets/images/home.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -24,7 +24,7 @@
         }
       },
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/house.png",
+        "foregroundImage": "./assets/images/home.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -38,14 +38,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/house.png"
+      "favicon": "./assets/images/home.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/house.png",
+          "image": "./assets/images/home.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
