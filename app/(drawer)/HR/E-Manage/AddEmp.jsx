@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     backgroundColor: "#fff",
+    marginTop: 10,
     // elevation: 4,
     zIndex: 10,
   },

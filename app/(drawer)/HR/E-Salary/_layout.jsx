@@ -10,10 +10,6 @@ const RootLayout = () => {
         <Stack.Screen name="ViewSalary" options={{ title: "ViewSalary", headerShown: false }} />
         
 
-        
-
-      
-  
     </Stack>
   
   );

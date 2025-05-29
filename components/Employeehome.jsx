@@ -92,7 +92,7 @@ const AdminDashboard = () => {
 
   return (
     <View style={styles.container}>
-      {/* <StatusBar barStyle="light-content" backgroundColor="#00C897" translucent /> */}
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       < LottieView
          source={require('../assets/svg/header.json')}
          autoPlay={true}
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
      style={styles.ani2}
    />
   </Animated.View>
-     {/* Welcome <Text style={{ color: '#5aaf57', fontFamily: 'PlusR' }}>{user.name.split(' ')[0]}</Text> */}
+     Welcome <Text style={{ color: '#5aaf57', fontFamily: 'PlusR' }}>{user.name.split(' ')[0]}</Text>
 
   </Animated.Text>
 </Animated.View>
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
 
 
         <View style={styles.cardContent}>
-          {/* <Text style={styles.name}>{user.name? user.name.split(' ')[0] : 'User'}</Text>  */}
+          <Text style={styles.name}>{user.name? user.name.split(' ')[0] : 'User'}</Text> 
           <Text style={styles.designation}>
             {user.designation?.name || 'No Designation'}
           </Text>
@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     zIndex: 10,
     elevation: 5,
+    // marginTop: 0,
     
   },
   headerTopRow: {
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   centerTextContainer: {
-    marginTop: HEADER_MIN_HEIGHT-10 ,
+      marginTop: Platform.OS === 'ios' ? HEADER_MIN_HEIGHT-10 : HEADER_MIN_HEIGHT-15 ,
   alignItems: 'center',
   // position: 'absolute',
   width: '100%',
@@ -258,13 +259,14 @@ const styles = StyleSheet.create({
     fontFamily:"PlusR"
   },
   svgicon:{
-    marginLeft:30,
-    right:10,
+    marginLeft:10,
+    right:-10,
+    marginTop: 40,
   },
  
   card: {
     position: 'absolute',
-    top: HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.1,
+    top: Platform.OS === 'ios' ?  HEADER_MAX_HEIGHT - CARD_HEIGHT / 1.2 : HEADER_MAX_HEIGHT - CARD_HEIGHT / 1,
     alignSelf: 'center',
     width: width * 0.80,
     height: CARD_HEIGHT,
@@ -297,12 +299,14 @@ const styles = StyleSheet.create({
     // borderColor: '#00AC88',
     // borderWidth: 2,
     resizeMode: 'cover',
+   
   },
   
   cardContent: {
     
-    marginLeft:20,
+    marginLeft:30,
     flexShrink: 1,
+    marginTop: 30,
   },
   ani: {
     ...StyleSheet.absoluteFillObject,
@@ -342,8 +346,9 @@ transform:[{scale:4.5}],
     color: '#196f3d',
   },
   scrollContent: {
-    paddingTop: HEADER_MAX_HEIGHT -160 ,
+     paddingTop: Platform.OS === 'ios' ? HEADER_MAX_HEIGHT -160 : HEADER_MAX_HEIGHT - 120 ,
     paddingBottom: 150,
+    // marginTop: -30,
     // borderWidth:1,
     
   },

@@ -28,29 +28,37 @@ const ViewUpEmp = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [employeeModalVisible, setEmployeeModalVisible] = useState(false);
   const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
   const Router = useRouter();
   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const data = await getAllEmployees();
-      const employeesWithPhotos = data.map((emp) => ({
-        id: emp.id.toString(),
-        usercode: emp.usercode,
-        name: emp.name,
-        department: emp.designation?.department?.department || "N/A",
-        email: emp.officialEmail || "N/A",
-        phone: emp.officialContact || "N/A",
-        gender: emp.gender,
-        age: emp.age,
-        category: emp.category?.category,
-        designation: emp.designation?.name || "N/A",
-        employeeType: emp.employeeType?.employeeType || "N/A",
-        employeeId: emp.employeeType?.id || "N/A",
-        pincode: emp.employeeAddress?.id || "N/A",
-        pic: emp.employeePic || "https://randomuser.me/api/portraits/lego/1.jpg",
-      }));
-      setEmployees(employeesWithPhotos);
+      try {
+        setLoading(true); // Start loading
+        const data = await getAllEmployees();
+        const employeesWithPhotos = data.map((emp) => ({
+          id: emp.id.toString(),
+          usercode: emp.usercode,
+          name: emp.name,
+          department: emp.designation?.department?.department || "N/A",
+          email: emp.officialEmail || "N/A",
+          phone: emp.officialContact || "N/A",
+          gender: emp.gender,
+          age: emp.age,
+          category: emp.category?.category,
+          designation: emp.designation?.name || "N/A",
+          employeeType: emp.employeeType?.employeeType || "N/A",
+          employeeId: emp.employeeType?.id || "N/A",
+          pincode: emp.employeeAddress?.id || "N/A",
+          pic: emp.employeePic || "https://randomuser.me/api/portraits/lego/1.jpg",
+        }));
+        setEmployees(employeesWithPhotos);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      } finally {
+        setLoading(false); // Stop loading
+      }
     };
     fetchEmployees();
   }, []);
@@ -128,6 +136,17 @@ const ViewUpEmp = () => {
     </TouchableOpacity>
   );
 
+  // Filter employees based on search query
+  const filteredEmployees = employees.filter((e) => {
+    const lowerCaseSearchQuery = searchQuery?.toLowerCase() || "";
+    const lowerCaseName = e.name?.toLowerCase() || "";
+    const lowerCaseDepartment = e.department?.toLowerCase() || "";
+    return (
+      lowerCaseName.includes(lowerCaseSearchQuery) ||
+      lowerCaseDepartment.includes(lowerCaseSearchQuery)
+    );
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -173,50 +192,60 @@ const ViewUpEmp = () => {
           </TouchableOpacity>
         )}
       </View>
-      <FlatList
-        data={employees.filter((e) => {
-          const lowerCaseSearchQuery = searchQuery?.toLowerCase() || "";
-          const lowerCaseName = e.name?.toLowerCase() || "";
-          const lowerCaseDepartment = e.department?.toLowerCase() || "";
-          return (
-            lowerCaseName.includes(lowerCaseSearchQuery) ||
-            lowerCaseDepartment.includes(lowerCaseSearchQuery)
-          );
-        })}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => onSelectEmployeeDetails(item)}
-          >
-            <Text style={styles.index}>{index + 1}</Text>
-            <View style={styles.imageWrapper}>
-              <Image
-                source={
-                  item.pic
-                    ? { uri: `data:image/jpeg;base64,${item.pic}` }
-                    : { uri: "https://randomuser.me/api/portraits/lego/1.jpg" }
-                }
-                style={styles.avatar}
+
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <LottieView
+            source={require('../../../../assets/svg/loader2.json')}
+            autoPlay
+            loop
+            style={styles.loader}
+          />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredEmployees}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              style={styles.item}
+              onPress={() => onSelectEmployeeDetails(item)}
+            >
+              <Text style={styles.index}>{index + 1}</Text>
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={
+                    item.pic
+                      ? { uri: `data:image/jpeg;base64,${item.pic}` }
+                      : { uri: "https://randomuser.me/api/portraits/lego/1.jpg" }
+                  }
+                  style={styles.avatar}
+                />
+              </View>
+              <View style={styles.nameDeptWrapper}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.department} numberOfLines={1}>
+                  {item.department}
+                </Text>
+              </View>
+              <Feather
+                name="edit"
+                size={20}
+                color="#5aaf57"
+                style={styles.icon}
+                onPress={() => navigateToEdit(item.id)}
               />
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No employees found</Text>
             </View>
-            <View style={styles.nameDeptWrapper}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.department} numberOfLines={1}>
-                {item.department}
-              </Text>
-            </View>
-            <Feather
-              name="edit"
-              size={20}
-              color="#5aaf57"
-              style={styles.icon}
-              onPress={() => navigateToEdit(item.id)}
-            />
-          </TouchableOpacity>
-        )}
-      />
+          }
+        />
+      )}
+
       <Modal
         visible={employeeModalVisible}
         transparent={true}
@@ -487,6 +516,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingBottom: 10,
+    marginTop: 10,
   },
   card: {
     flexDirection: "row",
@@ -515,6 +545,33 @@ const styles = StyleSheet.create({
     fontFamily: "PlusR",
     color: "#5aaf57",
     marginTop: 4,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Optional: Add a semi-transparent background
+  },
+  loader: {
+    width: 100,
+    height: 100,
+    transform: [{ scale: 1.5 }], // Adjust scale for better visibility
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#757575',
+    fontFamily: "PlusR",
   },
 });
 

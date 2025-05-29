@@ -182,7 +182,7 @@ const AttendanceCard = () => {
 const styles = StyleSheet.create({
   card: {
     width: width - 70,
-    height: height / 2.5,
+    height: height / 2.4,
     marginHorizontal: 14,
     backgroundColor: '#fff',
     borderRadius: 20,

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, ActivityIndicator, RefreshControl, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, ActivityIndicator, RefreshControl, Alert, StatusBar } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -260,6 +260,7 @@ const MonthlySalary = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+         
       {/* Header with Drawer Menu and Refresh Icon */}
       <View style={styles.headerContainer}>
         <TouchableOpacity

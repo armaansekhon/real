@@ -10,7 +10,8 @@ import {
   Platform,
   StatusBar,
   TouchableOpacity,
-  SafeAreaView
+  SafeAreaView,
+
 } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons'; // Icons!
 import LottieView from 'lottie-react-native';
@@ -82,6 +83,11 @@ const AdminDashboard = () => {
 
   return (
     <View style={styles.container}>
+            <StatusBar
+              barStyle="dark-content"
+              backgroundColor="transparent"
+              translucent
+            />
       {/* <StatusBar barStyle="light-content" backgroundColor="#00C897" translucent /> */}
       < LottieView
          source={require('../assets/svg/header.json')}
@@ -152,7 +158,7 @@ const AdminDashboard = () => {
           style={styles.avatar}
         />
         <View style={styles.cardContent}>
-          <Text style={styles.name}>John Doe</Text>
+          <Text style={styles.name}>Pisoft</Text>
           <Text style={styles.designation}>Senior Developer</Text>
           {/* <Text style={styles.details}>ID: EMP12345</Text> */}
         </View>
@@ -200,6 +206,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 35
   },
   centerTextContainer: {
     marginTop: Platform.OS === 'ios' ? HEADER_MIN_HEIGHT-10 : HEADER_MIN_HEIGHT-40 ,
@@ -213,7 +220,8 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 36,
     // fontWeight: '700',
-    fontFamily:"PlusR"
+    fontFamily:"PlusR",
+    marginTop: 23,
   },
  
   card: {
@@ -245,6 +253,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 65,
     height: 65,
+    marginTop: 30,
     borderRadius: 40,
     
     // borderColor: '#00AC88',
@@ -252,7 +261,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   cardContent: {
-    
+    marginTop: 20,
     marginLeft:30,
     flexShrink: 1,
   },

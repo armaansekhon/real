@@ -463,6 +463,7 @@ fontSize:18,
     fontSize: 32,
     fontFamily: "PlusR",
     marginBottom: 14,
+    marginTop: -10,
     color: '#222',
   },
   pageSubtitle: {

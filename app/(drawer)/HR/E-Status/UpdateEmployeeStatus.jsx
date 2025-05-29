@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 22,
     paddingTop: Platform.OS == "android" ? 20 : 60,
-    marginBottom: 30,
+    marginBottom: 20,
     backgroundColor: '#fff',
   },
 });

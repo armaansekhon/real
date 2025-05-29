@@ -50,7 +50,8 @@ export default function AdminAppointments() {
           }
         );
         const data = await response.json();
-        setAppointments(data);
+        // setAppointments(data);
+        setAppointments(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching appointments:', error);
         setAppointments([]);
@@ -130,6 +131,7 @@ export default function AdminAppointments() {
 const styles = StyleSheet.create({
   container: {
     padding: 12,
+    marginTop: 20,
     backgroundColor: '#fff',
     borderRadius: 20,
     margin: 16,

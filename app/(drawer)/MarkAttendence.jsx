@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: 'PlusSB',
-    marginTop:22,
+    marginTop:10,
     marginBottom: 7,
     color: '#5aaf57',
   },
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     fontFamily: 'PlusR',
   },
   menu: {
-   marginTop:50,
+   marginTop:10,
   },
 });
 

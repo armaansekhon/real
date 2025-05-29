@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 35,
     fontFamily: "PlusSB",
+    marginTop: -40,
     
   },
   headerSubTitle: {

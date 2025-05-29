@@ -376,6 +376,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     // elevation: 4,
     zIndex: 10,
+    marginTop: -10,
   },
   headerRow: {
     flexDirection: "row",

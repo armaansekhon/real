@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingBottom: 10,
+    marginTop: 10,
   },
   headerContent: {
     flexDirection: 'row',
@@ -85,6 +86,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 33,
     fontFamily: 'PlusSB',
+    marginTop: -25,
   },
   greenText: {
     color: '#5aaf57',

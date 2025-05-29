@@ -6,12 +6,13 @@ import Malelogo from "../../../assets/svg/loguser.svg";
 import { LinearGradient } from 'expo-linear-gradient';
 import useLogin from '../../../hooks/useLogin';
 import { useRouter } from 'expo-router';
-
+import { useNavigation } from 'expo-router';
 
 const { width } = Dimensions.get("screen");
 const Router=useRouter();
 
 const Profile = () => {
+    const navigation = useNavigation();
   const { user, img } = useUser() || {};
   const {logout,loading}=useLogin();
   console.log(user)
@@ -72,7 +73,10 @@ const handleLogout=()=>{
     <SafeAreaView style={Styles.container}>
       {/* Header */}
       <View style={Styles.header}>
-        <Ionicons name="menu" size={24} color="black" />
+              <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                <Ionicons name="menu" size={26} color="black" />
+              </TouchableOpacity>
+        
         <Text style={Styles.title}>User  <Text style={{color:"#5aaf57"}}>Profile</Text> </Text>
       </View>
 
@@ -147,6 +151,7 @@ const Styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     marginBottom: 20,
+    marginTop: 30,
   },
   title: {
     marginTop: 15,
@@ -169,9 +174,11 @@ const Styles = StyleSheet.create({
   cardWrapper: {
     alignItems: 'center',
     marginBottom: 20,
+    marginTop: -20,
+
   },
   card: {
-    width: width * 0.75,
+    width: width * 0.83,
     height: 100,
     borderRadius: 12,
     paddingLeft: 50,
@@ -192,7 +199,7 @@ const Styles = StyleSheet.create({
   },
   profileImageContainer: {
     position: 'absolute',
-    left: 20,
+    left: 5,
     top: 15,
     backgroundColor: 'white',
     borderRadius: 60,
@@ -221,7 +228,8 @@ const Styles = StyleSheet.create({
   },
   infoSection: {
 
-    alignSelf:"center"
+    alignSelf:"center",
+    marginRight: -40,
   },
   name: {
     color: '#fff',
